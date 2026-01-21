@@ -52,8 +52,8 @@ modifier: Modifier
             shape = RoundedCornerShape(15.dp)
         )
             .border(
-                width = 1.dp,
-                color = Color.LightGray,
+                width = 1.5.dp,
+                color =  CustomColors.OffWhite,
                 shape = RoundedCornerShape(15.dp)
             )
     ){

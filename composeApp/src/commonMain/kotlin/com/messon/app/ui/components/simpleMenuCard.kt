@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,7 +43,6 @@ fun SimpleCard(
     modifier: Modifier,
     shortDay: String
 ){
-    var isExpanded by remember{mutableStateOf(false)}
     Box(
         modifier = modifier.fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -58,6 +56,10 @@ fun SimpleCard(
                 color = Color.LightGray,
                 shape = RoundedCornerShape(15.dp)
             )
+            .clip(RoundedCornerShape(15.dp))
+            .clickable{
+                getIsExpanded()
+            }
 
     ){
         ConstraintLayout(modifier = Modifier.fillMaxSize()){
@@ -111,9 +113,7 @@ fun SimpleCard(
                     }
                     .padding(horizontal = 8.dp)
                     .clip(CircleShape)
-                    .clickable{
-                        getIsExpanded()
-                    }
+
             )
         }
     }

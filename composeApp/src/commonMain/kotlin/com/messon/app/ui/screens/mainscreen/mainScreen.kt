@@ -117,10 +117,6 @@ fun ContentScreen(
         0->HomeScreen(
             modifier = modifier,
             onBellIconClick = {},
-            gradientColors =listOf(
-                Color(0xFF2274A5),
-                Color(0xFFC99700),
-            ),
             studentName = "Akash"
         )
         1->MenuScreen(

@@ -1,6 +1,11 @@
 package com.messon.app.ui.screens.mainscreen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -136,7 +141,13 @@ fun MenuScreen(
 
                 AnimatedContent(
                     targetState = isExpanded,
-                    label = "ExpandCollapse"
+                    label = "ExpandCollapse",
+                    transitionSpec =
+                        {
+                            (fadeIn(animationSpec = tween(350, delayMillis = 100)) +
+                                    scaleIn(initialScale = 0.92f, animationSpec = tween(350, delayMillis = 100)))
+                                .togetherWith(fadeOut(animationSpec = tween(150)))
+                        }
                 ) { expanded ->
 
                     if (!expanded) {

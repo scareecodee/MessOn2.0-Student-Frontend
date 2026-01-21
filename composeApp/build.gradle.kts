@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 
-    kotlin("plugin.serialization") version "1.9.10"
+    alias(libs.plugins.kotlin.serialization)
 
 }
 
@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.koin.android)
 
             implementation(libs.koin.compose)
+
+            implementation(libs.ktor.client.okhttp)
 
 
         }
@@ -64,6 +66,9 @@ kotlin {
 
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
+            implementation("io.github.alexzhirkevich:qrose:1.0.1")
+
+            implementation("co.touchlab:kermit:2.0.8")
 
 
         }
