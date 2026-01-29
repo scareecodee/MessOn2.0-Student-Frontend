@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
@@ -35,7 +33,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.app.utils.CustomColors
+import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -44,7 +42,8 @@ import tech.annexflow.constraintlayout.compose.ConstraintLayout
 
 @Composable
 fun AnalyticsTab(
-modifier: Modifier
+modifier: Modifier,
+isClickable: Boolean
 ){
     Box(
         modifier = modifier.background(
@@ -65,16 +64,19 @@ modifier: Modifier
                 title ="Breakfast",
                 color = CustomColors.RichCerulean,
                 days = listOf(),
+                isClickable = isClickable
             )
             EachAnalyticsItem(
                 title = "Lunch",
                 color = CustomColors.HoneyBronze,
                 days = listOf(),
+                isClickable = isClickable
             )
             EachAnalyticsItem(
                 title = "Dinner",
                 color = CustomColors.BlackberryCream,
                 days = listOf(),
+                isClickable = isClickable
             )
         }
     }
@@ -88,7 +90,8 @@ fun EachAnalyticsItem(
     title: String,
     color: Color,
     numbOfMealsConsumed: Int=90,
-    days: List<String>
+    days: List<String>,
+    isClickable: Boolean
 ){
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -157,7 +160,7 @@ fun EachAnalyticsItem(
                     top.linkTo(parent.top)
                 }
                     .clip(CircleShape)
-                    .clickable{
+                    .clickable(isClickable){
                         isExpanded=!isExpanded
                     }
             )

@@ -1,15 +1,10 @@
 package com.messon.app.ui.screens.mainscreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -28,9 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.messon.app.domain.dataModels.NavItem
 import com.messon.app.domain.dataModels.User
-import com.messon.app.utils.CustomColors
+import com.messon.app.theme.CustomColors
+import com.messon.app.utils.Screen
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.home
 import messon.composeapp.generated.resources.menu
@@ -40,7 +37,9 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun MainScreen(){
+fun MainScreen(
+    navController: NavController
+){
     var selectedItemIndex by remember { mutableStateOf(0) }
     val navItemList=listOf<NavItem>(
         NavItem(icon = Res.drawable.home,"Home"),
@@ -76,7 +75,7 @@ fun MainScreen(){
                             disabledTextColor = Color.Black
 
                         ),
-                        onClick = {
+                        onClick= {
                             selectedItemIndex=index
                         },
                         selected = selectedItemIndex==index,
@@ -102,7 +101,8 @@ fun MainScreen(){
     ) {innerPadding->
         ContentScreen(
             modifier = Modifier.padding(top = 0.dp, bottom = innerPadding.calculateBottomPadding()),
-            selectedScreenIndex=selectedItemIndex
+            selectedScreenIndex=selectedItemIndex,
+            navController=navController
         )
     }
 }
@@ -111,13 +111,19 @@ fun MainScreen(){
 @Composable
 fun ContentScreen(
     modifier: Modifier,
-    selectedScreenIndex: Int
+    selectedScreenIndex: Int,
+    navController: NavController
 ){
     when(selectedScreenIndex){
         0->HomeScreen(
             modifier = modifier,
             onBellIconClick = {},
-            studentName = "Akash"
+            studentName = "Akash",
+            onComplaintClick ={
+                navController.navigate(Screen.RegisterComplainScreen.route){
+                    launchSingleTop=true
+                }
+            }
         )
         1->MenuScreen(
             modifier = modifier

@@ -70,6 +70,9 @@ kotlin {
 
             implementation("co.touchlab:kermit:2.0.8")
 
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.1")
+
+
 
         }
         commonTest.dependencies {

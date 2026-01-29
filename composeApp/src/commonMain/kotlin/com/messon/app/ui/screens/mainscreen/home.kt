@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,15 +39,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.app.ui.components.AnalyticsTab
 import com.messon.app.ui.components.CardHomeScreen
 import com.messon.app.ui.components.ComplaintBox
 import com.messon.app.ui.components.CouponCard
-import com.messon.app.utils.CustomColors
+import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -54,18 +58,43 @@ import org.jetbrains.compose.resources.Font
 import tech.annexflow.constraintlayout.compose.ConstraintLayout
 import tech.annexflow.constraintlayout.compose.Dimension
 import co.touchlab.kermit.Logger
+import com.messon.app.utils.getCurrentDate
+import com.messon.app.utils.getCurrentDay
 
 @Composable
 fun HomeScreen(
     modifier: Modifier,
     onBellIconClick:()-> Unit,
-    studentName:String
+    studentName:String,
+    onComplaintClick:()->Unit
 ){
+    val dayWithDate = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                color = CustomColors.RichCerulean,
+                fontSize = 23.5.sp
+            )
+        ) {
+            append(getCurrentDay())
+            append(",")
+        }
+
+        withStyle(
+            style = SpanStyle(
+                color = Color.Black,
+                fontSize = 14.5.sp
+            )
+        ) {
+            append(getCurrentDate())
+        }
+    }
+
 
     val Log = Logger.withTag("CMP_LOG")
 
     var clickedCardIndex by remember{ mutableIntStateOf(-1) }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        val screenHeight=maxHeight
         ConstraintLayout(
             modifier = modifier.fillMaxSize()
                 .blur(if (clickedCardIndex != -1) 2.5.dp else 0.dp)
@@ -103,7 +132,9 @@ fun HomeScreen(
                         shape = CircleShape
                     )
                     .clip(CircleShape)
-                    .clickable{
+                    .clickable(
+                        enabled = clickedCardIndex==-1
+                    ){
                         onBellIconClick()
                     }
             ){
@@ -148,15 +179,15 @@ fun HomeScreen(
             )
 
             Text(
-                text ="Today’s Date",
-                fontSize = 24.sp,
-                color = CustomColors.RichCerulean,
+                text =dayWithDate ,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                 modifier = Modifier.constrainAs(todaysDateRef){
                     start.linkTo(parent.start, margin = 20.dp)
                     top.linkTo(whiteBoxRef.top)
                 }
-                    .padding(top = 28.dp, bottom = 20.dp)
+                    .padding(top = 28.dp, bottom = 20.dp, end = 10.dp)
 
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -275,6 +306,7 @@ fun HomeScreen(
 
                 item {
                     AnalyticsTab(
+                        isClickable =clickedCardIndex==-1,
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
                     )
@@ -282,9 +314,10 @@ fun HomeScreen(
 
                 item {
                     ComplaintBox(
+                        isClickable=clickedCardIndex == -1,
                         modifier = Modifier
                             .padding(vertical = 20.dp, horizontal = 15.dp),
-                        onComplaintClick = {}
+                        onComplaintClick = onComplaintClick
                     )
                 }
             }
@@ -297,8 +330,9 @@ fun HomeScreen(
             CallCouponCard(
                 onCloseBtnClick ={ clickedCardIndex=-1},
                 data = "heyy",
-                modifier = Modifier,
-                clickedCardIndex = clickedCardIndex
+                modifier = Modifier.height(screenHeight*0.45f),
+                clickedCardIndex = clickedCardIndex,
+                currentDate = getCurrentDate()
             )
         }
     }
@@ -308,6 +342,7 @@ fun HomeScreen(
 
 @Composable
 fun CallCouponCard(
+    currentDate:String,
     onCloseBtnClick:()-> Unit,
     data: String,
     clickedCardIndex:Int=-1,
@@ -317,7 +352,7 @@ fun CallCouponCard(
         0->CouponCard(
             modifier = modifier,
             mealSlot = "Breakfast",
-            date="Today day",
+            date=currentDate,
             borderColor = CustomColors.RichCerulean,
             containerColor = Color(0xFFF5F8FA),
             data =data,
@@ -326,7 +361,7 @@ fun CallCouponCard(
         1->CouponCard(
             modifier = modifier,
             mealSlot = "Lunch",
-            date="Today day",
+            date=currentDate,
             borderColor = CustomColors.HoneyBronze,
             containerColor = Color(0xFFFFFBF4),
             data =data,
@@ -336,7 +371,7 @@ fun CallCouponCard(
             CouponCard(
                 modifier = modifier,
                 mealSlot = "Dinner",
-                date="Today day",
+                date=currentDate,
                 borderColor = CustomColors.BlackberryCream,
                 containerColor =Color(0xFFF6F5F7),
                 data =data,

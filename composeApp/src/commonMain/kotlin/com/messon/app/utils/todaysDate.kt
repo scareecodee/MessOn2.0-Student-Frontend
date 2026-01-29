@@ -3,7 +3,7 @@ package com.messon.app.utils
 import kotlinx.datetime.*
 import kotlin.time.Clock
 
-fun getTodayFormatted(): String {
+fun getCurrentDay(): String {
     val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     val dayOfWeek = when (today.dayOfWeek) {
@@ -15,6 +15,14 @@ fun getTodayFormatted(): String {
         DayOfWeek.SATURDAY -> "Saturday"
         DayOfWeek.SUNDAY -> "Sunday"
     }
+
+
+    return dayOfWeek
+}
+
+
+fun getCurrentDate(): String{
+    val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
     val month = when (today.monthNumber) {
         1 -> "Jan"
@@ -32,5 +40,7 @@ fun getTodayFormatted(): String {
         else -> ""
     }
 
-    return "$dayOfWeek, ${today.dayOfMonth} $month ${today.year}"
+    return " ${today.dayOfMonth} $month ${today.year}"
 }
+
+

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.app.utils.CustomColors
+import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
@@ -30,7 +30,8 @@ import tech.annexflow.constraintlayout.compose.ConstraintLayout
 @Composable
 fun ComplaintBox(
     modifier: Modifier,
-    onComplaintClick:()-> Unit
+    onComplaintClick:()-> Unit,
+    isClickable: Boolean
 ){
     Box(
         modifier = modifier.height(60.dp)
@@ -44,7 +45,7 @@ fun ComplaintBox(
                 shape = RoundedCornerShape(10.dp)
             )
             .clip(RoundedCornerShape(10.dp))
-            .clickable{
+            .clickable(isClickable){
                 onComplaintClick()
             }
     ){

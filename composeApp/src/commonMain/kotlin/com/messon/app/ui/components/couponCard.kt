@@ -46,8 +46,7 @@ fun CouponCard(
         shape = RoundedCornerShape(30.dp),
         modifier = modifier
             .fillMaxWidth()
-            .height(320.dp)
-            .padding(horizontal =50.dp)
+            .padding(horizontal =40.dp)
             .border(
                 width = 2.dp,
                 color = borderColor,
@@ -73,7 +72,7 @@ fun CouponCard(
 
             Spacer(modifier = Modifier.size(5.dp))
             QrCode(
-                modifier = Modifier.size(140.dp),
+                modifier = Modifier.size(160.dp),
                 data = data,
                 logo = logo
             )

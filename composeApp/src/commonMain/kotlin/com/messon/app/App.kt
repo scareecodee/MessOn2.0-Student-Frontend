@@ -18,7 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.messon.app.ui.components.QrCode
+import com.messon.app.ui.navigation.AppNav
+import com.messon.app.ui.screens.auth.SignInScreen
 import com.messon.app.ui.screens.mainscreen.HomeScreen
 import com.messon.app.ui.screens.mainscreen.MainScreen
 import org.jetbrains.compose.resources.painterResource
@@ -31,13 +34,9 @@ import messon.composeapp.generated.resources.person
 @Preview
 fun App() {
     MaterialTheme {
-        MainScreen()
-//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-//            QrCode(
-//                modifier = Modifier.size(100.dp),
-//                data = "sundram",
-//                logo = painterResource(Res.drawable.person)
-//            )
-//        }
+        val navController=rememberNavController()
+        AppNav(
+            navController=navController
+        )
     }
 }
