@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "499767546987",
+    "project_id": "messon-mess",
+    "storage_bucket": "messon-mess.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499767546987:android:478952e1490c110585cd2e",
+        "android_client_info": {
+          "package_name": "com.messon.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "499767546987-3e1injun6o6idqalv2b6chj0aih3f99k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.messon.app",
+            "certificate_hash": "cc19d8f87ce1215dc8b4f85ed854ceae5ce4dd2c"
+          }
+        },
+        {
+          "client_id": "499767546987-i0cdk28trnaq3rd6gd0mmd4ro0g8hsnb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxnQ2Fc27T4tWCeNTGz-CqnH2l0cwzvRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "499767546987-i0cdk28trnaq3rd6gd0mmd4ro0g8hsnb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

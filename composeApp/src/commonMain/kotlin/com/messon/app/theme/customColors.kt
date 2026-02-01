@@ -10,8 +10,8 @@ object CustomColors{
 
     val OffWhite=Color(0xFFF8F8F8)
 
-
-
-
+    val LightBlue = Color(0xFFE9F2F6)
+    val Cream = Color(0xFFFFF7EA)
+    val LightLavender = Color(0xFFF7F3FA)
 
 }

@@ -1,4 +1,4 @@
-package com.messon.app.ui.components
+package com.messon.app.presentation.ui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

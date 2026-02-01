@@ -1,12 +1,14 @@
 package com.messon.app.utils
 
-import kotlinx.datetime.*
-import kotlin.time.Clock
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.DayOfWeek
 
 fun getCurrentDay(): String {
     val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-
-    val dayOfWeek = when (today.dayOfWeek) {
+    return when (today.dayOfWeek) {
         DayOfWeek.MONDAY -> "Monday"
         DayOfWeek.TUESDAY -> "Tuesday"
         DayOfWeek.WEDNESDAY -> "Wednesday"
@@ -15,15 +17,10 @@ fun getCurrentDay(): String {
         DayOfWeek.SATURDAY -> "Saturday"
         DayOfWeek.SUNDAY -> "Sunday"
     }
-
-
-    return dayOfWeek
 }
 
-
-fun getCurrentDate(): String{
+fun getCurrentDate(): String {
     val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-
     val month = when (today.monthNumber) {
         1 -> "Jan"
         2 -> "Feb"
@@ -39,8 +36,5 @@ fun getCurrentDate(): String{
         12 -> "Dec"
         else -> ""
     }
-
     return " ${today.dayOfMonth} $month ${today.year}"
 }
-
-

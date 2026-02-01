@@ -1,4 +1,4 @@
-package com.messon.app.ui.screens.mainscreen
+package com.messon.app.presentation.ui.screens.mainscreen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -26,8 +26,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.app.domain.dataModels.DayWiseMenu
-import com.messon.app.ui.components.ExpandedMenuCard
-import com.messon.app.ui.components.SimpleCard
+import com.messon.app.presentation.ui.components.ExpandedMenuCard
+import com.messon.app.presentation.ui.components.SimpleCard
 import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -126,7 +126,7 @@ fun MenuScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             modifier= Modifier.constrainAs(listRef){
                 top.linkTo(headingRef.bottom, margin = 25.dp)
-                bottom.linkTo(parent.bottom)
+                bottom.linkTo(parent.bottom, margin = 5.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 height= Dimension.fillToConstraints

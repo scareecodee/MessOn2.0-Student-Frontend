@@ -1,4 +1,4 @@
-package com.messon.app.ui.screens.mainscreen
+package com.messon.app.presentation.ui.screens.mainscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,8 +28,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.domain.dataModels.User
-import com.messon.app.ui.components.EachItemProfileScreen
+import com.messon.app.presentation.ui.components.EachItemProfileScreen
 import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.intersemibold
@@ -48,7 +50,7 @@ fun ProfileScreen(
     modifier: Modifier,
     onNotificationClick:()->Unit={},
     onAboutUsClick:()->Unit={},
-    onLogoutClick:()->Unit={}
+    onLogoutClick:()->Unit={},
 ){
 
     ConstraintLayout(
@@ -85,15 +87,16 @@ fun ProfileScreen(
                 .background(color = Color.White, shape = CircleShape)
                 .border(width = 2.dp, color = CustomColors.RichCerulean, shape = CircleShape)
         ){
-            Image(
-                modifier = Modifier.padding(10.dp)
-                    .size(100.dp)
+            AsyncImage(
+                model = user.profileImg,
+//                error = painterResource(Res.drawable.error),
+                contentDescription = "profile imagae",
+                modifier = Modifier .padding(10.dp)
+                    .size(80.dp)
                     .clip(CircleShape)
 
-                ,
-                contentScale = ContentScale.Crop,
-                painter = painterResource(Res.drawable.person),
-                contentDescription = "profile image",
+//                fallback = painterResource(Res.drawable.default_avatar),
+              ,  contentScale = ContentScale.Crop
             )
         }
 
@@ -101,7 +104,7 @@ fun ProfileScreen(
         Text(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            text = user.name,
+            text = user.name?:"",
             fontSize = 16.sp,
             fontFamily = FontFamily(Font(Res.font.intersemibold)),
             modifier= Modifier.constrainAs(nameRef){

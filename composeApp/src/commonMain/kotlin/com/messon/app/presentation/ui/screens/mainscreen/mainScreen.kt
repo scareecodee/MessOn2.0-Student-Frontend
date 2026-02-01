@@ -1,4 +1,4 @@
-package com.messon.app.ui.screens.mainscreen
+package com.messon.app.presentation.ui.screens.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.domain.dataModels.NavItem
 import com.messon.app.domain.dataModels.User
 import com.messon.app.theme.CustomColors
@@ -38,7 +40,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun MainScreen(
-    navController: NavController
+    navController: NavController,
+    authSecureStorage: AuthSecureStorage
 ){
     var selectedItemIndex by remember { mutableStateOf(0) }
     val navItemList=listOf<NavItem>(
@@ -102,7 +105,8 @@ fun MainScreen(
         ContentScreen(
             modifier = Modifier.padding(top = 0.dp, bottom = innerPadding.calculateBottomPadding()),
             selectedScreenIndex=selectedItemIndex,
-            navController=navController
+            navController=navController,
+            authSecureStorage =authSecureStorage
         )
     }
 }
@@ -112,28 +116,41 @@ fun MainScreen(
 fun ContentScreen(
     modifier: Modifier,
     selectedScreenIndex: Int,
-    navController: NavController
-){
+    navController: NavController,
+    authSecureStorage: AuthSecureStorage
+) {
+    var name by remember { mutableStateOf<String?>(null) }
+    var email by remember { mutableStateOf<String?>(null) }
+    var profileImg by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        name = authSecureStorage.getName()
+        email = authSecureStorage.getEmail()
+        profileImg = authSecureStorage.getPicture()
+    }
+
     when(selectedScreenIndex){
-        0->HomeScreen(
+        0 -> HomeScreen(
             modifier = modifier,
-            onBellIconClick = {},
+            onBellIconClick = {
+                navController.navigate(Screen.NotificationScreen.route){
+                    launchSingleTop = true
+                }
+            },
             studentName = "Akash",
             onComplaintClick ={
                 navController.navigate(Screen.RegisterComplainScreen.route){
-                    launchSingleTop=true
+                    launchSingleTop = true
                 }
             }
         )
-        1->MenuScreen(
-            modifier = modifier
-        )
-        2->ProfileScreen(
+        1 -> MenuScreen(modifier = modifier)
+        2 -> ProfileScreen(
             modifier = modifier,
             user = User(
-                name = "Sundram Kumar",
-                mailId = "abc@gmail.com",
-                profileImg = "jnjkdjdnj"
+                name = name ?: "",
+                mailId = email ?: "",
+                profileImg = profileImg ?: ""
             )
         )
     }

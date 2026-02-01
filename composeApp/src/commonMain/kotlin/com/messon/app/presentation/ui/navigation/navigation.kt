@@ -1,36 +1,64 @@
-package com.messon.app.ui.navigation
+package com.messon.app.presentation.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.messon.app.ui.screens.auth.SignInScreen
-import com.messon.app.ui.screens.mainscreen.MainScreen
-import com.messon.app.ui.screens.mainscreen.RegisterComplaintScreen
+import com.messon.app.domain.auth.AuthSecureStorage
+import com.messon.app.presentation.ui.screens.auth.SignInRoute
+import com.messon.app.presentation.ui.screens.mainscreen.MainScreen
+import com.messon.app.presentation.ui.screens.mainscreen.NotificationScreen
+import com.messon.app.presentation.ui.screens.mainscreen.RegisterComplaintScreen
+import com.messon.app.presentation.viewmodel.AuthViewModel
 import com.messon.app.utils.Screen
 import com.messon.app.theme.enterLeft
 import com.messon.app.theme.exitRight
 
 @Composable
 fun AppNav(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: AuthViewModel,
+    authSecureStorage: AuthSecureStorage
 ){
+    var sessionChecked by remember { mutableStateOf(false) }
+    var isSessionValid by remember{ mutableStateOf(false) }
+
+    LaunchedEffect(Unit){
+        isSessionValid=authSecureStorage.isSessionValid()
+        sessionChecked=true
+    }
+
+    if(!sessionChecked)
+    {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            CircularProgressIndicator()
+        }
+        return
+    }
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = if(isSessionValid) Screen.MainScreen.route else Screen.LoginScreen.route
     ){
         composable(
             route = Screen.LoginScreen.route,
             enterTransition = enterLeft,
             exitTransition = exitRight
         ) {
-            SignInScreen(
-                modifier = Modifier,
-                onBtnClick = {
-                    navController.navigate(Screen.MainScreen.route)
-                }
+            SignInRoute(
+                viewModel = viewModel,
+                onLoginSuccess = { navController.navigate(Screen.MainScreen.route) }
             )
+
         }
         composable(
             route=Screen.MainScreen.route,
@@ -38,7 +66,8 @@ fun AppNav(
             exitTransition = exitRight
         ) {
             MainScreen(
-                navController = navController
+                navController = navController,
+                authSecureStorage = authSecureStorage
             )
         }
 
@@ -56,6 +85,15 @@ fun AppNav(
             )
         }
 
-
+        composable(
+            route=Screen.NotificationScreen.route,
+            enterTransition = enterLeft,
+            exitTransition = exitRight
+        ) {
+            NotificationScreen(modifier = Modifier,
+                onMarkAsReadBtnClick = {},
+                onBackBtnClick = {navController.navigate(Screen.MainScreen.route)}
+            )
+        }
     }
 }

@@ -2,14 +2,15 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
+    id("org.jetbrains.kotlin.multiplatform")
+    id("com.android.application")
+    id("org.jetbrains.compose")
 
-    alias(libs.plugins.kotlin.serialization)
-
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.native.cocoapods")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
+
 
 kotlin {
     androidTarget {
@@ -27,6 +28,19 @@ kotlin {
             isStatic = true
         }
     }
+
+    cocoapods {
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        pod("GoogleSignIn")
+    }
     
     sourceSets {
         androidMain.dependencies {
@@ -37,6 +51,16 @@ kotlin {
             implementation(libs.koin.compose)
 
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android)
+
+
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation(libs.googleid)
+            implementation(libs.play.services.auth)
+
+            implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
 
 
         }
@@ -56,33 +80,40 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.encoding)
 
-//            implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+            implementation("io.coil-kt.coil3:coil-compose:3.3.0")
 
             implementation("tech.annexflow.compose:constraintlayout-compose-multiplatform:0.5.1-shaded")
 
-            implementation(libs.koin.core)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.lifecycle.viewmodel)
+            implementation(libs.navigation.compose)
 
             implementation(compose.materialIconsExtended)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
             implementation("io.github.alexzhirkevich:qrose:1.0.1")
 
             implementation("co.touchlab:kermit:2.0.8")
 
-            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.1")
+            //toast
+            implementation("network.chaintech:cmptoast:1.0.8")
 
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
 
 
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.koin.test)
 
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+
 
 
         }

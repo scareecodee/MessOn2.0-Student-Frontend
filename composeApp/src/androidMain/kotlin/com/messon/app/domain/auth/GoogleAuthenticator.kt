@@ -1,4 +1,4 @@
-package com.messon.app.domain
+package com.messon.app.domain.auth
 
 import android.content.Context
 import android.util.Log
@@ -9,7 +9,6 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.messon.app.domain.auth.GoogleAuth
 import com.messon.app.utils.Result
 import com.messon.app.utils.NetworkError
 import kotlinx.coroutines.withTimeout

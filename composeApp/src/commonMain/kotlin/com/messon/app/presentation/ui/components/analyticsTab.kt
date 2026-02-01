@@ -1,4 +1,4 @@
-package com.messon.app.ui.components
+package com.messon.app.presentation.ui.components
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState

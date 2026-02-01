@@ -1,4 +1,4 @@
-package com.messon.app.ui.screens.mainscreen
+package com.messon.app.presentation.ui.screens.mainscreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -46,10 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.app.ui.components.AnalyticsTab
-import com.messon.app.ui.components.CardHomeScreen
-import com.messon.app.ui.components.ComplaintBox
-import com.messon.app.ui.components.CouponCard
 import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
@@ -58,6 +54,10 @@ import org.jetbrains.compose.resources.Font
 import tech.annexflow.constraintlayout.compose.ConstraintLayout
 import tech.annexflow.constraintlayout.compose.Dimension
 import co.touchlab.kermit.Logger
+import com.messon.app.presentation.ui.components.AnalyticsTab
+import com.messon.app.presentation.ui.components.CardHomeScreen
+import com.messon.app.presentation.ui.components.ComplaintBox
+import com.messon.app.presentation.ui.components.CouponCard
 import com.messon.app.utils.getCurrentDate
 import com.messon.app.utils.getCurrentDay
 
@@ -328,7 +328,7 @@ fun HomeScreen(
             exit = fadeOut() + scaleOut()
         ) {
             CallCouponCard(
-                onCloseBtnClick ={ clickedCardIndex=-1},
+                onCloseBtnClick ={ clickedCardIndex=-1 },
                 data = "heyy",
                 modifier = Modifier.height(screenHeight*0.45f),
                 clickedCardIndex = clickedCardIndex,
@@ -358,7 +358,7 @@ fun CallCouponCard(
             data =data,
             onCloseBtnClick = onCloseBtnClick
             )
-        1->CouponCard(
+        1-> CouponCard(
             modifier = modifier,
             mealSlot = "Lunch",
             date=currentDate,
