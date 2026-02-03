@@ -26,12 +26,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.messon.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
@@ -58,16 +62,25 @@ import com.messon.app.presentation.ui.components.AnalyticsTab
 import com.messon.app.presentation.ui.components.CardHomeScreen
 import com.messon.app.presentation.ui.components.ComplaintBox
 import com.messon.app.presentation.ui.components.CouponCard
+import com.messon.app.presentation.viewmodel.CouponViewModel
+import com.messon.app.utils.CouponState
 import com.messon.app.utils.getCurrentDate
 import com.messon.app.utils.getCurrentDay
+import multiplatform.network.cmptoast.ToastDuration
+import multiplatform.network.cmptoast.ToastGravity
+import multiplatform.network.cmptoast.showToast
 
 @Composable
 fun HomeScreen(
     modifier: Modifier,
     onBellIconClick:()-> Unit,
     studentName:String,
-    onComplaintClick:()->Unit
+    onComplaintClick:()->Unit,
+    couponViewModel: CouponViewModel
 ){
+
+    var clickedCardIndex by remember{ mutableIntStateOf(-1) }
+    val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
     val dayWithDate = buildAnnotatedString {
         withStyle(
             style = SpanStyle(
@@ -89,10 +102,13 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(uiState) {
+        if (uiState is CouponState.Error) {
+            clickedCardIndex=-1
+            showToast((uiState as CouponState.Error).message)
+        }
+    }
 
-    val Log = Logger.withTag("CMP_LOG")
-
-    var clickedCardIndex by remember{ mutableIntStateOf(-1) }
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
         val screenHeight=maxHeight
         ConstraintLayout(
@@ -233,10 +249,9 @@ fun HomeScreen(
                                 borderColor = CustomColors.RichCerulean,
                                 containerColor = Color(0xFFF5F8FA),
                                 mealSlot = "Breakfast",
-                                dishes = listOf(""),
                                 onCardClick = {
                                     clickedCardIndex=0
-                                    Log.d(tag = "card clicked", message ={"0"})
+                                   couponViewModel.onCouponClick(mealSlot ="breakfast")
                                 }
                             )
                         }
@@ -246,10 +261,9 @@ fun HomeScreen(
                                 borderColor = CustomColors.HoneyBronze,
                                 containerColor =Color(0xFFFFFBF4),
                                 mealSlot = "Lunch",
-                                dishes = listOf(""),
                                 onCardClick = {
                                     clickedCardIndex=1
-                                    Log.d(tag = "card clicked", message ={"1"})
+                                    couponViewModel.onCouponClick(mealSlot ="lunch")
                                 }
                             )
                         }
@@ -259,10 +273,9 @@ fun HomeScreen(
                                 borderColor = CustomColors.BlackberryCream,
                                 containerColor =Color(0xFFF6F5F7),
                                 mealSlot = "Dinner",
-                                dishes = listOf(""),
                                 onCardClick = {
                                     clickedCardIndex=2
-                                    Log.d(tag = "card clicked", message ={"2"})
+                                    couponViewModel.onCouponClick(mealSlot ="dinner")
                                 }
                             )
                         }
@@ -322,21 +335,38 @@ fun HomeScreen(
                 }
             }
         }
-        AnimatedVisibility(
-            visible = clickedCardIndex!=-1,
-            enter = fadeIn(tween(easing = LinearOutSlowInEasing)) + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            CallCouponCard(
-                onCloseBtnClick ={ clickedCardIndex=-1 },
-                data = "heyy",
-                modifier = Modifier.height(screenHeight*0.45f),
-                clickedCardIndex = clickedCardIndex,
-                currentDate = getCurrentDate()
-            )
-        }
-    }
+        when (uiState) {
 
+            CouponState.Idle -> Unit
+
+            CouponState.Loading -> {
+                CircularProgressIndicator()
+            }
+
+            is CouponState.Success -> {
+                val data = (uiState as CouponState.Success).couponDetail.toString()
+                AnimatedVisibility(
+                    visible = clickedCardIndex != -1,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    CallCouponCard(
+                        onCloseBtnClick = {
+                            clickedCardIndex = -1
+                                          },
+                        data = data,
+                        modifier = Modifier.height(screenHeight * 0.45f),
+                        clickedCardIndex = clickedCardIndex,
+                        currentDate = getCurrentDate()
+                    )
+                }
+            }
+
+            is CouponState.Error-> Unit
+        }
+
+
+    }
     }
 
 

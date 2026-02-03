@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import co.touchlab.kermit.Logger
-import com.messon.app.data.remote.dto.LoginResponseDto
+import com.messon.app.domain.dataModels.LoginResponse
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
@@ -26,7 +26,7 @@ actual class AuthSecureStorage(
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    actual suspend fun saveLogin(response: LoginResponseDto) {
+    actual suspend fun saveLogin(response: LoginResponse) {
         Log.d(
             tag = "savedOnDisk", message = {response.toString()}
         )
@@ -34,9 +34,9 @@ actual class AuthSecureStorage(
             clear()
             putString("access_token", response.accessToken)
             putString("token_type", response.tokenType)
-            putString("email", response.user.email)
+            putString("email", response.user.mailId)
             putString("name", response.user.name)
-            putString("picture", response.user.picture)
+            putString("picture", response.user.profileImg)
             putString("expires_at", response.expiresIn)
             putString("id", response.user.id)
             apply()

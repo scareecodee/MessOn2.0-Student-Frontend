@@ -1,5 +1,7 @@
 package com.messon.app.di
 
+import android.content.Context
+import com.messon.app.core.AppDispatchers
 import com.messon.app.data.remote.network.createHttpClient
 import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.domain.auth.GoogleAuth
@@ -11,6 +13,7 @@ actual val platformModule = module {
 
 
 
+    single { AppDispatchers() }
 
     single { createHttpClient(OkHttp.create()) }
 
@@ -21,5 +24,14 @@ actual val platformModule = module {
         )
     }
 
-    single<AuthSecureStorage> { AuthSecureStorage(get()) }
+    single {
+        val context: Context = get()
+        try {
+            AuthSecureStorage(context)
+        } catch (e: Exception) {
+            context.deleteSharedPreferences("auth_prefs")
+            AuthSecureStorage(context)
+        }
+    }
+
 }

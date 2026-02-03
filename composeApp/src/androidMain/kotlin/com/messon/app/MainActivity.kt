@@ -11,6 +11,7 @@ import com.messon.app.di.sharedModule
 import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.presentation.viewmodel.AuthViewModel
 import com.messon.app.domain.auth.GoogleAuthAndroid
+import com.messon.app.presentation.viewmodel.CouponViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -32,7 +33,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val authSecureStorage: AuthSecureStorage= koinInject()
             val authViewModel: AuthViewModel = koinViewModel<AuthViewModel>()
-            App(authViewModel = authViewModel, authSecureStorage =authSecureStorage )
+            val couponViewModel: CouponViewModel=koinViewModel<CouponViewModel>()
+            App(authViewModel = authViewModel, authSecureStorage =authSecureStorage, couponViewModel = couponViewModel )
         }
     }
 }

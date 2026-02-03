@@ -1,5 +1,4 @@
 package com.messon.app.presentation.ui.screens.mainscreen
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -28,6 +27,7 @@ import androidx.navigation.NavController
 import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.domain.dataModels.NavItem
 import com.messon.app.domain.dataModels.User
+import com.messon.app.presentation.viewmodel.CouponViewModel
 import com.messon.app.theme.CustomColors
 import com.messon.app.utils.Screen
 import messon.composeapp.generated.resources.Res
@@ -41,10 +41,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun MainScreen(
     navController: NavController,
-    authSecureStorage: AuthSecureStorage
+    authSecureStorage: AuthSecureStorage,
+    couponViewModel: CouponViewModel
 ){
     var selectedItemIndex by remember { mutableStateOf(0) }
-    val navItemList=listOf<NavItem>(
+    val navItemList=listOf(
         NavItem(icon = Res.drawable.home,"Home"),
         NavItem(icon = Res.drawable.menu,"Menu"),
         NavItem(icon = Res.drawable.person,"Profile")
@@ -106,7 +107,8 @@ fun MainScreen(
             modifier = Modifier.padding(top = 0.dp, bottom = innerPadding.calculateBottomPadding()),
             selectedScreenIndex=selectedItemIndex,
             navController=navController,
-            authSecureStorage =authSecureStorage
+            authSecureStorage =authSecureStorage,
+            couponViewModel = couponViewModel
         )
     }
 }
@@ -117,7 +119,8 @@ fun ContentScreen(
     modifier: Modifier,
     selectedScreenIndex: Int,
     navController: NavController,
-    authSecureStorage: AuthSecureStorage
+    authSecureStorage: AuthSecureStorage,
+    couponViewModel: CouponViewModel
 ) {
     var name by remember { mutableStateOf<String?>(null) }
     var email by remember { mutableStateOf<String?>(null) }
@@ -142,7 +145,8 @@ fun ContentScreen(
                 navController.navigate(Screen.RegisterComplainScreen.route){
                     launchSingleTop = true
                 }
-            }
+            },
+            couponViewModel = couponViewModel
         )
         1 -> MenuScreen(modifier = modifier)
         2 -> ProfileScreen(
@@ -150,7 +154,8 @@ fun ContentScreen(
             user = User(
                 name = name ?: "",
                 mailId = email ?: "",
-                profileImg = profileImg ?: ""
+                profileImg = profileImg ?: "",
+                id = ""
             )
         )
     }

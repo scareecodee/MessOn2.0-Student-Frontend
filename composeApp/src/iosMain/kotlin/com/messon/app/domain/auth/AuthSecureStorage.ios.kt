@@ -1,7 +1,7 @@
 package com.messon.app.domain.auth
 
 
-import com.messon.app.data.remote.dto.LoginResponseDto
+import com.messon.app.domain.dataModels.LoginResponse
 import kotlinx.cinterop.*
 import platform.Foundation.*
 import platform.Security.*
@@ -15,7 +15,7 @@ actual class AuthSecureStorage {
     private val service = "com.messon.app.auth"
 
 
-    actual suspend fun saveLogin(response: LoginResponseDto) {
+    actual suspend fun saveLogin(response: LoginResponse) {
         clear()
 
         save("access_token", response.accessToken)
@@ -36,7 +36,7 @@ actual class AuthSecureStorage {
     actual suspend fun getExpiresAt(): String? = read("expires_at")
 
 
-    actual suspend fun clear() {
+    actual fun clear() {
         val query = mapOf(
             kSecClass to kSecClassGenericPassword,
             kSecAttrService to service

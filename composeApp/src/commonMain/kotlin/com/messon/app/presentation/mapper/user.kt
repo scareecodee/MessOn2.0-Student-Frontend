@@ -8,7 +8,8 @@ fun UserDto.toDomain(): User{
     return User(
         name = name,
         mailId = email,
-        profileImg = picture?:""
+        profileImg = picture?:"",
+        id = id,
     )
 }
 

@@ -11,5 +11,6 @@ enum class NetworkError : Error {
     SERIALIZATION,
     UNKNOWN,
     INVALID_CREDENTIAL,
-    FORBIDDEN
+    FORBIDDEN,
+    NOT_FOUND
 }

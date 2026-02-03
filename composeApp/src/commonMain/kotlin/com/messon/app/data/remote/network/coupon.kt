@@ -2,11 +2,12 @@ package com.messon.app.data.remote.network
 
 import co.touchlab.kermit.Logger
 import com.messon.app.data.remote.dto.CouponDetailDto
-import com.messon.app.data.remote.dto.GetCouponReqDto
 import com.messon.app.utils.NetworkError
 import com.messon.app.utils.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -23,19 +24,25 @@ class Coupon(
     val Log = Logger.withTag("CMP_LOG")
 
     suspend fun fetchCoupon(
-       getCouponReqDto: GetCouponReqDto
+       token: String,
+       mealSlot: String
     ): Result<CouponDetailDto, NetworkError>
     {
+        val token = token
+            .replace("\n", "")
+            .replace("\r", "")
+            .trim()
+
+        Log.d (tag = "token sent to backnd", message = {token})
         Log.d(tag = "Ktor", message = {"in login block"})
 
         val response=try {
-            httpClient.post(
-                urlString = "${BASE_URL}getcoupon"
+            httpClient.get(
+                urlString = "${BASE_URL}coupons/today/${mealSlot}"
             ) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    getCouponReqDto
-                )
+                header("Authorization", "Bearer $token")
+                Log.d(tag = "AUTH_HEADER", message =  { headers["Authorization"] ?: "NULL" })
+
             }
         } catch (e: UnresolvedAddressException){
             return  Result.Error(NetworkError.NO_INTERNET)
@@ -58,6 +65,7 @@ class Coupon(
             }
 
             401-> Result.Error(NetworkError.UNAUTHORIZED)
+            404-> Result.Error(NetworkError.NOT_FOUND)
             403-> Result.Error(NetworkError.FORBIDDEN)
             409 -> Result.Error(NetworkError.CONFLICT)
             408 ->  Result.Error(NetworkError.REQUEST_TIMEOUT)

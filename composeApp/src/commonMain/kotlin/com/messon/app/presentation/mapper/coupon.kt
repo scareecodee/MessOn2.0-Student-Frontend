@@ -8,6 +8,7 @@ fun CouponDetailDto.toDomain(): CouponDetail{
         date = date,
         mealSlot=mealSlot,
         expiredAt = expireAt,
-        expired = expired
+        usedAt = usedAt,
+        couponId = couponId
     )
 }

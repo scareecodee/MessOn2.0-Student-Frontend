@@ -33,7 +33,6 @@ fun CardHomeScreen(
     borderColor: Color,
     containerColor:Color,
     mealSlot: String,
-    dishes: List<String>
 ){
     
     Card(

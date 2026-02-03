@@ -1,6 +1,5 @@
 package com.messon.app.domain.repository
 
-import com.messon.app.data.remote.dto.GetCouponReqDto
 import com.messon.app.data.remote.network.Coupon
 import com.messon.app.domain.dataModels.CouponDetail
 import com.messon.app.presentation.mapper.toDomain
@@ -9,11 +8,11 @@ import com.messon.app.utils.Result
 
 
 class CouponRepository(
-    private val coupon: Coupon
+    private val coupon: Coupon,
 ) {
 
-    suspend fun fetchCoupon(getCouponReqDto: GetCouponReqDto):Result<CouponDetail, NetworkError> {
-        val dtoResult = coupon.fetchCoupon(getCouponReqDto)
+    suspend fun fetchCoupon(token: String, mealSlot: String):Result<CouponDetail, NetworkError> {
+        val dtoResult = coupon.fetchCoupon(token,mealSlot)
 
         return when (dtoResult) {
             is Result.Success -> {
