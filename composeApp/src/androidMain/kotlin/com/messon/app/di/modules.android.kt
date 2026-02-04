@@ -2,16 +2,20 @@ package com.messon.app.di
 
 import android.content.Context
 import com.messon.app.core.AppDispatchers
+import com.messon.app.data.local.DataBase
+import com.messon.app.data.local.getDatabase
 import com.messon.app.data.remote.network.createHttpClient
 import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.domain.auth.GoogleAuth
 import com.messon.app.domain.auth.GoogleAuthAndroid
 import io.ktor.client.engine.okhttp.OkHttp
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 actual val platformModule = module {
 
 
+    single<DataBase> { getDatabase(androidContext()) }
 
     single { AppDispatchers() }
 

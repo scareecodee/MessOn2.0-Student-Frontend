@@ -9,6 +9,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.kotlin.native.cocoapods")
     id("org.jetbrains.kotlin.plugin.compose")
+
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 
@@ -104,6 +107,9 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
 
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
+
 
         }
         commonTest.dependencies {
@@ -151,3 +157,11 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+
+room{
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    ksp(libs.room.compiler)
+}

@@ -3,9 +3,11 @@ package com.messon.app.domain.dataModels
 import kotlinx.datetime.LocalDate
 
 data class CouponDetail(
-    private val date: LocalDate,
-    private val mealSlot: String,
-    private val usedAt:Int?,
-    private val expiredAt: Long?,
-    private val couponId: String
+    val uid: String,
+     val date: LocalDate,
+     val mealSlot: String,
+     val usedAt:Int?,
+     val expiredAt: Long?,
+     val couponId: String,
+    val signature:String
 )

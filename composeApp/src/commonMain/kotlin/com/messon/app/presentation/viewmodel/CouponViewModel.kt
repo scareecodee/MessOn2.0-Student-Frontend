@@ -1,6 +1,4 @@
 package com.messon.app.presentation.viewmodel
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -14,6 +12,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.Clock
+import kotlinx.datetime.toLocalDateTime
+
 
 class CouponViewModel(
     private val secureStorage: AuthSecureStorage,
@@ -40,7 +44,12 @@ class CouponViewModel(
                 return@launch
             }
 
-            couponRepository.fetchCoupon(token, mealSlot)
+            couponRepository.fetchCoupon(
+                token = token, mealSlot = mealSlot,
+                date = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+            )
                 .onSuccess {
                     _uiState.value = CouponState.Success(it)
                 }
@@ -48,5 +57,9 @@ class CouponViewModel(
                     _uiState.value = CouponState.Error(it.toString())
                 }
         }
+    }
+
+    fun clearError(){
+        _uiState.value= CouponState.Idle
     }
 }

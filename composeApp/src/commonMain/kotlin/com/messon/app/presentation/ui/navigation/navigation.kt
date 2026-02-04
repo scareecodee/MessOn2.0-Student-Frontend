@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.messon.app.data.local.dao.CouponDao
 import com.messon.app.domain.auth.AuthSecureStorage
 import com.messon.app.presentation.ui.screens.auth.SignInRoute
 import com.messon.app.presentation.ui.screens.mainscreen.MainScreen
@@ -30,7 +31,7 @@ fun AppNav(
     navController: NavHostController,
     viewModel: AuthViewModel,
     authSecureStorage: AuthSecureStorage,
-    couponViewModel: CouponViewModel
+    couponViewModel: CouponViewModel,
 ){
     var sessionChecked by remember { mutableStateOf(false) }
     var isSessionValid by remember{ mutableStateOf(false) }
@@ -70,7 +71,7 @@ fun AppNav(
             MainScreen(
                 navController = navController,
                 authSecureStorage = authSecureStorage,
-                couponViewModel = couponViewModel
+                couponViewModel = couponViewModel,
             )
         }
 

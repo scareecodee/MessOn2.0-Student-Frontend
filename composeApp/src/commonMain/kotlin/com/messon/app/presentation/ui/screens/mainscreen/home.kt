@@ -47,6 +47,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,6 +70,7 @@ import com.messon.app.utils.getCurrentDay
 import multiplatform.network.cmptoast.ToastDuration
 import multiplatform.network.cmptoast.ToastGravity
 import multiplatform.network.cmptoast.showToast
+
 
 @Composable
 fun HomeScreen(
@@ -106,6 +108,7 @@ fun HomeScreen(
         if (uiState is CouponState.Error) {
             clickedCardIndex=-1
             showToast((uiState as CouponState.Error).message)
+            couponViewModel.clearError()
         }
     }
 

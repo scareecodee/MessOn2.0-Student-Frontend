@@ -1,6 +1,8 @@
 package com.messon.app.di
 
 import com.messon.app.core.AppDispatchers
+import com.messon.app.data.local.DataBase
+import com.messon.app.data.local.dao.CouponDao
 import com.messon.app.data.remote.network.Auth
 import com.messon.app.data.remote.network.Coupon
 import com.messon.app.domain.repository.AuthRepository
@@ -13,11 +15,14 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.compose.viewmodel.dsl.viewModel
 
 val sharedModule = module {
+
+    single<CouponDao> { get<DataBase>().couponDao() }
+
     single { Auth(get()) }
 
     single { AuthRepository(get()) }
 
-    single { CouponRepository(get()) }
+    single { CouponRepository(get(),get()) }
 
     single { Coupon(get()) }
 
