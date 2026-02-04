@@ -44,6 +44,7 @@ kotlin {
         }
         pod("GoogleSignIn")
     }
+
     
     sourceSets {
         androidMain.dependencies {
@@ -127,11 +128,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.messon.app"
+    namespace = "com.messon.student.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.messon.app"
+        applicationId = "com.messon.student.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

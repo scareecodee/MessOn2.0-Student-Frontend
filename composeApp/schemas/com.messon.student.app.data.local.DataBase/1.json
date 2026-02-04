@@ -1,0 +1,65 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "02ca2fa5cec5b0698ae68f328d94c185",
+    "entities": [
+      {
+        "tableName": "CouponEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`couponId` TEXT NOT NULL, `uid` TEXT NOT NULL, `date` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `expireAt` INTEGER, `signature` TEXT NOT NULL, `usedAt` INTEGER, PRIMARY KEY(`couponId`))",
+        "fields": [
+          {
+            "fieldPath": "couponId",
+            "columnName": "couponId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mealSlot",
+            "columnName": "mealSlot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expireAt",
+            "columnName": "expireAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "signature",
+            "columnName": "signature",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usedAt",
+            "columnName": "usedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "couponId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02ca2fa5cec5b0698ae68f328d94c185')"
+    ]
+  }
+}
