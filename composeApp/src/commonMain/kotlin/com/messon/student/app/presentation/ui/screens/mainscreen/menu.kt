@@ -17,162 +17,165 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.domain.dataModels.DayWiseMenu
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.presentation.ui.components.ExpandedMenuCard
 import com.messon.student.app.presentation.ui.components.SimpleCard
+import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.theme.CustomColors
+import com.messon.student.app.utils.Day
+import com.messon.student.app.utils.MessMenuState
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensanssemiBold
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.Font
-import tech.annexflow.constraintlayout.compose.ConstraintLayout
-import tech.annexflow.constraintlayout.compose.Dimension
+
 
 @Composable
 fun MenuScreen(
-    modifier: Modifier
-){
-    val dayWiseMenuList=listOf(
-        DayWiseMenu(
-            day="Monday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "M"
-        ),
-        DayWiseMenu(
-            day="Tuesday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "T"
-        ),
-        DayWiseMenu(
-            day="Wednesday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "W"
-        ),
-        DayWiseMenu(
-            day="Thursday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "Th"
-        ),
-        DayWiseMenu(
-            day="Friday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "F"
+    modifier: Modifier,
+    messMenuViewModel: MessMenuViewModel
+) {
+    val uiState = messMenuViewModel.uiState.collectAsState(MessMenuState.Idle).value
 
-        ),
-        DayWiseMenu(
-            day="Saturday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "Sa"
-        ),
-        DayWiseMenu(
-            day="Sunday",
-            breakfastDishes =listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            lunchDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            dinnerDishes = listOf("Rice, Dal, Soyabean curry, Chicken curry"),
-            shortDay = "S"
-        )
+    val days = listOf(
+        Day.MONDAY.value to "M",
+        Day.TUESDAY.value to "T",
+        Day.WEDNESDAY.value to "W",
+        Day.THURSDAY.value to "Th",
+        Day.FRIDAY.value to "F",
+        Day.SATURDAY.value to "Sa",
+        Day.SUNDAY.value to "S"
     )
 
-    val expandedMap = remember {
-        mutableStateMapOf<String, Boolean>()
+    LaunchedEffect(uiState) {
+        if (uiState is MessMenuState.Error) {
+            showToast(uiState.message)
+            messMenuViewModel.clearError()
+        }
     }
+
+    var expandedDay by remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
 
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
             .background(CustomColors.OffWhite)
     ) {
-        val (statusBarBox,headingRef,listRef)=createRefs()
+        val (statusBarBox, headingRef, listRef) = createRefs()
+
         Box(
-            modifier = Modifier.fillMaxWidth()
-                .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()+5.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() + 5.dp)
                 .background(CustomColors.LightGrayBlue)
-                .constrainAs(statusBarBox){
+                .constrainAs(statusBarBox) {
                     top.linkTo(parent.top)
-                    end.linkTo(parent.end)
                 }
         )
+
         Text(
-            text ="Mess Menu",
+            text = "Mess Menu",
             fontSize = 20.sp,
             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-            modifier = Modifier
-                .constrainAs(headingRef){
-                    start.linkTo(parent.start, margin = 16.dp)
-                    top.linkTo(parent.top, margin =60.dp)
-                }
+            modifier = Modifier.constrainAs(headingRef) {
+                start.linkTo(parent.start, margin = 16.dp)
+                top.linkTo(parent.top, margin = 60.dp)
+            }
         )
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier= Modifier.constrainAs(listRef){
-                top.linkTo(headingRef.bottom, margin = 25.dp)
-                bottom.linkTo(parent.bottom, margin = 5.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                height= Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .constrainAs(listRef) {
+                    top.linkTo(headingRef.bottom, margin = 25.dp)
+                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.fillToConstraints
+                }
                 .fillMaxWidth()
         ) {
-            items(dayWiseMenuList) { item ->
+            items(days) { (day, shortDay) ->
 
-                val isExpanded = expandedMap[item.day] ?: false
+                val isExpanded = expandedDay == day
 
                 AnimatedContent(
                     targetState = isExpanded,
                     label = "ExpandCollapse",
-                    transitionSpec =
-                        {
-                            (fadeIn(animationSpec = tween(350, delayMillis = 100)) +
-                                    scaleIn(initialScale = 0.92f, animationSpec = tween(350, delayMillis = 100)))
-                                .togetherWith(fadeOut(animationSpec = tween(150)))
-                        }
+                    transitionSpec = {
+                        (fadeIn(tween(550, delayMillis = 100)) +
+                                scaleIn(initialScale = 0.92f,
+                                    animationSpec = tween(550, delayMillis = 100)
+                                ))
+                            .togetherWith(fadeOut(tween(150)))
+                    }
                 ) { expanded ->
 
                     if (!expanded) {
                         SimpleCard(
                             modifier = Modifier,
-                            shortDay = item.shortDay,
+                            shortDay = shortDay,
                             getIsExpanded = {
-                                expandedMap[item.day] = true
+                                expandedDay = day       // ✅ collapse others
+                                messMenuViewModel.onMenuCardClick(day)
                             }
                         )
                     } else {
-                        ExpandedMenuCard(
-                            modifier = Modifier,
-                            day = item.day,
-                            breakfastDishes = item.breakfastDishes.joinToString(),
-                            lunchDishes = item.lunchDishes.joinToString(),
-                            dinnerDishes = item.dinnerDishes.joinToString(),
-                            getIsExpanded = {
-                                expandedMap[item.day] = false
+                        when (uiState) {
+                            is MessMenuState.Success -> {
+                                val menu = uiState.eachDayMenu
+                                ExpandedMenuCard(
+                                    modifier = Modifier,
+                                    day = day,
+                                    breakfastDishes = menu.breakfast.dishesName,
+                                    lunchDishes = menu.lunch.dishesName,
+                                    dinnerDishes = menu.dinner.dishesName,
+                                    getIsExpanded = {
+                                        expandedDay = null
+                                    }
+                                )
                             }
-                        )
+
+                            is MessMenuState.Loading -> {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+
+                            is MessMenuState.Error,
+                            is MessMenuState.Idle -> {
+                                ExpandedMenuCard(
+                                    modifier = Modifier,
+                                    day = day,
+                                    breakfastDishes = null,
+                                    lunchDishes = null,
+                                    dinnerDishes = null,
+                                    getIsExpanded = {
+                                        expandedDay = null
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
-
         }
-
     }
-
 }

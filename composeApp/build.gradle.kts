@@ -86,7 +86,7 @@ kotlin {
 
             implementation("io.coil-kt.coil3:coil-compose:3.3.0")
 
-            implementation("tech.annexflow.compose:constraintlayout-compose-multiplatform:0.5.1-shaded")
+            implementation("tech.annexflow.compose:constraintlayout-compose-multiplatform:0.6.1")
 
             api(libs.koin.core)
             implementation(libs.koin.compose)
@@ -96,14 +96,14 @@ kotlin {
 
             implementation(compose.materialIconsExtended)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
-            implementation("io.github.alexzhirkevich:qrose:1.0.1")
+            implementation("io.github.alexzhirkevich:qrose:1.1.1")
 
             implementation("co.touchlab:kermit:2.0.8")
 
             //toast
-            implementation("network.chaintech:cmptoast:1.0.8")
+            implementation("network.chaintech:cmptoast:1.0.71")
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
@@ -111,6 +111,7 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
 
+            implementation("org.jetbrains.compose.material3:material3:1.9.0")
 
         }
         commonTest.dependencies {

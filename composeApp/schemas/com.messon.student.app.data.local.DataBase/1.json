@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "02ca2fa5cec5b0698ae68f328d94c185",
+    "identityHash": "f4ce2f353bd3b37d5bdaef33f3d991d4",
     "entities": [
       {
         "tableName": "CouponEntity",
@@ -55,11 +55,54 @@
             "couponId"
           ]
         }
+      },
+      {
+        "tableName": "MessMenuEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`menuId` TEXT NOT NULL, `date` TEXT NOT NULL, `day` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `dishesName` TEXT NOT NULL, PRIMARY KEY(`day`, `mealSlot`))",
+        "fields": [
+          {
+            "fieldPath": "menuId",
+            "columnName": "menuId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "day",
+            "columnName": "day",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mealSlot",
+            "columnName": "mealSlot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dishesName",
+            "columnName": "dishesName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "day",
+            "mealSlot"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02ca2fa5cec5b0698ae68f328d94c185')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f4ce2f353bd3b37d5bdaef33f3d991d4')"
     ]
   }
 }

@@ -8,31 +8,27 @@ import androidx.navigation.NavBackStackEntry
 private const val animationDuration = 350
 
 
-val enterLeft: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? = {
-    slideInHorizontally(
-        initialOffsetX = { fullWidth -> fullWidth },
+val enterLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
+    fadeIn(
         animationSpec = tween(400)
     )
 }
 
 
-val exitRight:(AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?= {
-    slideOutHorizontally(
-        targetOffsetX = { fullWidth -> -fullWidth },
+val exitRight: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
+    fadeOut(
         animationSpec = tween(animationDuration)
     )
 }
 
-val popEnterRight: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)?= {
-    slideInHorizontally(
-        initialOffsetX = { fullWidth -> -fullWidth }, // enters from left
+val popEnterRight: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
+    fadeIn(
         animationSpec = tween(animationDuration)
     )
 }
 
-val popExitLeft:  (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?  = {
-    slideOutHorizontally(
-        targetOffsetX = { fullWidth -> fullWidth }, // exits to right
+val popExitLeft: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
+    fadeOut(
         animationSpec = tween(animationDuration)
     )
 }

@@ -22,6 +22,7 @@ import com.messon.student.app.presentation.ui.screens.mainscreen.NotificationScr
 import com.messon.student.app.presentation.ui.screens.mainscreen.RegisterComplaintScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.utils.Screen
 import com.messon.student.app.theme.enterLeft
 import com.messon.student.app.theme.exitRight
@@ -33,6 +34,7 @@ fun AppNav(
     googleAuth: GoogleAuth,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
+    messMenuViewModel: MessMenuViewModel
 ){
     var sessionChecked by remember { mutableStateOf(false) }
     var isSessionValid by remember{ mutableStateOf(false) }
@@ -74,6 +76,7 @@ fun AppNav(
                 navController = navController,
                 authSecureStorage = authSecureStorage,
                 couponViewModel = couponViewModel,
+                messMenuViewModel = messMenuViewModel
             )
         }
 

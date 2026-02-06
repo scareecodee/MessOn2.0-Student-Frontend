@@ -1,13 +1,15 @@
 package com.messon.student.app.utils
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlinx.datetime.DayOfWeek
+import kotlin.time.Clock
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.Month
+import kotlinx.datetime.Instant
 
 fun getCurrentDay(): String {
-    val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val today: LocalDate = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()).toLocalDateTime(TimeZone.currentSystemDefault()).date
     return when (today.dayOfWeek) {
         DayOfWeek.MONDAY -> "Monday"
         DayOfWeek.TUESDAY -> "Tuesday"
@@ -16,24 +18,25 @@ fun getCurrentDay(): String {
         DayOfWeek.FRIDAY -> "Friday"
         DayOfWeek.SATURDAY -> "Saturday"
         DayOfWeek.SUNDAY -> "Sunday"
+        else -> ""
     }
 }
 
 fun getCurrentDate(): String {
-    val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-    val month = when (today.monthNumber) {
-        1 -> "Jan"
-        2 -> "Feb"
-        3 -> "Mar"
-        4 -> "Apr"
-        5 -> "May"
-        6 -> "Jun"
-        7 -> "Jul"
-        8 -> "Aug"
-        9 -> "Sep"
-        10 -> "Oct"
-        11 -> "Nov"
-        12 -> "Dec"
+    val today: LocalDate = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()).toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val month = when (today.month) {
+        Month.JANUARY -> "Jan"
+        Month.FEBRUARY -> "Feb"
+        Month.MARCH -> "Mar"
+        Month.APRIL -> "Apr"
+        Month.MAY -> "May"
+        Month.JUNE -> "Jun"
+        Month.JULY -> "Jul"
+        Month.AUGUST -> "Aug"
+        Month.SEPTEMBER -> "Sep"
+        Month.OCTOBER -> "Oct"
+        Month.NOVEMBER -> "Nov"
+        Month.DECEMBER -> "Dec"
         else -> ""
     }
     return " ${today.dayOfMonth} $month ${today.year}"

@@ -5,14 +5,14 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import co.touchlab.kermit.Logger
 import com.messon.student.app.domain.dataModels.LoginResponse
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.time.Clock
 
 
 actual class AuthSecureStorage(
     context: Context
 ) {
-    val Log = Logger.withTag("CMP_LOG")
+    private val log = Logger.withTag("CMP_LOG")
 
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -27,7 +27,7 @@ actual class AuthSecureStorage(
     )
 
     actual suspend fun saveLogin(response: LoginResponse) {
-        Log.d(
+        log.d(
             tag = "savedOnDisk", message = {response.toString()}
         )
         prefs.edit().apply {
@@ -62,11 +62,11 @@ actual class AuthSecureStorage(
 
 
     actual suspend fun isSessionValid(): Boolean {
-        val token = getAccessToken() ?: return false
+        getAccessToken() ?: return false
         val expiresAt = getExpiresAt() ?: return false
         val normalized = expiresAt.substringBefore('.') + "Z"
         val expiryInstant = Instant.parse(normalized)
-        val now = Clock.System.now()
+        val now = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds())
 
         if(now < expiryInstant)
             return true

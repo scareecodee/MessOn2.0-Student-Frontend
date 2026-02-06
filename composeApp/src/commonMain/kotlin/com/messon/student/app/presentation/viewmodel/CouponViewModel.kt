@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlin.time.Clock
 import kotlinx.datetime.toLocalDateTime
 
 
@@ -44,7 +45,7 @@ class CouponViewModel(
 
             couponRepository.fetchCoupon(
                 token = token, mealSlot = mealSlot,
-                date = Clock.System.now()
+                date = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds())
                     .toLocalDateTime(TimeZone.currentSystemDefault())
                     .date
             )

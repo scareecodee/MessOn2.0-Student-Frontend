@@ -40,9 +40,9 @@ fun ExpandedMenuCard(
     getIsExpanded:()-> Unit,
     modifier: Modifier,
     day: String,
-    breakfastDishes: String,
-    lunchDishes: String,
-    dinnerDishes: String
+    breakfastDishes: String?,
+    lunchDishes: String?,
+    dinnerDishes: String?
 ){
   Box(
       modifier = modifier.fillMaxWidth()
@@ -93,21 +93,21 @@ fun ExpandedMenuCard(
           EachItemExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Breakfast",
-              dishes = breakfastDishes,
+              dishes = breakfastDishes?:"Unable to load",
               color = CustomColors.RichCerulean
           )
 
           EachItemExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Lunch",
-              dishes = lunchDishes,
+              dishes = lunchDishes?:"Unable to load",
               color = CustomColors.HoneyBronze
           )
 
           EachItemExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Dinner",
-              dishes = dinnerDishes,
+              dishes = dinnerDishes?:"Unable to load",
               color = CustomColors.BlackberryCream
           )
       }
@@ -149,10 +149,10 @@ fun EachItemExpandedMenuCard(
         )
 
         Text(
-            text =dishes,
+            text = dishes,
             fontSize = 12.sp,
             fontFamily = FontFamily(Font(Res.font.opensansregular)),
-            color = Color.Black,
+            color = if(dishes.isEmpty())Color.Red else Color.Black,
             modifier= Modifier.padding(start =10.dp, end =7.dp)
         )
     }

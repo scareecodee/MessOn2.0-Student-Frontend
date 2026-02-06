@@ -10,6 +10,7 @@ import com.messon.student.app.presentation.ui.navigation.AppNav
 import com.messon.student.app.presentation.ui.navigation.AppNav
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 
 
 @Composable
@@ -18,7 +19,8 @@ fun App(
     authSecureStorage: AuthSecureStorage,
     authViewModel: AuthViewModel,
     couponViewModel: CouponViewModel,
-    googleAuth: GoogleAuth
+    googleAuth: GoogleAuth,
+    messMenuViewModel: MessMenuViewModel
 ) {
     MaterialTheme {
         val navController=rememberNavController()
@@ -28,7 +30,8 @@ fun App(
             viewModel = authViewModel,
             authSecureStorage=authSecureStorage,
             couponViewModel = couponViewModel,
-            googleAuth = googleAuth
+            googleAuth = googleAuth,
+            messMenuViewModel = messMenuViewModel
         )
     }
 }

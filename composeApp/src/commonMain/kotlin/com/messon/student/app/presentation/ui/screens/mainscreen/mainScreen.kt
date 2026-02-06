@@ -28,6 +28,7 @@ import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.dataModels.NavItem
 import com.messon.student.app.domain.dataModels.User
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.Screen
 import messon.composeapp.generated.resources.Res
@@ -42,7 +43,8 @@ import org.jetbrains.compose.resources.painterResource
 fun MainScreen(
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
-    couponViewModel: CouponViewModel
+    couponViewModel: CouponViewModel,
+    messMenuViewModel: MessMenuViewModel
 ){
     var selectedItemIndex by remember { mutableStateOf(0) }
     val navItemList=listOf(
@@ -108,7 +110,8 @@ fun MainScreen(
             selectedScreenIndex=selectedItemIndex,
             navController=navController,
             authSecureStorage =authSecureStorage,
-            couponViewModel = couponViewModel
+            couponViewModel = couponViewModel,
+            messMenuViewModel = messMenuViewModel
         )
     }
 }
@@ -120,7 +123,8 @@ fun ContentScreen(
     selectedScreenIndex: Int,
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
-    couponViewModel: CouponViewModel
+    couponViewModel: CouponViewModel,
+    messMenuViewModel: MessMenuViewModel
 ) {
     var name by remember { mutableStateOf<String?>(null) }
     var email by remember { mutableStateOf<String?>(null) }
@@ -140,15 +144,16 @@ fun ContentScreen(
                     launchSingleTop = true
                 }
             },
-            studentName = "Akash",
             onComplaintClick ={
                 navController.navigate(Screen.RegisterComplainScreen.route){
                     launchSingleTop = true
                 }
             },
-            couponViewModel = couponViewModel
+            couponViewModel = couponViewModel,
+            messMenuViewModel = messMenuViewModel,
+            authSecureStorage = authSecureStorage
         )
-        1 -> MenuScreen(modifier = modifier)
+        1 -> MenuScreen(modifier = modifier,messMenuViewModel)
         2 -> ProfileScreen(
             modifier = modifier,
             user = User(

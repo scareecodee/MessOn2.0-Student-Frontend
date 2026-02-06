@@ -30,11 +30,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansregular
 import org.jetbrains.compose.resources.Font
-import tech.annexflow.constraintlayout.compose.ConstraintLayout
 
 @Composable
 fun EachNotificationItem(
@@ -92,7 +93,7 @@ contentDescription: String
                     top.linkTo(boxedIconRef.top, margin = 5.dp)
                     end.linkTo(parent.end, margin = 15.dp)
                     start.linkTo(boxedIconRef.end, margin = 10.dp)
-                    width= tech.annexflow.constraintlayout.compose.Dimension.fillToConstraints
+                    width= Dimension.fillToConstraints
                 }
 
             )
@@ -125,7 +126,7 @@ contentDescription: String
                     top.linkTo(subjectRef.bottom, margin = 9.dp)
                     end.linkTo(parent.end, margin = 5.dp)
                     start.linkTo(subjectRef.start)
-                    width= tech.annexflow.constraintlayout.compose.Dimension.fillToConstraints
+                    width= Dimension.fillToConstraints
                 }
 
             )

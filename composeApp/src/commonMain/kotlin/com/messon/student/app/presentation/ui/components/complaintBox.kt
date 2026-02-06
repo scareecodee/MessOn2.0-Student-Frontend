@@ -21,11 +21,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
-import tech.annexflow.constraintlayout.compose.ConstraintLayout
 
 @Composable
 fun ComplaintBox(

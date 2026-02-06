@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import coil3.compose.AsyncImage
 import com.messon.student.app.domain.dataModels.User
 import com.messon.student.app.presentation.ui.components.EachItemProfileScreen
@@ -36,8 +38,7 @@ import messon.composeapp.generated.resources.intersemibold
 import messon.composeapp.generated.resources.opensansmedium
 import messon.composeapp.generated.resources.opensansregular
 import org.jetbrains.compose.resources.Font
-import tech.annexflow.constraintlayout.compose.ConstraintLayout
-import tech.annexflow.constraintlayout.compose.Dimension
+
 
 
 @Composable
