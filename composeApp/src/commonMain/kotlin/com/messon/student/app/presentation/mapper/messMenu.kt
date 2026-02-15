@@ -19,7 +19,6 @@ fun EachDayMenuDto.toDomain(): EachDayMenu{
 fun EachMealSlotMenuDto.toDomain(): EachMealSlotMenu{
     return EachMealSlotMenu(
         menuId = menuId,
-        date =date,
         day = day.lowercase(),
         mealSlot =mealSlot.lowercase(),
         dishesName =dishesName,
@@ -30,7 +29,6 @@ fun EachMealSlotMenuDto.toDomain(): EachMealSlotMenu{
 fun MessMenuEntity.toDomain(): EachMealSlotMenu{
     return EachMealSlotMenu(
         menuId = menuId,
-        date =date,
         day = day.lowercase(),
         mealSlot =mealSlot.lowercase(),
         dishesName = dishesName,
@@ -43,7 +41,6 @@ fun EachMealSlotMenu.toEntity(): MessMenuEntity{
         menuId = menuId,
         mealSlot= mealSlot.lowercase(),
         day=day.lowercase(),
-        date = date,
         dishesName = dishesName
     )
 }

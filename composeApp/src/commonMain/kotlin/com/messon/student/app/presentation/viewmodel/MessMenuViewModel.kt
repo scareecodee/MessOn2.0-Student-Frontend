@@ -10,8 +10,8 @@ import com.messon.student.app.utils.onError
 import com.messon.student.app.utils.onSuccess
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MessMenuViewModel(
     private val secureStorage: AuthSecureStorage,
@@ -21,42 +21,50 @@ class MessMenuViewModel(
 
     private val log = Logger.withTag("CMP_LOG")
 
-    private val _uiState = MutableSharedFlow<MessMenuState>(replay = 1)
-    val uiState: SharedFlow<MessMenuState> = _uiState
+    private val _currentDayMenu=MutableStateFlow<MessMenuState>(MessMenuState.Idle)
+    val currentDayMenu=_currentDayMenu
+    private val _uiState = MutableStateFlow<MessMenuState>(MessMenuState.Idle)
+    val uiState = _uiState
 
-    fun onMenuCardClick(day: String) {
+    fun onMenuCardClick(day: String,currentDay: Boolean=false) {
+        if (_uiState.value == MessMenuState.Loading) return
+
+
         viewModelScope.launch(dispatcher) {
-
-            // Emit loading state
-            _uiState.emit(MessMenuState.Loading)
-
+            _uiState.value = MessMenuState.Loading
+            if(currentDay)
+            {
+                _currentDayMenu.value= MessMenuState.Loading
+            }
             val token = secureStorage.getAccessToken()
-            log.d(tag = "token from disk") { token.toString() }
+            log.d { "token from disk: $token" }
 
             if (token.isNullOrBlank()) {
-                _uiState.emit(MessMenuState.Error("Session expired. Please login again."))
+                _uiState.value = MessMenuState.Error("Session expired. Please login again.")
                 return@launch
             }
 
-            // Fetch menu from repository
-            messMenuRepository.fetchMenuByDay(
-                token = token,
-                day = day
-            )
+            messMenuRepository.fetchMenuByDay(day, token)
                 .onSuccess {
-                    // Emit success every time, even if same menu
-                    _uiState.emit(MessMenuState.Success(eachDayMenu = it))
+                    _uiState.value = MessMenuState.Success(it)
+                    if(currentDay){
+                        _currentDayMenu.value= MessMenuState.Success(it)
+                    }
                 }
                 .onError {
-                    _uiState.emit(MessMenuState.Error(it.toString()))
+                    _uiState.value = MessMenuState.Error(it.toString())
+                    if(currentDay){
+                        _currentDayMenu.value= MessMenuState.Error(it.toString())
+                    }
                 }
         }
     }
 
-    // Optional: clear errors
-    fun clearError() {
-        viewModelScope.launch {
-            _uiState.emit(MessMenuState.Idle)
-        }
+    fun clearMenuError() {
+        _uiState.value = MessMenuState.Idle
+    }
+
+    fun clearCurrentDayMenuError() {
+        _currentDayMenu.value = MessMenuState.Idle
     }
 }

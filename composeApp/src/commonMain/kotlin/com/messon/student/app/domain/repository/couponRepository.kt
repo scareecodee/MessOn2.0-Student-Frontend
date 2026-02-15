@@ -22,6 +22,7 @@ class CouponRepository(
     private val couponDao: CouponDao,
 ) {
 
+    val Log= Logger.withTag("CMP_LOG")
     private val log = Logger.withTag("CMP_COUPON")
     private val dateConverter = DateTimeConverters()
 
@@ -43,22 +44,24 @@ class CouponRepository(
             Result.Error(NetworkError.UNKNOWN)
         }
 
-        // 🔹 If network succeeds → update Room
+
         if (remoteResult is Result.Success) {
             try {
                 couponDao.insertCoupon(remoteResult.data.toEntity())
+                Log.d(tag = "room", message = {remoteResult.toString()})
             } catch (e: Exception) {
                 log.e { "Room insert failed: ${e.message}" }
                 return Result.Error(LocalError.WRITE_ERROR)
             }
         }
 
-        // 🔹 ALWAYS read from Room (single source of truth)
+
         val localCoupon: CouponEntity? = try {
             couponDao.getCouponByDateAndMeal(
-                date = dateConverter.fromLocalDate(date),
+                date = date,
                 mealSlot = mealSlot
             )
+
         } catch (e: Exception) {
             null
         }

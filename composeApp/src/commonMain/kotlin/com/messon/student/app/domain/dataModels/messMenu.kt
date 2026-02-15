@@ -10,7 +10,6 @@ data class EachDayMenu(
 
 data class  EachMealSlotMenu(
     val menuId: String,
-    val date: String ,
     val day: String,
     val mealSlot: String,
     val dishesName: String,

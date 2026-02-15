@@ -13,6 +13,7 @@ fun CouponDetailDto.toDomain(): CouponDetail{
         couponId = couponId,
         uid = uid,
         signature = signature,
+        mealType = mealType
     )
 }
 
@@ -23,7 +24,8 @@ fun CouponEntity.toDomain(): CouponDetail = CouponDetail(
     usedAt = usedAt,
     expiredAt = expireAt,
     uid = uid,
-    signature = signature
+    signature = signature,
+    mealType = mealType
 )
 
 
@@ -34,5 +36,6 @@ fun CouponDetail.toEntity(): CouponEntity = CouponEntity(
     mealSlot =mealSlot,
     expireAt = expiredAt,
     signature = signature,
-    usedAt = usedAt
+    usedAt = usedAt,
+    mealType=mealType
 )

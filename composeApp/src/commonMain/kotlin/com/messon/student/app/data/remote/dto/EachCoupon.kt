@@ -25,7 +25,10 @@ data class CouponDetailDto(
     val expireAt: Long?,
 
     @SerialName("signature")
-    val signature:String
+    val signature:String,
+
+    @SerialName("mealType")
+    val mealType: String
 
 )
 

@@ -1,5 +1,6 @@
 package com.messon.student.app.domain.repository
 import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Logger.Companion.e
 import com.messon.student.app.presentation.mapper.toDomain
 import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
@@ -43,6 +44,7 @@ class MessMenuRepository(
 
         if (remoteResult is Result.Success) {
             try {
+                log.e(tag = "mess menu db ", message = {remoteResult.toString()})
                 messMenuDao.insertEachMealSlotMenu(remoteResult.data.breakfast.toEntity())
                 messMenuDao.insertEachMealSlotMenu(remoteResult.data.lunch.toEntity())
                 messMenuDao.insertEachMealSlotMenu(remoteResult.data.dinner.toEntity())

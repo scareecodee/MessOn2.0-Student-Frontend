@@ -3,6 +3,7 @@ package com.messon.student.app.presentation.ui.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,7 @@ fun CouponCard(
     containerColor: Color,
     data: String,
     onCloseBtnClick:()-> Unit,
+    mealType:String,
     logo: Painter= painterResource(Res.drawable.compose_multiplatform)
 ){
     Card(
@@ -71,20 +73,35 @@ fun CouponCard(
 
             Spacer(modifier = Modifier.size(5.dp))
             QrCode(
-                modifier = Modifier.size(160.dp),
+                modifier = Modifier.size(180.dp),
                 data = data,
-                logo = logo
+                myLogo = logo
             )
             Spacer(modifier = Modifier.size(5.dp))
 
-            Text(
-                text =mealSlot,
-                fontFamily = FontFamily(Font(Res.font.opensansbold)),
-                fontSize =14.sp,
-                maxLines = 1,
-                color = borderColor,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(
+                    text =mealSlot,
+                    fontFamily = FontFamily(Font(Res.font.opensansbold)),
+                    fontSize =14.sp,
+                    maxLines = 1,
+                    color = borderColor,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text =mealType,
+                    fontFamily = FontFamily(Font(Res.font.opensansbold)),
+                    fontSize =14.sp,
+                    maxLines = 1,
+                    color = Color.Red.copy(alpha = 0.8f),
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
             Spacer(modifier = Modifier.size(5.dp))
             Button(
                 shape = RoundedCornerShape(50.dp),

@@ -12,6 +12,7 @@ import com.messon.student.app.domain.repository.CouponRepository
 import com.messon.student.app.domain.repository.MessMenuRepository
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -44,6 +45,12 @@ val sharedModule = module {
             secureStorage = get(),
             dispatcher = Dispatchers.Main,
             authRepository = get()
+        )
+    }
+
+    viewModel {
+        MealPlannerViewModel(
+
         )
     }
 

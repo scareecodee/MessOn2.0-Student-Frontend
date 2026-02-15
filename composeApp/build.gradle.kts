@@ -104,6 +104,8 @@ kotlin {
 
             //toast
             implementation("network.chaintech:cmptoast:1.0.71")
+            implementation("network.chaintech:qr-kit:3.1.3")
+
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)

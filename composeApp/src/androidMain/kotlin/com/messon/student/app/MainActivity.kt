@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge import com.messon.student.app.domain.a
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -29,12 +30,14 @@ class MainActivity : ComponentActivity() {
             val authViewModel: AuthViewModel = koinViewModel<AuthViewModel>()
             val couponViewModel: CouponViewModel =koinViewModel<CouponViewModel>()
             val messMenuViewModel: MessMenuViewModel=koinViewModel<MessMenuViewModel>()
+            val mealPlannerViewModel: MealPlannerViewModel=koinViewModel<MealPlannerViewModel>()
             App(
                 authViewModel = authViewModel,
                 authSecureStorage =authSecureStorage,
                 couponViewModel = couponViewModel ,
                 googleAuth = googleAuth,
-                messMenuViewModel = messMenuViewModel
+                messMenuViewModel = messMenuViewModel,
+                mealPlannerViewModel = mealPlannerViewModel
             )
         }
     }

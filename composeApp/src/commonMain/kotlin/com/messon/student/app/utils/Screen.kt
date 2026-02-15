@@ -7,4 +7,6 @@ sealed class Screen(val route: String) {
     object RegisterComplainScreen: Screen(route = "register_complaint_screen")
 
     object NotificationScreen: Screen(route ="notification_screen")
+
+    object MealPreferenceScreen: Screen(route="meal_pref-screeen")
 }

@@ -18,7 +18,6 @@ fun getCurrentDay(): String {
         DayOfWeek.FRIDAY -> "Friday"
         DayOfWeek.SATURDAY -> "Saturday"
         DayOfWeek.SUNDAY -> "Sunday"
-        else -> ""
     }
 }
 

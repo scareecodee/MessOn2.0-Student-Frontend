@@ -1,5 +1,4 @@
 package com.messon.student.app.presentation.ui.screens.mainscreen
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,11 +22,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mood
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -58,8 +62,8 @@ import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 import com.messon.student.app.presentation.ui.components.AnalyticsTab
 import com.messon.student.app.presentation.ui.components.CardHomeScreen
-import com.messon.student.app.presentation.ui.components.ComplaintBox
 import com.messon.student.app.presentation.ui.components.CouponCard
+import com.messon.student.app.presentation.ui.components.QuickAccessBox
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.utils.CouponState
@@ -68,7 +72,9 @@ import com.messon.student.app.utils.MessMenuState
 import com.messon.student.app.utils.getCurrentDate
 import com.messon.student.app.utils.getCurrentDay
 import multiplatform.network.cmptoast.showToast
-
+import kotlinx.serialization.json.Json
+import messon.composeapp.generated.resources.preference
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun HomeScreen(
@@ -77,10 +83,14 @@ fun HomeScreen(
     onComplaintClick:()->Unit,
     couponViewModel: CouponViewModel,
     messMenuViewModel: MessMenuViewModel,
-    authSecureStorage: AuthSecureStorage
+    authSecureStorage: AuthSecureStorage,
+    onMealPlannerClick:()->Unit
 ){
-   var userName by remember { mutableStateOf("") }
-    val menuState by messMenuViewModel.uiState.collectAsStateWithLifecycle(MessMenuState.Idle)
+    val pullToRefreshState = rememberPullToRefreshState()
+
+    var userName by remember { mutableStateOf("") }
+    val menuState by messMenuViewModel.currentDayMenu.collectAsStateWithLifecycle(MessMenuState.Idle)
+    val isRefreshing = menuState is MessMenuState.Loading
     var clickedCardIndex by remember{ mutableIntStateOf(-1) }
     val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
     val dayWithDate = buildAnnotatedString {
@@ -115,16 +125,16 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-       messMenuViewModel.onMenuCardClick(getCurrentDay().lowercase())
-    }
+
 
     LaunchedEffect(menuState) {
+
         if (menuState is MessMenuState.Error) {
             showToast((menuState as MessMenuState.Error).message)
-            messMenuViewModel.clearError()
+            messMenuViewModel.clearCurrentDayMenuError()
         }
     }
+
 
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
@@ -226,135 +236,171 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            LazyColumn(
-                userScrollEnabled = clickedCardIndex == -1,
-                modifier = Modifier.fillMaxWidth()
+            PullToRefreshBox(
+                state = pullToRefreshState,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        containerColor = CustomColors.RichCerulean,
+                        color = Color.White,
+                        isRefreshing = isRefreshing,
+                        state = pullToRefreshState
+                    )
+                },
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    messMenuViewModel.onMenuCardClick(
+                        getCurrentDay().lowercase(), currentDay = true
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxSize()
                     .constrainAs(lazyColumnRef){
                         top.linkTo(todaysDateRef.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
                         height= Dimension.fillToConstraints
-                    }
-            ) {
-                item {
+                    },
+                contentAlignment = Alignment.TopCenter
+            ){
+                LazyColumn(
+                    userScrollEnabled = clickedCardIndex == -1,
+                    modifier = Modifier.fillMaxWidth()
 
-                    Text(
-                        text ="Today’s Coupons",
-                        fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(start = 20.dp)
-                    )
-                    Text(
-                        text = "Click on the coupons to get QR",
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                        color = Color.LightGray,
-                        modifier = Modifier.padding(start = 20.dp)
+                ) {
+                    item {
 
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                }
-                item {
-                    LazyRow(
-                        userScrollEnabled = clickedCardIndex == -1,
-                        horizontalArrangement = Arrangement.spacedBy(15.dp),
-                    ) {
-                        item {
-                            CardHomeScreen(
-                                menuState=menuState,
-                                modifier = Modifier.padding(start = 15.dp),
-                                borderColor = CustomColors.RichCerulean,
-                                containerColor = Color(0xFFF5F8FA),
-                                mealSlot = MealSlot.BREAKFAST,
-                                onCardClick = {
-                                    clickedCardIndex=0
-                                   couponViewModel.onCouponClick(mealSlot = MealSlot.BREAKFAST.value)
-                                }
-                            )
-                        }
-                        item {
-                            CardHomeScreen(
-                                menuState=menuState,
-                                modifier = Modifier,
-                                borderColor = CustomColors.HoneyBronze,
-                                containerColor =Color(0xFFFFFBF4),
-                                mealSlot = MealSlot.LUNCH,
-                                onCardClick = {
-                                    clickedCardIndex=1
-                                    couponViewModel.onCouponClick(mealSlot = MealSlot.LUNCH.value)
-                                }
-                            )
-                        }
-                        item {
-                            CardHomeScreen(
-                                menuState=menuState,
-                                modifier = Modifier.padding(end = 15.dp),
-                                borderColor = CustomColors.BlackberryCream,
-                                containerColor =Color(0xFFF6F5F7),
-                                mealSlot = MealSlot.DINNER,
-                                onCardClick = {
-                                    clickedCardIndex=2
-                                    couponViewModel.onCouponClick(mealSlot = MealSlot.DINNER.value)
-                                }
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    Divider(
-                        thickness = 1.5.dp,
-                        color = CustomColors.OffWhite,
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 30.dp, vertical = 40.dp)
-                    )
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 18.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
                         Text(
-                            text = "Analytics",
+                            text ="Today’s Coupons",
+                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                             fontSize = 16.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
-
+                            modifier = Modifier.padding(start = 20.dp)
                         )
                         Text(
-                            text = "This Week",
-                            fontSize = 10.sp,
-                            color = CustomColors.RichCerulean,
-                            fontFamily = FontFamily(Font(Res.font.opensansregular))
+                            text = "Click on the coupons to get QR",
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(Res.font.opensansregular)),
+                            color = Color.LightGray,
+                            modifier = Modifier.padding(start = 20.dp)
+
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                    }
+                    item {
+                        LazyRow(
+                            userScrollEnabled = clickedCardIndex == -1,
+                            horizontalArrangement = Arrangement.spacedBy(15.dp),
+                        ) {
+                            item {
+                                CardHomeScreen(
+                                    menuState=menuState,
+                                    modifier = Modifier.padding(start = 15.dp),
+                                    borderColor = CustomColors.RichCerulean,
+                                    containerColor = Color(0xFFF5F8FA),
+                                    mealSlot = MealSlot.BREAKFAST,
+                                    onCardClick = {
+                                        clickedCardIndex=0
+                                        couponViewModel.onCouponClick(mealSlot = MealSlot.BREAKFAST.value)
+                                    }
+                                )
+                            }
+                            item {
+                                CardHomeScreen(
+                                    menuState=menuState,
+                                    modifier = Modifier,
+                                    borderColor = CustomColors.HoneyBronze,
+                                    containerColor =Color(0xFFFFFBF4),
+                                    mealSlot = MealSlot.LUNCH,
+                                    onCardClick = {
+                                        clickedCardIndex=1
+                                        couponViewModel.onCouponClick(mealSlot = MealSlot.LUNCH.value)
+                                    }
+                                )
+                            }
+                            item {
+                                CardHomeScreen(
+                                    menuState=menuState,
+                                    modifier = Modifier.padding(end = 15.dp),
+                                    borderColor = CustomColors.BlackberryCream,
+                                    containerColor =Color(0xFFF6F5F7),
+                                    mealSlot = MealSlot.DINNER,
+                                    onCardClick = {
+                                        clickedCardIndex=2
+                                        couponViewModel.onCouponClick(mealSlot = MealSlot.DINNER.value)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        Divider(
+                            thickness = 1.5.dp,
+                            color = CustomColors.OffWhite,
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 30.dp, vertical = 40.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(15.dp))
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 18.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Analytics",
+                                fontSize = 16.sp,
+                                color = Color.Black,
+                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
 
-                }
+                            )
+                            Text(
+                                text = "This Week",
+                                fontSize = 10.sp,
+                                color = CustomColors.RichCerulean,
+                                fontFamily = FontFamily(Font(Res.font.opensansregular))
+                            )
+                        }
 
-                item {
-                    AnalyticsTab(
-                        isClickable =clickedCardIndex==-1,
-                        modifier = Modifier
-                            .padding(horizontal = 15.dp)
-                    )
-                }
+                        Spacer(modifier = Modifier.height(15.dp))
 
-                item {
-                    ComplaintBox(
-                        isClickable=clickedCardIndex == -1,
-                        modifier = Modifier
-                            .padding(vertical = 20.dp, horizontal = 15.dp),
-                        onComplaintClick = onComplaintClick
-                    )
+                    }
+
+                    item {
+                        AnalyticsTab(
+                            isClickable =clickedCardIndex==-1,
+                            modifier = Modifier
+                                .padding(horizontal = 15.dp)
+                        )
+                    }
+
+                    item {
+                        QuickAccessBox(
+                            icon = rememberVectorPainter(Icons.Outlined.Mood),
+                            title = "Feedback",
+                            isClickable=clickedCardIndex == -1,
+                            modifier = Modifier
+                                .padding(vertical = 10.dp, horizontal = 15.dp),
+                            onClick = onComplaintClick
+                        )
+                    }
+
+                    item {
+                        QuickAccessBox(
+                            icon = painterResource(Res.drawable.preference),
+                            title = "Meal Planner",
+                            isClickable=clickedCardIndex == -1,
+                            modifier = Modifier
+                                .padding(vertical = 10.dp, horizontal = 15.dp),
+                            onClick = onMealPlannerClick
+                        )
+                    }
                 }
             }
+
         }
         when (uiState) {
 
@@ -365,7 +411,8 @@ fun HomeScreen(
             }
 
             is CouponState.Success -> {
-                val data = (uiState as CouponState.Success).couponDetail.toString()
+                val data = (uiState as CouponState.Success).couponDetail
+                val dataAsJson=Json.encodeToString(data)
                 AnimatedVisibility(
                     visible = clickedCardIndex != -1,
                     enter = fadeIn() + scaleIn(),
@@ -375,16 +422,18 @@ fun HomeScreen(
                         onCloseBtnClick = {
                             clickedCardIndex = -1
                                           },
-                        data = data,
+                        data = dataAsJson,
                         modifier = Modifier.height(screenHeight * 0.45f),
                         clickedCardIndex = clickedCardIndex,
-                        currentDate = getCurrentDate()
+                        currentDate = getCurrentDate(),
+                        mealType = data.mealType.toString()
                     )
                 }
             }
 
             is CouponState.Error-> Unit
         }
+
 
 
     }
@@ -397,7 +446,8 @@ fun CallCouponCard(
     onCloseBtnClick:()-> Unit,
     data: String,
     clickedCardIndex:Int=-1,
-    modifier: Modifier
+    modifier: Modifier,
+    mealType: String
 ){
     when(clickedCardIndex){
         0->CouponCard(
@@ -407,7 +457,8 @@ fun CallCouponCard(
             borderColor = CustomColors.RichCerulean,
             containerColor = Color(0xFFF5F8FA),
             data =data,
-            onCloseBtnClick = onCloseBtnClick
+            onCloseBtnClick = onCloseBtnClick,
+            mealType = mealType
             )
         1-> CouponCard(
             modifier = modifier,
@@ -416,7 +467,8 @@ fun CallCouponCard(
             borderColor = CustomColors.HoneyBronze,
             containerColor = Color(0xFFFFFBF4),
             data =data,
-            onCloseBtnClick = onCloseBtnClick
+            onCloseBtnClick = onCloseBtnClick,
+            mealType = mealType
         )
         2->
             CouponCard(
@@ -426,7 +478,8 @@ fun CallCouponCard(
                 borderColor = CustomColors.BlackberryCream,
                 containerColor =Color(0xFFF6F5F7),
                 data =data,
-                onCloseBtnClick = onCloseBtnClick
+                onCloseBtnClick = onCloseBtnClick,
+                mealType = mealType
             )
     }
 }

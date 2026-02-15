@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f4ce2f353bd3b37d5bdaef33f3d991d4",
+    "identityHash": "33767cf530899d5b6918800cd9d6011f",
     "entities": [
       {
         "tableName": "CouponEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`couponId` TEXT NOT NULL, `uid` TEXT NOT NULL, `date` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `expireAt` INTEGER, `signature` TEXT NOT NULL, `usedAt` INTEGER, PRIMARY KEY(`couponId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`couponId` TEXT NOT NULL, `uid` TEXT NOT NULL, `date` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `expireAt` INTEGER, `signature` TEXT NOT NULL, `usedAt` INTEGER, `mealType` TEXT NOT NULL, PRIMARY KEY(`date`, `mealSlot`))",
         "fields": [
           {
             "fieldPath": "couponId",
@@ -47,28 +47,29 @@
             "fieldPath": "usedAt",
             "columnName": "usedAt",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mealType",
+            "columnName": "mealType",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "couponId"
+            "date",
+            "mealSlot"
           ]
         }
       },
       {
         "tableName": "MessMenuEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`menuId` TEXT NOT NULL, `date` TEXT NOT NULL, `day` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `dishesName` TEXT NOT NULL, PRIMARY KEY(`day`, `mealSlot`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`menuId` TEXT NOT NULL, `day` TEXT NOT NULL, `mealSlot` TEXT NOT NULL, `dishesName` TEXT NOT NULL, PRIMARY KEY(`day`, `mealSlot`))",
         "fields": [
           {
             "fieldPath": "menuId",
             "columnName": "menuId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "date",
-            "columnName": "date",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -102,7 +103,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f4ce2f353bd3b37d5bdaef33f3d991d4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '33767cf530899d5b6918800cd9d6011f')"
     ]
   }
 }

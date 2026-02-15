@@ -24,9 +24,6 @@ data class  EachMealSlotMenuDto(
     @SerialName("menu_id")
     val menuId: String,
 
-    @SerialName("date")
-    val date: String ,
-
     @SerialName("day")
     val day: String,
 

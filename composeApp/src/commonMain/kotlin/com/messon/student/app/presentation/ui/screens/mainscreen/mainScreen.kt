@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.dataModels.NavItem
 import com.messon.student.app.domain.dataModels.User
+import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.theme.CustomColors
@@ -44,7 +45,8 @@ fun MainScreen(
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel
+    messMenuViewModel: MessMenuViewModel,
+    authViewModel: AuthViewModel
 ){
     var selectedItemIndex by remember { mutableStateOf(0) }
     val navItemList=listOf(
@@ -111,7 +113,8 @@ fun MainScreen(
             navController=navController,
             authSecureStorage =authSecureStorage,
             couponViewModel = couponViewModel,
-            messMenuViewModel = messMenuViewModel
+            messMenuViewModel = messMenuViewModel,
+            authViewModel = authViewModel
         )
     }
 }
@@ -124,7 +127,8 @@ fun ContentScreen(
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel
+    messMenuViewModel: MessMenuViewModel,
+    authViewModel: AuthViewModel
 ) {
     var name by remember { mutableStateOf<String?>(null) }
     var email by remember { mutableStateOf<String?>(null) }
@@ -151,7 +155,12 @@ fun ContentScreen(
             },
             couponViewModel = couponViewModel,
             messMenuViewModel = messMenuViewModel,
-            authSecureStorage = authSecureStorage
+            authSecureStorage = authSecureStorage,
+           onMealPlannerClick = {
+               navController.navigate(Screen.MealPreferenceScreen.route){
+                   launchSingleTop = true
+               }
+           }
         )
         1 -> MenuScreen(modifier = modifier,messMenuViewModel)
         2 -> ProfileScreen(
@@ -161,7 +170,13 @@ fun ContentScreen(
                 mailId = email ?: "",
                 profileImg = profileImg ?: "",
                 id = ""
-            )
+            ),
+            onLogoutClick = {
+                authViewModel.logout{
+                }
+
+            }
+
         )
     }
 }

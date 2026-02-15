@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,10 +28,13 @@ import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
+
 @Composable
-fun ComplaintBox(
+fun QuickAccessBox(
+    icon: Painter,
+    title: String,
     modifier: Modifier,
-    onComplaintClick:()-> Unit,
+    onClick:()-> Unit,
     isClickable: Boolean
 ){
     Box(
@@ -46,14 +50,14 @@ fun ComplaintBox(
             )
             .clip(RoundedCornerShape(10.dp))
             .clickable(isClickable){
-                onComplaintClick()
+                onClick()
             }
     ){
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (badMoodIconRef,textRef,expandIconRef)=createRefs()
 
             Icon(
-                imageVector = Icons.Outlined.MoodBad,
+                painter =icon,
                 modifier = Modifier.size(20.dp)
                     .constrainAs(badMoodIconRef){
                         start.linkTo(parent.start, margin = 15.dp)
@@ -66,7 +70,7 @@ fun ComplaintBox(
 
             Text(
                 fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                text = "Complaint Food",
+                text = title,
                 color = CustomColors.RichCerulean,
                 fontSize = 14.sp,
                 maxLines = 1,

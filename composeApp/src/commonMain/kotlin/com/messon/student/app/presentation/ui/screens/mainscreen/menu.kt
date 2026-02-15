@@ -64,7 +64,7 @@ fun MenuScreen(
     LaunchedEffect(uiState) {
         if (uiState is MessMenuState.Error) {
             showToast(uiState.message)
-            messMenuViewModel.clearError()
+            messMenuViewModel.clearMenuError()
         }
     }
 
