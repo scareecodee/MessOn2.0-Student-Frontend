@@ -37,7 +37,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.theme.CustomColors
-import com.messon.student.app.utils.AuthState
+import com.messon.student.app.presentation.ui.state.AuthState
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.google
 import messon.composeapp.generated.resources.opensansbold

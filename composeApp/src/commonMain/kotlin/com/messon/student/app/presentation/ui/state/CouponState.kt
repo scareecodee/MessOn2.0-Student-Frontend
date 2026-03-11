@@ -1,7 +1,6 @@
-package com.messon.student.app.utils
+package com.messon.student.app.presentation.ui.state
 
 import com.messon.student.app.domain.dataModels.CouponDetail
-
 
 sealed class CouponState {
     object Idle : CouponState()

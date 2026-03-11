@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.repository.CouponRepository
-import com.messon.student.app.utils.CouponState
+import com.messon.student.app.presentation.ui.state.CouponState
 import com.messon.student.app.utils.onError
 import com.messon.student.app.utils.onSuccess
 import kotlinx.coroutines.launch

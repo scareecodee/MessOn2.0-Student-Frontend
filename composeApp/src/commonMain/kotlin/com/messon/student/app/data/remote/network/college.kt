@@ -2,43 +2,35 @@ package com.messon.student.app.data.remote.network
 
 
 import co.touchlab.kermit.Logger
-import com.messon.student.app.data.remote.dto.EachDayMenuDto
+import com.messon.student.app.data.remote.dto.CollegeDto
 import com.messon.student.app.utils.NetworkError
-import com.messon.student.app.utils.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.SerializationException
+import io.ktor.client.request.get
+import com.messon.student.app.utils.Result
+
 
 private const val BASE_URL = "http://172.18.9.63:8000/"
 
-
-
-class MessMenu(
+class CollegeApi(
     private val httpClient: HttpClient
 ){
     val Log = Logger.withTag("CMP_LOG")
 
-    suspend fun getEachDayMenu(
-        token: String,
-        day: String
-    ): Result<EachDayMenuDto, NetworkError>
+    suspend fun fetchColleges(
+    ): Result<List<CollegeDto>, NetworkError>
     {
         Log.d(tag = "Ktor", message = {"in login block"})
 
         val response=try {
             httpClient.get(
-                urlString = "${BASE_URL}fetch/menu/${day}"
+                urlString = "${BASE_URL}fetch-colleges"
             ) {
                 contentType(ContentType.Application.Json)
-                header("Authorization", "Bearer $token")
-
             }
         } catch (e: UnresolvedAddressException){
             return  Result.Error(NetworkError.NO_INTERNET)
@@ -56,8 +48,8 @@ class MessMenu(
 
         return when(response.status.value){
             in 200..299->{
-                val menu=response.body<EachDayMenuDto>()
-                Result.Success(menu)
+                val user=response.body<List<CollegeDto>>()
+                Result.Success(user)
             }
             401->Result.Error(NetworkError.UNAUTHORIZED)
             403->Result.Error(NetworkError.FORBIDDEN)

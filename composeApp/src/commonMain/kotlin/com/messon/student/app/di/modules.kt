@@ -5,21 +5,22 @@ import com.messon.student.app.data.local.DataBase
 import com.messon.student.app.data.local.dao.CouponDao
 import com.messon.student.app.data.local.dao.MessMenuDao
 import com.messon.student.app.data.remote.network.Auth
+import com.messon.student.app.data.remote.network.CollegeApi
 import com.messon.student.app.data.remote.network.Coupon
-import com.messon.student.app.data.remote.network.MessMenu
+import com.messon.student.app.data.remote.network.MessApi
 import com.messon.student.app.domain.repository.AuthRepository
+import com.messon.student.app.domain.repository.CollegeRepository
 import com.messon.student.app.domain.repository.CouponRepository
-import com.messon.student.app.domain.repository.MessMenuRepository
+import com.messon.student.app.domain.repository.MessRepository
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
+import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
-import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
+import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import org.koin.compose.viewmodel.dsl.viewModel
-import kotlin.math.sin
 
 val sharedModule = module {
 
@@ -32,19 +33,27 @@ val sharedModule = module {
 
     single { AuthRepository(get()) }
 
-    single{ MessMenuRepository(get(),get()) }
+    single{ MessRepository(get()) }
 
     single { CouponRepository(get(),get()) }
+    single { CollegeRepository(get()) }
+
+
+
 
     single { Coupon(get()) }
 
-    single{ MessMenu(get()) }
+    single{ MessApi(get()) }
+    single{ CollegeApi(get()) }
+
+
 
     viewModel {
         AuthViewModel(
             secureStorage = get(),
             dispatcher = Dispatchers.Main,
-            authRepository = get()
+            authRepository = get(),
+            collegeRepository = get()
         )
     }
 
@@ -55,10 +64,9 @@ val sharedModule = module {
     }
 
     viewModel {
-        MessMenuViewModel(
+        MenuFetchVM(
             secureStorage = get(),
-            dispatcher = Dispatchers.IO,
-            messMenuRepository = get()
+            messRepository = get()
         )
     }
 
@@ -67,6 +75,12 @@ val sharedModule = module {
             secureStorage = get(),
             couponRepository = get(),
             dispatcher = get<AppDispatchers>().io
+        )
+    }
+
+    viewModel {
+        CollegeScreenVM(
+            collegeRepository = get()
         )
     }
 }

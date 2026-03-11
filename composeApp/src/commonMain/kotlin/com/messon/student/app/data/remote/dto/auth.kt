@@ -1,14 +1,20 @@
 package com.messon.student.app.data.remote.dto
-
-
+import com.messon.student.app.utils.UserRole
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginRequestDto(
     @SerialName("id_token")
-    val idToken: String
+    val idToken: String,
+
+    @SerialName("role")
+    val role: String= UserRole.STUDENT.value,
+
+    @SerialName("college_id")
+    val collegeId: String
 )
+
 
 @Serializable
 data class LoginResponseDto(
@@ -25,8 +31,8 @@ data class LoginResponseDto(
     val expiresIn: String? = null,
 )
 
-@Serializable
 
+@Serializable
 data class UserDto(
     @SerialName("id")
     val id: String,
@@ -40,4 +46,3 @@ data class UserDto(
     @SerialName("picture")
     val picture: String? = null
 )
-

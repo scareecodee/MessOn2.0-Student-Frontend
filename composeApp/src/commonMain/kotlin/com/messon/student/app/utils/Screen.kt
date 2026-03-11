@@ -8,5 +8,8 @@ sealed class Screen(val route: String) {
 
     object NotificationScreen: Screen(route ="notification_screen")
 
-    object MealPreferenceScreen: Screen(route="meal_pref-screeen")
+    object MealPreferenceScreen: Screen(route="meal_pref-screen")
+
+    object CollegeListScreen: Screen(route="college_list_screen")
+
 }

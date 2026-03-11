@@ -6,9 +6,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -19,19 +16,22 @@ import androidx.navigation.compose.composable
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.ui.screens.auth.SignInRoute
+import com.messon.student.app.presentation.ui.screens.college.CollegeListScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.MainScreen
-import com.messon.student.app.presentation.ui.screens.mainscreen.MealPreferenceScreen
+import com.messon.student.app.presentation.ui.screens.mess.MealPreferenceScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.NotificationScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.RegisterComplaintScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
-import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
 import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.Screen
 import com.messon.student.app.theme.enterLeft
 import com.messon.student.app.theme.exitRight
-import com.messon.student.app.utils.AuthState
+import com.messon.student.app.presentation.ui.state.AuthState
+import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
+import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppNav(
@@ -40,10 +40,12 @@ fun AppNav(
     googleAuth: GoogleAuth,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel,
+    menuFetchVM: MenuFetchVM,
     mealPlannerViewModel: MealPlannerViewModel
 ) {
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+    val collegeScreenVM: CollegeScreenVM= koinViewModel()
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -55,7 +57,7 @@ fun AppNav(
             }
 
             AuthState.Unauthenticated -> {
-                navController.navigate(Screen.LoginScreen.route) {
+                navController.navigate(Screen.CollegeListScreen.route) {
                     popUpTo(0) { inclusive = true }
                     launchSingleTop = true
                 }
@@ -81,7 +83,7 @@ fun AppNav(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = Screen.CollegeListScreen.route
     ) {
 
         composable(
@@ -109,8 +111,8 @@ fun AppNav(
                 navController = navController,
                 authSecureStorage = authSecureStorage,
                 couponViewModel = couponViewModel,
-                messMenuViewModel = messMenuViewModel,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                menuFetchVM=menuFetchVM
             )
         }
 
@@ -150,7 +152,23 @@ fun AppNav(
             exitTransition = exitRight
         ) {
             MealPreferenceScreen(
-                mealPlannerViewModel = mealPlannerViewModel
+                viewModel = menuFetchVM
+            )
+        }
+
+        composable(
+            route = Screen.CollegeListScreen.route,
+            enterTransition = enterLeft,
+            exitTransition = exitRight
+        ) {
+            CollegeListScreen(
+                onCardClick = {
+                    navController.navigate(Screen.LoginScreen.route)
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                collegeScreenVM =collegeScreenVM
             )
         }
 

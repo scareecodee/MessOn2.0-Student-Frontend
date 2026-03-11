@@ -2,69 +2,54 @@ package com.messon.student.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import com.messon.student.app.domain.auth.AuthSecureStorage
-import com.messon.student.app.domain.repository.MessMenuRepository
-import com.messon.student.app.utils.MessMenuState
+import com.messon.student.app.domain.repository.MessRepository
+import com.messon.student.app.presentation.ui.state.FetchMenuState
+import com.messon.student.app.utils.WeekType
 import com.messon.student.app.utils.onError
 import com.messon.student.app.utils.onSuccess
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class MessMenuViewModel(
-    private val secureStorage: AuthSecureStorage,
-    private val messMenuRepository: MessMenuRepository,
-    private val dispatcher: CoroutineDispatcher
+class MenuFetchVM(
+    private val  secureStorage: AuthSecureStorage,
+    private val messRepository: MessRepository
 ) : ViewModel() {
 
-    private val log = Logger.withTag("CMP_LOG")
 
-    private val _currentDayMenu=MutableStateFlow<MessMenuState>(MessMenuState.Idle)
-    val currentDayMenu=_currentDayMenu
-    private val _uiState = MutableStateFlow<MessMenuState>(MessMenuState.Idle)
-    val uiState = _uiState
+    private val _uiState = MutableStateFlow<FetchMenuState>(FetchMenuState.Idle)
+    val uiState: StateFlow<FetchMenuState> =_uiState.asStateFlow()
 
-    fun onMenuCardClick(day: String,currentDay: Boolean=false) {
-        if (_uiState.value == MessMenuState.Loading) return
+    fun fetchMenu(
+    ) {
+        if(_uiState.value is FetchMenuState.Loading) return
+        _uiState.value = FetchMenuState.Loading
 
+        viewModelScope.launch(Dispatchers.IO) {
 
-        viewModelScope.launch(dispatcher) {
-            _uiState.value = MessMenuState.Loading
-            if(currentDay)
-            {
-                _currentDayMenu.value= MessMenuState.Loading
-            }
             val token = secureStorage.getAccessToken()
-            log.d { "token from disk: $token" }
 
             if (token.isNullOrBlank()) {
-                _uiState.value = MessMenuState.Error("Session expired. Please login again.")
+                _uiState.value =
+                    FetchMenuState.Error("Session expired. Please login again.")
                 return@launch
             }
 
-            messMenuRepository.fetchMenuByDay(day, token)
+            messRepository.fetchMessMenu(
+                token = token,
+                weekType = WeekType.CURRENT_WEEK.value,
+            )
                 .onSuccess {
-                    _uiState.value = MessMenuState.Success(it)
-                    if(currentDay){
-                        _currentDayMenu.value= MessMenuState.Success(it)
-                    }
+                    _uiState.value = FetchMenuState.Success(it)
                 }
                 .onError {
-                    _uiState.value = MessMenuState.Error(it.toString())
-                    if(currentDay){
-                        _currentDayMenu.value= MessMenuState.Error(it.toString())
-                    }
+                    _uiState.value = FetchMenuState.Error(it.toString())
                 }
         }
     }
 
-    fun clearMenuError() {
-        _uiState.value = MessMenuState.Idle
-    }
-
-    fun clearCurrentDayMenuError() {
-        _currentDayMenu.value = MessMenuState.Idle
-    }
 }

@@ -1,7 +1,6 @@
-package com.messon.student.app.utils
-import com.messon.student.app.data.remote.network.Auth
-import com.messon.student.app.domain.dataModels.User
+package com.messon.student.app.presentation.ui.state
 
+import com.messon.student.app.domain.dataModels.User
 
 sealed class AuthState {
     object Idle : AuthState()

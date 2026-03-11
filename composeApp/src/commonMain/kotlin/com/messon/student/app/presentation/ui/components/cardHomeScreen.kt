@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import co.touchlab.kermit.Logger
+import com.messon.student.app.presentation.ui.state.FetchMenuState
 import com.messon.student.app.utils.MealSlot
-import com.messon.student.app.utils.MessMenuState
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -38,7 +38,7 @@ fun CardHomeScreen(
     borderColor: Color,
     containerColor:Color,
     mealSlot: MealSlot,
-    menuState: MessMenuState
+    fetchMenuState: FetchMenuState
 ){
     val Log= Logger.withTag("CMP_LOG")
     Card(
@@ -82,8 +82,8 @@ fun CardHomeScreen(
                 }
             )
 
-            when(menuState){
-                is MessMenuState.Loading -> {
+            when(fetchMenuState){
+                is FetchMenuState.Loading -> {
                   CircularProgressIndicator(
                       color = borderColor,
                       strokeWidth = 3.dp,
@@ -98,13 +98,13 @@ fun CardHomeScreen(
                   )
                 }
 
-                is MessMenuState.Success -> {
-                    val menu = menuState.eachDayMenu
+                is FetchMenuState.Success -> {
+                    val menu = fetchMenuState.menus[1]
 
                     val dishes = when(mealSlot){
-                        MealSlot.BREAKFAST -> menu.breakfast.dishesName
-                        MealSlot.LUNCH -> menu.lunch.dishesName
-                        MealSlot.DINNER -> menu.dinner.dishesName
+                        MealSlot.BREAKFAST -> menu.toString()
+                        MealSlot.LUNCH -> menu.toString()
+                        MealSlot.DINNER -> menu.toString()
                     }
                     Log.d(tag ="home screen", message = {dishes})
                     Text(
@@ -123,7 +123,7 @@ fun CardHomeScreen(
                     )
                 }
 
-                is MessMenuState.Idle -> {
+                is FetchMenuState.Idle -> {
                     Text(
                         text = "pull to refresh",
                         maxLines = 2,
@@ -139,7 +139,7 @@ fun CardHomeScreen(
                             .padding(horizontal = 8.dp)
                     )
                 }
-                is MessMenuState.Error -> {
+                is FetchMenuState.Error -> {
                     Text(
                         text = "unable to load",
                         maxLines = 2,

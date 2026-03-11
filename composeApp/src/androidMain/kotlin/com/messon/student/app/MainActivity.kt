@@ -9,7 +9,7 @@ import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
-import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
+import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -29,14 +29,14 @@ class MainActivity : ComponentActivity() {
             val authSecureStorage: AuthSecureStorage = koinInject()
             val authViewModel: AuthViewModel = koinViewModel<AuthViewModel>()
             val couponViewModel: CouponViewModel =koinViewModel<CouponViewModel>()
-            val messMenuViewModel: MessMenuViewModel=koinViewModel<MessMenuViewModel>()
+            val menuFetchVM=koinViewModel<MenuFetchVM>()
             val mealPlannerViewModel: MealPlannerViewModel=koinViewModel<MealPlannerViewModel>()
             App(
                 authViewModel = authViewModel,
                 authSecureStorage =authSecureStorage,
                 couponViewModel = couponViewModel ,
                 googleAuth = googleAuth,
-                messMenuViewModel = messMenuViewModel,
+                menuFetchVM = menuFetchVM,
                 mealPlannerViewModel = mealPlannerViewModel
             )
         }

@@ -5,31 +5,33 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class EachDayMenuDto(
-
-    @SerialName("breakfast")
-    var breakfast: EachMealSlotMenuDto,
-
-    @SerialName("lunch")
-    var lunch: EachMealSlotMenuDto,
-
-    @SerialName("dinner")
-    var dinner: EachMealSlotMenuDto,
-
-    )
-
-@Serializable
-
-data class  EachMealSlotMenuDto(
-    @SerialName("menu_id")
-    val menuId: String,
+data class MenuResDto(
 
     @SerialName("day")
     val day: String,
 
-    @SerialName("meal_type")
+    @SerialName("meal_slot")
     val mealSlot: String,
 
-    @SerialName("menu_text")
-    val dishesName: String,
+    @SerialName("meal_type")
+    val mealType: String,
+
+    @SerialName("dishes")
+    val dishes: String
 )
+
+@Serializable
+data class  MealAvailabilityDto(
+    @SerialName("day")
+    val day: String,
+
+    @SerialName("meal_slot")
+    val mealSlot: String,
+
+    @SerialName("veg")
+    val isVegAvailable: Boolean,
+
+    @SerialName("nonveg")
+    val isNonVegAvailable: Boolean
+)
+

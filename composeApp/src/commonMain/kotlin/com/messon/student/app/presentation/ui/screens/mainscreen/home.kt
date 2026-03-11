@@ -65,10 +65,10 @@ import com.messon.student.app.presentation.ui.components.CardHomeScreen
 import com.messon.student.app.presentation.ui.components.CouponCard
 import com.messon.student.app.presentation.ui.components.QuickAccessBox
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
-import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
-import com.messon.student.app.utils.CouponState
+import com.messon.student.app.presentation.ui.state.CouponState
+import com.messon.student.app.presentation.ui.state.FetchMenuState
 import com.messon.student.app.utils.MealSlot
-import com.messon.student.app.utils.MessMenuState
+import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import com.messon.student.app.utils.getCurrentDate
 import com.messon.student.app.utils.getCurrentDay
 import multiplatform.network.cmptoast.showToast
@@ -82,15 +82,15 @@ fun HomeScreen(
     onBellIconClick:()-> Unit,
     onComplaintClick:()->Unit,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel,
+    menuFetchVM: MenuFetchVM,
     authSecureStorage: AuthSecureStorage,
     onMealPlannerClick:()->Unit
 ){
     val pullToRefreshState = rememberPullToRefreshState()
 
     var userName by remember { mutableStateOf("") }
-    val menuState by messMenuViewModel.currentDayMenu.collectAsStateWithLifecycle(MessMenuState.Idle)
-    val isRefreshing = menuState is MessMenuState.Loading
+    val menuState by menuFetchVM.uiState.collectAsStateWithLifecycle()
+    val isRefreshing = menuState is FetchMenuState.Loading
     var clickedCardIndex by remember{ mutableIntStateOf(-1) }
     val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
     val dayWithDate = buildAnnotatedString {
@@ -127,13 +127,13 @@ fun HomeScreen(
 
 
 
-    LaunchedEffect(menuState) {
-
-        if (menuState is MessMenuState.Error) {
-            showToast((menuState as MessMenuState.Error).message)
-            messMenuViewModel.clearCurrentDayMenuError()
-        }
-    }
+//    LaunchedEffect(menuState) {
+//
+//        if (menuState is MessMenuState.Error) {
+//            showToast((menuState as MessMenuState.Error).message)
+//            messMenuViewModel.clearCurrentDayMenuError()
+//        }
+//    }
 
 
 
@@ -248,9 +248,9 @@ fun HomeScreen(
                 },
                 isRefreshing = isRefreshing,
                 onRefresh = {
-                    messMenuViewModel.onMenuCardClick(
-                        getCurrentDay().lowercase(), currentDay = true
-                    )
+//                    messMenuViewModel.onMenuCardClick(
+//                        getCurrentDay().lowercase(), currentDay = true
+//                    )
                 },
                 modifier = Modifier
                     .fillMaxSize()
@@ -294,7 +294,7 @@ fun HomeScreen(
                         ) {
                             item {
                                 CardHomeScreen(
-                                    menuState=menuState,
+                                    fetchMenuState = menuState,
                                     modifier = Modifier.padding(start = 15.dp),
                                     borderColor = CustomColors.RichCerulean,
                                     containerColor = Color(0xFFF5F8FA),
@@ -307,7 +307,7 @@ fun HomeScreen(
                             }
                             item {
                                 CardHomeScreen(
-                                    menuState=menuState,
+                                    fetchMenuState = menuState,
                                     modifier = Modifier,
                                     borderColor = CustomColors.HoneyBronze,
                                     containerColor =Color(0xFFFFFBF4),
@@ -320,7 +320,7 @@ fun HomeScreen(
                             }
                             item {
                                 CardHomeScreen(
-                                    menuState=menuState,
+                                    fetchMenuState = menuState,
                                     modifier = Modifier.padding(end = 15.dp),
                                     borderColor = CustomColors.BlackberryCream,
                                     containerColor =Color(0xFFF6F5F7),

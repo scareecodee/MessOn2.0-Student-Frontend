@@ -27,7 +27,7 @@ private val httpClient: HttpClient
         loginRequestDto: LoginRequestDto
     ): Result<LoginResponseDto, NetworkError>
     {
-        Log.d(tag = "Ktor", message = {"in login block"})
+        Log.d(tag = "Ktor", message = {loginRequestDto.toString()})
 
         val response=try {
           httpClient.post(

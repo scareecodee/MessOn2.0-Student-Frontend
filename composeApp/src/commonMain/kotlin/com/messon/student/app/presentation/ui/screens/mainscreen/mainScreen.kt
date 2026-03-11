@@ -27,9 +27,10 @@ import androidx.navigation.NavController
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.dataModels.NavItem
 import com.messon.student.app.domain.dataModels.User
+import com.messon.student.app.presentation.ui.screens.mess.ViewMessMenuScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
-import com.messon.student.app.presentation.viewmodel.MessMenuViewModel
+import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.Screen
 import messon.composeapp.generated.resources.Res
@@ -45,8 +46,8 @@ fun MainScreen(
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    menuFetchVM: MenuFetchVM
 ){
     var selectedItemIndex by remember { mutableStateOf(0) }
     val navItemList=listOf(
@@ -113,8 +114,8 @@ fun MainScreen(
             navController=navController,
             authSecureStorage =authSecureStorage,
             couponViewModel = couponViewModel,
-            messMenuViewModel = messMenuViewModel,
-            authViewModel = authViewModel
+            authViewModel = authViewModel,
+            menuFetchVM=menuFetchVM
         )
     }
 }
@@ -127,8 +128,8 @@ fun ContentScreen(
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
-    messMenuViewModel: MessMenuViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    menuFetchVM: MenuFetchVM
 ) {
     var name by remember { mutableStateOf<String?>(null) }
     var email by remember { mutableStateOf<String?>(null) }
@@ -154,7 +155,7 @@ fun ContentScreen(
                 }
             },
             couponViewModel = couponViewModel,
-            messMenuViewModel = messMenuViewModel,
+            menuFetchVM=menuFetchVM,
             authSecureStorage = authSecureStorage,
            onMealPlannerClick = {
                navController.navigate(Screen.MealPreferenceScreen.route){
@@ -162,7 +163,10 @@ fun ContentScreen(
                }
            }
         )
-        1 -> MenuScreen(modifier = modifier,messMenuViewModel)
+        1 -> ViewMessMenuScreen(
+            onBackBtnClick = {navController.popBackStack()},
+            menuFetchVM =menuFetchVM
+        )
         2 -> ProfileScreen(
             modifier = modifier,
             user = User(
