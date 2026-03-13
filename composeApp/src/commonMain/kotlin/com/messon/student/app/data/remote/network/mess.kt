@@ -1,8 +1,8 @@
 package com.messon.student.app.data.remote.network
 import co.touchlab.kermit.Logger
-import com.messon.student.app.data.remote.dto.MealAvailabilityDto
 import com.messon.student.app.data.remote.dto.MenuResDto
 import com.messon.student.app.data.remote.dto.MessRuleDto
+import com.messon.student.app.data.remote.dto.PrefSetupDto
 import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
 import io.ktor.client.HttpClient
@@ -112,16 +112,16 @@ class MessApi(
     }
 
 
-    suspend fun fetchMealAvailability(
+    suspend fun fetchPrefSetupData(
         weekType: String,
         token:String,
-    ): Result<List<MealAvailabilityDto>, NetworkError>
+    ): Result<List<PrefSetupDto>, NetworkError>
     {
         Log.d(tag = "Ktor", message = {"fetching mess rule"})
 
         val response=try {
             httpClient.get(
-                urlString = "${BASE_URL}fetch/messes/day-policy/${weekType}"
+                urlString = "${BASE_URL}fetch/meal-preference/${weekType}"
             ) {
                 contentType(ContentType.Application.Json)
                 header("Authorization", "Bearer $token")
@@ -142,7 +142,9 @@ class MessApi(
 
         return when(response.status.value){
             in 200..299->{
-                val mess=response.body<List<MealAvailabilityDto>>()
+                val mess=response.body<List<PrefSetupDto>>()
+                Log.d(tag = "Ktor", message = {mess.toString()})
+
                 Result.Success(mess)
             }
             401->Result.Error(NetworkError.UNAUTHORIZED)

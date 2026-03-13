@@ -3,10 +3,9 @@ import co.touchlab.kermit.Logger
 import com.messon.student.app.presentation.mapper.toDomain
 import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
-import com.messon.student.app.data.local.dao.MessMenuDao
 import com.messon.student.app.data.remote.network.MessApi
-import com.messon.student.app.domain.dataModels.MealAvailability
 import com.messon.student.app.domain.dataModels.Menu
+import com.messon.student.app.domain.dataModels.PrefSetupData
 
 
 class MessRepository(
@@ -43,13 +42,13 @@ class MessRepository(
     }
 
 
-    suspend fun fetchMealAvailability(
+    suspend fun fetchPrefSetupData(
         token: String,
         weekType: String
-    ): Result<List<MealAvailability>, NetworkError> {
+    ): Result<List<PrefSetupData>, NetworkError> {
 
         return when (
-            val result =messApi.fetchMealAvailability(
+            val result =messApi.fetchPrefSetupData(
                 token = token,
                 weekType = weekType,
             )

@@ -151,8 +151,9 @@ fun AppNav(
             enterTransition = enterLeft,
             exitTransition = exitRight
         ) {
+            val mealPlannerViewModel: MealPlannerViewModel=koinViewModel()
             MealPreferenceScreen(
-                viewModel = menuFetchVM
+                mealPlannerViewModel = mealPlannerViewModel
             )
         }
 

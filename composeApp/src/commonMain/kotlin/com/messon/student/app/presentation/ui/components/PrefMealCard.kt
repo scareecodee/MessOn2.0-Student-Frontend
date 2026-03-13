@@ -42,7 +42,9 @@ fun PrefMealCard(
     menu: MealMenu,
     selectedType: MealType,
     onSelect: (MealType) -> Unit,
-    iconColor: Color
+    iconColor: Color,
+    isVegSelectable: Boolean,
+    isNonVegSelectable: Boolean
 ) {
     Surface(
         color = Color.White,
@@ -150,7 +152,8 @@ fun PrefMealCard(
                     start.linkTo(parent.start)
                     end.linkTo(nonVegBtn.start, margin = 6.dp)
                     width = Dimension.fillToConstraints
-                }
+                },
+                isClickable = isVegSelectable
             ) { onSelect(MealType.VEG) }
 
             PrefSelectionButton(
@@ -164,7 +167,8 @@ fun PrefMealCard(
                     start.linkTo(vegBtn.end, margin = 6.dp)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
-                }
+                },
+                isClickable = isNonVegSelectable
             ) { onSelect(MealType.NON_VEG) }
         }
     }

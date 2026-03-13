@@ -59,7 +59,8 @@ val sharedModule = module {
 
     viewModel {
         MealPlannerViewModel(
-
+            secureStorage = get(),
+            messRepository = get()
         )
     }
 

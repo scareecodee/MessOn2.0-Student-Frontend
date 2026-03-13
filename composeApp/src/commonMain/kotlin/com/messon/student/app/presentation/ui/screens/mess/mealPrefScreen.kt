@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,57 +36,68 @@ import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 import com.messon.student.app.domain.dataModels.DayModel
+import com.messon.student.app.presentation.ui.state.PrefSetupState
+import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.utils.MealSlot
+import multiplatform.network.cmptoast.showToast
 
 @Composable
 fun MealPreferenceScreen(
-    viewModel: MenuFetchVM
+    mealPlannerViewModel: MealPlannerViewModel
 ) {
+    
+    var selectedDayId by remember { mutableStateOf("Mon") }
+    val prefSetupState by mealPlannerViewModel.prefSetupState.collectAsState()
 
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchMenu()
+    LaunchedEffect(Unit){
+        mealPlannerViewModel.fetchPrefSetupData()
     }
 
-    var selectedDayId by remember { mutableStateOf("Mon") }
 
-    val preferences = remember {
-        mutableStateMapOf<String, DaySelection>().apply {
-            WEEK_DATA.forEach { put(it.id, DaySelection()) }
+    LaunchedEffect(prefSetupState){
+        if(prefSetupState is PrefSetupState.Error){
+            showToast("Error while loading")
+            mealPlannerViewModel.clearPrefSetupState()
         }
     }
+
+    val prefSetupData = remember(prefSetupState) {
+        (prefSetupState as? PrefSetupState.Success)?.prefSetupData ?: emptyList()
+    }
+
+    val preferences = remember(prefSetupData) {
+        mutableStateMapOf<String, DaySelection>().apply {
+
+            WEEK_DATA.forEach { day ->
+
+                val dayMeals = prefSetupData.filter {
+                    it.day.lowercase().startsWith(day.id.lowercase())
+                }
+                val breakfast = dayMeals.find { it.mealSlot == MealSlot.BREAKFAST.value }
+                val lunch = dayMeals.find { it.mealSlot == MealSlot.LUNCH.value }
+                val dinner = dayMeals.find { it.mealSlot == MealSlot.DINNER.value }
+
+                put(
+                    day.id,
+                    DaySelection(
+                        breakfast = if (breakfast?.isCompulsory == true) MealType.VEG else MealType.NONE,
+                        lunch = if (lunch?.isCompulsory == true) MealType.VEG else MealType.NONE,
+                        dinner = if (dinner?.isCompulsory == true) MealType.VEG else MealType.NONE
+                    )
+                )
+            }
+        }
+    }
+
+    val dayMenuMap = remember(prefSetupData) {
+        prefSetupData.toDayMenuMap()
+    }
+
+    val currentDayMenu = dayMenuMap[selectedDayId]
 
     val totalBookings = preferences.values.sumOf { it.selectionCount }
 
-    val menuMap = (uiState as? FetchMenuState.Success)
-        ?.menus
-        ?.toDayMenuMap()
-        ?: emptyMap()
 
-    val currentMenu = when (selectedDayId) {
-        "Mon" -> menuMap[WeekDay.MONDAY.value]
-        "Tue" -> menuMap[WeekDay.TUESDAY.value]
-        "Wed" ->  menuMap[WeekDay.WEDNESDAY.value]
-        "Thu" ->  menuMap[WeekDay.THURSDAY.value]
-        "Fri" ->  menuMap[WeekDay.FRIDAY.value]
-        "Sat" ->  menuMap[WeekDay.SATURDAY.value]
-        "Sun" ->  menuMap[WeekDay.SUNDAY.value]
-        else -> null
-    }
-
-    when (uiState) {
-
-        is FetchMenuState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-        else -> {
 
             ConstraintLayout(
                 modifier = Modifier
@@ -143,56 +155,130 @@ fun MealPreferenceScreen(
                         }
                     }
 
-                    item {
 
-                        val currentSelection = preferences[selectedDayId] ?: DaySelection()
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-
-                            PrefMealCard(
-                                title = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercase() },
-                                icon = Icons.Rounded.WbTwilight,
-                                menu = currentMenu?.breakfast ?: MENU_NOT_LOADED,
-                                selectedType = currentSelection.breakfast,
-                                onSelect = {
-                                    preferences[selectedDayId] = currentSelection.copy(
-                                        breakfast = if (currentSelection.breakfast == it) MealType.NONE else it
-                                    )
-                                },
-                                iconColor = CustomColors.RichCerulean
-                            )
-
-                            PrefMealCard(
-                                title = MealSlot.LUNCH.value.replaceFirstChar { it.uppercase() },
-                                icon = Icons.Rounded.WbSunny,
-                                menu = currentMenu?.lunch ?: MENU_NOT_LOADED,
-                                selectedType = currentSelection.lunch,
-                                onSelect = {
-                                    preferences[selectedDayId] = currentSelection.copy(
-                                        lunch = if (currentSelection.lunch == it) MealType.NONE else it
-                                    )
-                                },
-                                iconColor = CustomColors.HoneyBronze
-
-                            )
-
-                            PrefMealCard(
-                                title = MealSlot.DINNER.value.replaceFirstChar { it.uppercase() },
-                                icon = Icons.Rounded.Nightlight,
-                                menu = currentMenu?.dinner?: MENU_NOT_LOADED          ,
-                                selectedType = currentSelection.dinner,
-                                onSelect = {
-                                    preferences[selectedDayId] = currentSelection.copy(
-                                        dinner = if (currentSelection.dinner == it) MealType.NONE else it
-                                    )
-                                },
-                                iconColor = CustomColors.BlackberryCream
-                            )
+                    when(prefSetupState){
+                        is PrefSetupState.Loading -> {
+                            item {
+                                CircularProgressIndicator()
+                            }
                         }
+                        is PrefSetupState.Success->{
+                            item {
+
+                                val currentSelection = preferences[selectedDayId] ?: DaySelection()
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+
+                                    val breakfastData = currentDayMenu?.get(MealSlot.BREAKFAST)
+
+                                    PrefMealCard(
+                                        title = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercase() },
+                                        icon = Icons.Rounded.WbTwilight,
+                                        menu = MealMenu(
+                                            veg = breakfastData?.vegDish ?: "Not Available",
+                                            nonVeg = breakfastData?.nonVegDish ?: "Not Available"
+                                        ),
+                                        selectedType = currentSelection.breakfast,
+                                        onSelect = { type ->
+
+                                            if (breakfastData?.isCompulsory == true) {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    breakfast = type
+                                                )
+
+                                            } else {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    breakfast =
+                                                        if (currentSelection.breakfast == type)
+                                                            MealType.NONE
+                                                        else
+                                                            type
+                                                )
+                                            }
+                                        },
+                                        iconColor = CustomColors.RichCerulean,
+                                        isVegSelectable = breakfastData?.vegAvailability == true,
+                                        isNonVegSelectable = breakfastData?.nonVegAvailability == true
+                                    )
+
+                                    val lunchData = currentDayMenu?.get(MealSlot.LUNCH)
+
+                                    PrefMealCard(
+                                        title = MealSlot.LUNCH.value.replaceFirstChar { it.uppercase() },
+                                        icon = Icons.Default.WbSunny,
+                                        menu = MealMenu(
+                                            veg = lunchData?.vegDish ?: "Not Available",
+                                            nonVeg = lunchData?.nonVegDish ?: "Not Available"
+                                        ),
+                                        selectedType = currentSelection.lunch,
+                                        onSelect = { type ->
+
+                                            if (lunchData?.isCompulsory == true) {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    lunch =type
+                                                )
+
+                                            } else {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    lunch =
+                                                        if (currentSelection.lunch == type)
+                                                            MealType.NONE
+                                                        else
+                                                            type
+                                                )
+                                            }
+                                        },
+                                        iconColor = CustomColors.RichCerulean,
+                                        isVegSelectable = lunchData?.vegAvailability == true,
+                                        isNonVegSelectable = lunchData?.nonVegAvailability == true
+                                    )
+
+                                    val dinnerData = currentDayMenu?.get(MealSlot.DINNER)
+
+                                    PrefMealCard(
+                                        title = MealSlot.DINNER.value.replaceFirstChar { it.uppercase() },
+                                        icon = Icons.Rounded.Nightlight,
+                                        menu = MealMenu(
+                                            veg = dinnerData?.vegDish ?: "Not Available",
+                                            nonVeg = dinnerData?.nonVegDish ?: "Not Available"
+                                        ),
+                                        selectedType = currentSelection.dinner,
+                                        onSelect = { type ->
+
+                                            if (dinnerData?.isCompulsory == true) {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    dinner = type
+                                                )
+
+                                            } else {
+
+                                                preferences[selectedDayId] = currentSelection.copy(
+                                                    dinner =
+                                                        if (currentSelection.dinner == type)
+                                                            MealType.NONE
+                                                        else
+                                                            type
+                                                )
+                                            }
+                                        },
+                                        iconColor = CustomColors.RichCerulean,
+                                        isVegSelectable = dinnerData?.vegAvailability == true,
+                                        isNonVegSelectable = dinnerData?.nonVegAvailability == true
+                                    )
+                                }
+                            }
+                        }
+
+                        else -> {}
                     }
                 }
 
@@ -206,8 +292,8 @@ fun MealPreferenceScreen(
                 )
             }
         }
-    }
-}
+
+
 
 @Composable
 fun HeaderSection(modifier: Modifier = Modifier) {

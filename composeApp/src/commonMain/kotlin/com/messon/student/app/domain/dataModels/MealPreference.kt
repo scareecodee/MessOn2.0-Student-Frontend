@@ -8,6 +8,18 @@ data class DayPreference(
     val dinner: MealType
 )
 
+data class PrefSetupData(
+
+    val day: String,
+    val mealSlot: String,
+    val vegDish: String,
+    val nonVegDish: String,
+    val vegAvailability: Boolean,
+    val nonVegAvailability: Boolean,
+    val isCompulsory: Boolean,
+
+    )
+
 data class DaySelection(
     var breakfast: MealType = MealType.NONE,
     var lunch: MealType = MealType.NONE,

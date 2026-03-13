@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun PrefSelectionButton(
+    isClickable: Boolean,
     title: String,
     icon: ImageVector,
     isSelected: Boolean,
@@ -49,7 +50,7 @@ fun PrefSelectionButton(
             .background(bgColor, RoundedCornerShape(16.dp))
             .border(2.dp, borderColor, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
+            .clickable(isClickable) { onClick() }
             .padding(vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

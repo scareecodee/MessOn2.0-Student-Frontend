@@ -20,18 +20,3 @@ data class MenuResDto(
     val dishes: String
 )
 
-@Serializable
-data class  MealAvailabilityDto(
-    @SerialName("day")
-    val day: String,
-
-    @SerialName("meal_slot")
-    val mealSlot: String,
-
-    @SerialName("veg")
-    val isVegAvailable: Boolean,
-
-    @SerialName("nonveg")
-    val isNonVegAvailable: Boolean
-)
-
