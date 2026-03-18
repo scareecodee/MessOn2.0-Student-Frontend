@@ -7,3 +7,11 @@ sealed class PrefSetupState {
     data class Success(val prefSetupData: List<PrefSetupData>) : PrefSetupState()
     data class Error(val message: String) : PrefSetupState()
 }
+
+
+sealed class SavePrefState {
+    object Idle : SavePrefState()
+    object Loading : SavePrefState()
+    data class Success(val res: String) :  SavePrefState()
+    data class Error(val message: String) :  SavePrefState()
+}

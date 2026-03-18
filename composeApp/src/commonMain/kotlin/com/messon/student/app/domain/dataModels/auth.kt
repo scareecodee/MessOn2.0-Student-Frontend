@@ -12,6 +12,6 @@ data class  LoginResponse(
 
 data class LoginRequest(
     val idToken: String,
-    val role: String= UserRole.COLLEGE_ADMIN.value,
+    val role: String= UserRole.STUDENT.value,
     val collegeId: String
 )

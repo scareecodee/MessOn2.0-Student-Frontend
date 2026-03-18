@@ -37,6 +37,7 @@ import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 import com.messon.student.app.domain.dataModels.DayModel
 import com.messon.student.app.presentation.ui.state.PrefSetupState
+import com.messon.student.app.presentation.ui.state.SavePrefState
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.utils.MealSlot
 import multiplatform.network.cmptoast.showToast
@@ -48,6 +49,7 @@ fun MealPreferenceScreen(
     
     var selectedDayId by remember { mutableStateOf("Mon") }
     val prefSetupState by mealPlannerViewModel.prefSetupState.collectAsState()
+    val savePrefState by mealPlannerViewModel.savePrefState.collectAsState()
 
     LaunchedEffect(Unit){
         mealPlannerViewModel.fetchPrefSetupData()
@@ -61,33 +63,32 @@ fun MealPreferenceScreen(
         }
     }
 
+    LaunchedEffect(savePrefState){
+        when(savePrefState){
+            is SavePrefState.Error -> {
+                showToast("Error saving your meal pref.")
+            }
+            is SavePrefState.Success -> {
+                showToast("saved your meal pref.")
+
+            }
+
+            else -> {}
+        }
+        mealPlannerViewModel.clearSavePrefState()
+    }
+
     val prefSetupData = remember(prefSetupState) {
         (prefSetupState as? PrefSetupState.Success)?.prefSetupData ?: emptyList()
     }
 
-    val preferences = remember(prefSetupData) {
-        mutableStateMapOf<String, DaySelection>().apply {
-
-            WEEK_DATA.forEach { day ->
-
-                val dayMeals = prefSetupData.filter {
-                    it.day.lowercase().startsWith(day.id.lowercase())
-                }
-                val breakfast = dayMeals.find { it.mealSlot == MealSlot.BREAKFAST.value }
-                val lunch = dayMeals.find { it.mealSlot == MealSlot.LUNCH.value }
-                val dinner = dayMeals.find { it.mealSlot == MealSlot.DINNER.value }
-
-                put(
-                    day.id,
-                    DaySelection(
-                        breakfast = if (breakfast?.isCompulsory == true) MealType.VEG else MealType.NONE,
-                        lunch = if (lunch?.isCompulsory == true) MealType.VEG else MealType.NONE,
-                        dinner = if (dinner?.isCompulsory == true) MealType.VEG else MealType.NONE
-                    )
-                )
-            }
+    LaunchedEffect(prefSetupData) {
+        if (prefSetupData.isNotEmpty()) {
+            mealPlannerViewModel.initPreferences(prefSetupData)
         }
     }
+
+    val preferences by mealPlannerViewModel.preferences.collectAsState()
 
     val dayMenuMap = remember(prefSetupData) {
         prefSetupData.toDayMenuMap()
@@ -184,23 +185,12 @@ fun MealPreferenceScreen(
                                         ),
                                         selectedType = currentSelection.breakfast,
                                         onSelect = { type ->
-
-                                            if (breakfastData?.isCompulsory == true) {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    breakfast = type
-                                                )
-
-                                            } else {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    breakfast =
-                                                        if (currentSelection.breakfast == type)
-                                                            MealType.NONE
-                                                        else
-                                                            type
-                                                )
-                                            }
+                                            mealPlannerViewModel.updateMeal(
+                                                dayId = selectedDayId,
+                                                mealSlot = MealSlot.BREAKFAST,
+                                                type = type,
+                                                isCompulsory = breakfastData?.isCompulsory == true
+                                            )
                                         },
                                         iconColor = CustomColors.RichCerulean,
                                         isVegSelectable = breakfastData?.vegAvailability == true,
@@ -218,23 +208,12 @@ fun MealPreferenceScreen(
                                         ),
                                         selectedType = currentSelection.lunch,
                                         onSelect = { type ->
-
-                                            if (lunchData?.isCompulsory == true) {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    lunch =type
-                                                )
-
-                                            } else {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    lunch =
-                                                        if (currentSelection.lunch == type)
-                                                            MealType.NONE
-                                                        else
-                                                            type
-                                                )
-                                            }
+                                            mealPlannerViewModel.updateMeal(
+                                                dayId = selectedDayId,
+                                                mealSlot = MealSlot.LUNCH,
+                                                type = type,
+                                                isCompulsory = lunchData?.isCompulsory == true
+                                            )
                                         },
                                         iconColor = CustomColors.RichCerulean,
                                         isVegSelectable = lunchData?.vegAvailability == true,
@@ -252,23 +231,12 @@ fun MealPreferenceScreen(
                                         ),
                                         selectedType = currentSelection.dinner,
                                         onSelect = { type ->
-
-                                            if (dinnerData?.isCompulsory == true) {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    dinner = type
-                                                )
-
-                                            } else {
-
-                                                preferences[selectedDayId] = currentSelection.copy(
-                                                    dinner =
-                                                        if (currentSelection.dinner == type)
-                                                            MealType.NONE
-                                                        else
-                                                            type
-                                                )
-                                            }
+                                            mealPlannerViewModel.updateMeal(
+                                                dayId = selectedDayId,
+                                                mealSlot = MealSlot.DINNER,
+                                                type = type,
+                                                isCompulsory = dinnerData?.isCompulsory == true
+                                            )
                                         },
                                         iconColor = CustomColors.RichCerulean,
                                         isVegSelectable = dinnerData?.vegAvailability == true,
@@ -283,11 +251,15 @@ fun MealPreferenceScreen(
                 }
 
                 BottomBarSection(
+                    isLoading=savePrefState is SavePrefState.Loading,
                     totalBookings = totalBookings,
                     modifier = Modifier.constrainAs(bottomBar) {
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+                    },
+                    onSaveBtnClick = {
+                        mealPlannerViewModel.saveMealPref()
                     }
                 )
             }
@@ -362,8 +334,10 @@ fun HeaderSection(modifier: Modifier = Modifier) {
 
 @Composable
 fun BottomBarSection(
+    isLoading: Boolean,
     totalBookings: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSaveBtnClick:()-> Unit
 ) {
     Surface(
         color = Color.White,
@@ -402,7 +376,7 @@ fun BottomBarSection(
             }
 
             Button(
-                onClick = { /* Save Logic */ },
+                onClick =onSaveBtnClick,
                 colors = ButtonDefaults.buttonColors(containerColor = CustomColors.RichCerulean),
                 shape = RoundedCornerShape(16.dp),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
@@ -419,6 +393,10 @@ fun BottomBarSection(
                     fontSize = 10.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                if(isLoading){
+                    CircularProgressIndicator()
+                }
             }
         }
     }
@@ -435,16 +413,4 @@ val WEEK_DATA = listOf(
     DayModel("Sun", WeekDay.SUNDAY.value, "S")
 )
 
-val MENU_NOT_LOADED = MealMenu(
-    veg = "Menu not loaded",
-    nonVeg = "Menu not loaded"
-)
-
 data class MealMenu(val veg: String, val nonVeg: String)
-
-data class DayMenu(
-    val breakfast: MealMenu,
-    val lunch: MealMenu,
-    val dinner: MealMenu
-)
-

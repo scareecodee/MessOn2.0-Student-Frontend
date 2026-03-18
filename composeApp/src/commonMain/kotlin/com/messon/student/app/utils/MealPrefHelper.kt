@@ -18,3 +18,25 @@ fun List<PrefSetupData>.toDayMenuMap(): Map<String, Map<MealSlot, PrefSetupData>
         meals.associateBy { MealSlot.valueOf(it.mealSlot.uppercase()) }
     }
 }
+
+fun String.toApiDay(): String {
+    return when (this) {
+        "Mon" -> WeekDay.MONDAY.value
+        "Tue" -> WeekDay.TUESDAY.value
+        "Wed" -> WeekDay.WEDNESDAY.value
+        "Thu" -> WeekDay.THURSDAY.value
+        "Fri" -> WeekDay.FRIDAY.value
+        "Sat" -> WeekDay.SATURDAY.value
+        "Sun" -> WeekDay.SUNDAY.value
+        else -> this.lowercase()
+    }
+}
+
+
+fun MealType.toApiValue(): String? {
+    return when (this) {
+        MealType.VEG -> MealType.VEG.value
+        MealType.NON_VEG -> MealType.NON_VEG.value
+        MealType.NONE -> null
+    }
+}

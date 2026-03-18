@@ -1,6 +1,8 @@
 package com.messon.student.app.presentation.mapper
 
+import com.messon.student.app.data.remote.dto.MealPrefSaveReq
 import com.messon.student.app.data.remote.dto.PrefSetupDto
+import com.messon.student.app.domain.dataModels.MealPref
 import com.messon.student.app.domain.dataModels.PrefSetupData
 
 fun PrefSetupDto.toDomain(): PrefSetupData{
@@ -12,5 +14,14 @@ fun PrefSetupDto.toDomain(): PrefSetupData{
         vegAvailability = vegAvailability,
         nonVegAvailability =nonVegAvailability,
         isCompulsory = isCompulsory
+    )
+}
+
+
+fun MealPref.toDto(): MealPrefSaveReq{
+    return MealPrefSaveReq(
+        day = day,
+        mealSlot = mealSlot,
+        mealType=mealType
     )
 }

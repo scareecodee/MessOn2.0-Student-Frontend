@@ -17,6 +17,6 @@ data class MenuResDto(
     val mealType: String,
 
     @SerialName("dishes")
-    val dishes: String
+    val dishes: String?
 )
 

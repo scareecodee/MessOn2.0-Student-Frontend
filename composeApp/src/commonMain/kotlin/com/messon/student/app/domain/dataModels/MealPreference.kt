@@ -1,23 +1,21 @@
 package com.messon.student.app.domain.dataModels
 import com.messon.student.app.utils.MealType
 
-data class DayPreference(
-    val dayName: String,
-    val breakfast: MealType,
-    val lunch: MealType,
-    val dinner: MealType
+data class MealPref(
+    val day: String,
+    val mealSlot: String,
+    val mealType: String?,
 )
 
 data class PrefSetupData(
 
     val day: String,
     val mealSlot: String,
-    val vegDish: String,
-    val nonVegDish: String,
+    val vegDish: String?,
+    val nonVegDish: String?,
     val vegAvailability: Boolean,
     val nonVegAvailability: Boolean,
     val isCompulsory: Boolean,
-
     )
 
 data class DaySelection(

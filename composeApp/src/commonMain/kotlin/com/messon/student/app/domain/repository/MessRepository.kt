@@ -4,8 +4,10 @@ import com.messon.student.app.presentation.mapper.toDomain
 import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
 import com.messon.student.app.data.remote.network.MessApi
+import com.messon.student.app.domain.dataModels.MealPref
 import com.messon.student.app.domain.dataModels.Menu
 import com.messon.student.app.domain.dataModels.PrefSetupData
+import com.messon.student.app.presentation.mapper.toDto
 
 
 class MessRepository(
@@ -62,6 +64,35 @@ class MessRepository(
                     data = dto.map {
                         it.toDomain()
                     }
+                )
+            }
+            is Result.Error -> Result.Error(result.error)
+        }
+    }
+
+
+    suspend fun saveMealPref(
+        token: String,
+        weekType: String,
+        mealPref:List<MealPref>
+    ): Result<String, NetworkError> {
+
+        return when (
+            val result =messApi.saveMealPref(
+                token = token,
+                weekType = weekType,
+                mealPref = mealPref.map {
+                    it.toDto()
+                },
+            )
+        ) {
+            is Result.Success -> {
+
+                val dto = result.data
+
+
+                Result.Success(
+                    data = dto
                 )
             }
             is Result.Error -> Result.Error(result.error)

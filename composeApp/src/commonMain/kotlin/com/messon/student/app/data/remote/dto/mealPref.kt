@@ -12,10 +12,10 @@ data class PrefSetupDto(
     val mealSlot: String,
 
     @SerialName("veg_dishes")
-    val vegDish: String,
+    val vegDish: String?,
 
     @SerialName("nonVeg_dishes")
-    val nonVegDish: String,
+    val nonVegDish: String?,
 
     @SerialName("veg_available")
     val vegAvailability: Boolean,
@@ -25,5 +25,19 @@ data class PrefSetupDto(
 
     @SerialName("is_compulsory")
     val isCompulsory: Boolean,
+
+)
+
+@Serializable
+data class MealPrefSaveReq(
+
+    @SerialName("day")
+    val day: String,
+
+    @SerialName("meal_slot")
+    val mealSlot: String,
+
+    @SerialName("meal_type")
+    val mealType: String?
 
 )
