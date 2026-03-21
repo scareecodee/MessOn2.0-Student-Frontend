@@ -29,12 +29,9 @@ class Coupon(
             .replace("\r", "")
             .trim()
 
-        Log.d (tag = "token sent to backnd", message = {token})
-        Log.d(tag = "Ktor", message = {"in login block"})
-
         val response=try {
             httpClient.get(
-                urlString = "${BASE_URL}coupons/today/${mealSlot}"
+                urlString = "${BASE_URL}fetch/coupons/${mealSlot}"
             ) {
                 header("Authorization", "Bearer $token")
                 Log.d(tag = "AUTH_HEADER", message =  { headers["Authorization"] ?: "NULL" })

@@ -66,7 +66,7 @@ fun MealPreferenceScreen(
     LaunchedEffect(savePrefState){
         when(savePrefState){
             is SavePrefState.Error -> {
-                showToast("Error saving your meal pref.")
+                showToast((savePrefState as SavePrefState.Error).message)
             }
             is SavePrefState.Success -> {
                 showToast("saved your meal pref.")

@@ -20,8 +20,6 @@ import kotlinx.serialization.SerializationException
 
 private const val BASE_URL = "http://172.18.9.63:8000/"
 
-
-
 class MessApi(
     private val httpClient: HttpClient
 ){

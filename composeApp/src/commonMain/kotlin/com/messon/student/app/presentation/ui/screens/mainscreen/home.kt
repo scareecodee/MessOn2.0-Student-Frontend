@@ -426,7 +426,7 @@ fun HomeScreen(
                         modifier = Modifier.height(screenHeight * 0.45f),
                         clickedCardIndex = clickedCardIndex,
                         currentDate = getCurrentDate(),
-                        mealType = data.mealType.toString()
+                        mealType = data.mealType
                     )
                 }
             }
@@ -452,7 +452,7 @@ fun CallCouponCard(
     when(clickedCardIndex){
         0->CouponCard(
             modifier = modifier,
-            mealSlot = "Breakfast",
+            mealSlot = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercaseChar() },
             date=currentDate,
             borderColor = CustomColors.RichCerulean,
             containerColor = Color(0xFFF5F8FA),
@@ -462,7 +462,7 @@ fun CallCouponCard(
             )
         1-> CouponCard(
             modifier = modifier,
-            mealSlot = "Lunch",
+            mealSlot = MealSlot.LUNCH.value.replaceFirstChar { it.uppercaseChar() },
             date=currentDate,
             borderColor = CustomColors.HoneyBronze,
             containerColor = Color(0xFFFFFBF4),
@@ -473,7 +473,7 @@ fun CallCouponCard(
         2->
             CouponCard(
                 modifier = modifier,
-                mealSlot = "Dinner",
+                mealSlot = MealSlot.DINNER.value.replaceFirstChar { it.uppercaseChar() },
                 date=currentDate,
                 borderColor = CustomColors.BlackberryCream,
                 containerColor =Color(0xFFF6F5F7),

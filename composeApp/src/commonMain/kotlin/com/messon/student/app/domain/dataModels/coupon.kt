@@ -10,8 +10,9 @@ data class CouponDetail(
     val date: LocalDate,
     val mealSlot: String,
     val usedAt: Int?,
-    val expiredAt: Long?,
     val couponId: String,
+    val messId: String,
+    val collegeId: String,
     val signature: String,
     val mealType: String
 )

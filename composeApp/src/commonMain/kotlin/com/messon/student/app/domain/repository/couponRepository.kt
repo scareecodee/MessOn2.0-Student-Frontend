@@ -4,15 +4,9 @@ import co.touchlab.kermit.Logger
 import com.messon.student.app.data.remote.network.Coupon
 import com.messon.student.app.domain.dataModels.CouponDetail
 import com.messon.student.app.presentation.mapper.toDomain
-import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
-
-
 import com.messon.student.app.data.local.dao.CouponDao
-import com.messon.student.app.data.local.enitity.CouponEntity
-import com.messon.student.app.presentation.mapper.toEntity
 import com.messon.student.app.utils.Error
-import com.messon.student.app.utils.LocalError
 import com.messon.student.app.data.local.converter.DateTimeConverters
 import kotlinx.datetime.LocalDate
 
@@ -32,44 +26,22 @@ class CouponRepository(
         token: String
     ): Result<CouponDetail, Error> {
 
-
-        val remoteResult: Result<CouponDetail, NetworkError> = try {
-            val apiResult = couponApi.fetchCoupon(token, mealSlot)
-            when (apiResult) {
-                is Result.Success -> Result.Success(apiResult.data.toDomain())
-                is Result.Error -> Result.Error(apiResult.error)
-            }
-        } catch (e: Exception) {
-            log.e { "Network error: ${e.message}" }
-            Result.Error(NetworkError.UNKNOWN)
-        }
-
-
-        if (remoteResult is Result.Success) {
-            try {
-                couponDao.insertCoupon(remoteResult.data.toEntity())
-                Log.d(tag = "room", message = {remoteResult.toString()})
-            } catch (e: Exception) {
-                log.e { "Room insert failed: ${e.message}" }
-                return Result.Error(LocalError.WRITE_ERROR)
-            }
-        }
-
-
-        val localCoupon: CouponEntity? = try {
-            couponDao.getCouponByDateAndMeal(
-                date = date,
+        return when (
+            val result =couponApi.fetchCoupon(
+                token = token,
                 mealSlot = mealSlot
             )
+        ) {
+            is Result.Success -> {
 
-        } catch (e: Exception) {
-            null
-        }
+                val dto = result.data
 
-        return if (localCoupon != null) {
-            Result.Success(localCoupon.toDomain())
-        } else {
-            Result.Error(LocalError.NOT_FOUND)
+
+                Result.Success(
+                    data = dto.toDomain()
+                )
+            }
+            is Result.Error -> Result.Error(result.error)
         }
     }
 }

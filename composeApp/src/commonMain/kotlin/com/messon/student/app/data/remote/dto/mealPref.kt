@@ -26,6 +26,8 @@ data class PrefSetupDto(
     @SerialName("is_compulsory")
     val isCompulsory: Boolean,
 
+
+
 )
 
 @Serializable

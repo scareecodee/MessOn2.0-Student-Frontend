@@ -9,25 +9,28 @@ data class CouponDetailDto(
     @SerialName("coupon_id")
     val couponId: String,
 
-    @SerialName("user_id")
+    @SerialName("student_id")
     val uid: String,
+
+    @SerialName("mess_id")
+    val messId: String,
+
+    @SerialName("college_id")
+    val collegeId: String,
 
     @SerialName("date")
     val date: LocalDate,
 
-    @SerialName("meal")
+    @SerialName("meal_slot")
     val mealSlot: String,
 
-    @SerialName("used_at")
+    @SerialName("scanned_at")
     val usedAt: Int?,
-
-    @SerialName("expires_at")
-    val expireAt: Long?,
 
     @SerialName("signature")
     val signature:String,
 
-    @SerialName("mealType")
+    @SerialName("meal_type")
     val mealType: String
 
 )
