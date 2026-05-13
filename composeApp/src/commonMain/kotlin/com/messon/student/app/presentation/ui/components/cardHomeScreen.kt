@@ -38,7 +38,6 @@ fun CardHomeScreen(
     borderColor: Color,
     containerColor:Color,
     mealSlot: MealSlot,
-    fetchMenuState: FetchMenuState
 ){
     val Log= Logger.withTag("CMP_LOG")
     Card(
@@ -51,13 +50,13 @@ fun CardHomeScreen(
         ,
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = containerColor
+            containerColor = Color.White
         )
     ) {
         ConstraintLayout (
             modifier = Modifier.fillMaxSize()
         ){
-            val (qrIconRef,mealSlotRef,dishesRef,circularProgIndic)=createRefs()
+            val (qrIconRef,mealSlotRef)=createRefs()
             Icon(
                 painter = painterResource(Res.drawable.qr),
                 contentDescription ="qr icon",
@@ -67,95 +66,21 @@ fun CardHomeScreen(
                     end.linkTo(parent.end)
                     top.linkTo(parent.top, margin = 18.dp)
                 }
-                    .size(50.dp)
+                    .size(80.dp)
             )
 
             Text(
-                text =mealSlot.value,
+                text =mealSlot.value.replaceFirstChar { it.uppercaseChar() },
                 fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                 color =borderColor,
                 fontSize = 14.sp,
                 modifier = Modifier.constrainAs(mealSlotRef){
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(qrIconRef.bottom, margin = 15.dp)
+                    top.linkTo(qrIconRef.bottom, margin = 5.dp)
+                    bottom.linkTo(parent.bottom, margin = 5.dp)
                 }
             )
-
-            when(fetchMenuState){
-                is FetchMenuState.Loading -> {
-                  CircularProgressIndicator(
-                      color = borderColor,
-                      strokeWidth = 3.dp,
-                      strokeCap = StrokeCap.Round,
-                      modifier = Modifier.size(30.dp)
-                          .constrainAs(circularProgIndic){
-                              bottom.linkTo(parent.bottom)
-                          start.linkTo(parent.start, margin = 8.dp)
-                          end.linkTo(parent.end, margin = 8.dp)
-                          top.linkTo(mealSlotRef.bottom)
-                      }
-                  )
-                }
-
-                is FetchMenuState.Success -> {
-                    val menu = fetchMenuState.menus[1]
-
-                    val dishes = when(mealSlot){
-                        MealSlot.BREAKFAST -> menu.toString()
-                        MealSlot.LUNCH -> menu.toString()
-                        MealSlot.DINNER -> menu.toString()
-                    }
-                    Log.d(tag ="home screen", message = {dishes})
-                    Text(
-                        text = dishes.ifEmpty { "pull to refresh" },
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.Black,
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                        modifier = Modifier.constrainAs(dishesRef){
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            top.linkTo(mealSlotRef.bottom, margin = 12.dp)
-                        }
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-
-                is FetchMenuState.Idle -> {
-                    Text(
-                        text = "pull to refresh",
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.Black,
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                        modifier = Modifier.constrainAs(dishesRef){
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            top.linkTo(mealSlotRef.bottom, margin = 12.dp)
-                        }
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-                is FetchMenuState.Error -> {
-                    Text(
-                        text = "unable to load",
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.Black,
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                        modifier = Modifier.constrainAs(dishesRef){
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            top.linkTo(mealSlotRef.bottom, margin = 12.dp)
-                        }
-                            .padding(horizontal = 8.dp)
-                    )
-                }
-            }
 
         }
     }

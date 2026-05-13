@@ -20,5 +20,4 @@ object CustomColors{
     val Green500 = Color(0xFF22C55E)
     val Red50 = Color(0xFFFEF2F2)
     val Red500 = Color(0xFFEF4444)
-
 }

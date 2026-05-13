@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.messon.student.app.presentation.ui.components.StarRatingBar
 import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
@@ -60,8 +59,6 @@ fun RegisterComplaintScreen(
     onBackBtnClick:()-> Unit,
     limit: Int = 1000
 ) {
-    var complaint by remember { mutableStateOf("") }
-    val currentFeedbackLength = complaint.length
     var rating by remember { mutableStateOf(0) }
 
     ConstraintLayout(
@@ -148,24 +145,16 @@ fun RegisterComplaintScreen(
                             overflow = TextOverflow.Ellipsis
                         )
                         Spacer(modifier = Modifier.size(15.dp))
-                        StarRatingBar(
-                            rating = rating,
-                            onRatingChanged = { rating = it },
-                            maxStars =5,
-                            filledColor = Color(0xFFFFC107),
-                            outlineColor = Color.LightGray
-                        )
+//                        StarRatingBar(
+//                            rating = rating,
+//                            onRatingChanged = { rating = it },
+//                            maxStars =5,
+//                            filledColor = Color(0xFFFFC107),
+//                            outlineColor = Color.LightGray
+//                        )
                     }
                 }
             }
-
-//            item {
-//                AnimatedContent(
-//                    targetState =
-//                ){
-//
-//                }
-//            }
         }
 
 

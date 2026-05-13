@@ -150,12 +150,11 @@ fun ContentScreen(
                 }
             },
             onComplaintClick ={
-                navController.navigate(Screen.RegisterComplainScreen.route){
+                navController.navigate(Screen.RatingScreen.route){
                     launchSingleTop = true
                 }
             },
             couponViewModel = couponViewModel,
-            menuFetchVM=menuFetchVM,
             authSecureStorage = authSecureStorage,
            onMealPlannerClick = {
                navController.navigate(Screen.MealPreferenceScreen.route){

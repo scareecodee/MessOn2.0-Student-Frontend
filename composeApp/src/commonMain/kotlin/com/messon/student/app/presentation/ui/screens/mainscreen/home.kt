@@ -82,16 +82,12 @@ fun HomeScreen(
     onBellIconClick:()-> Unit,
     onComplaintClick:()->Unit,
     couponViewModel: CouponViewModel,
-    menuFetchVM: MenuFetchVM,
     authSecureStorage: AuthSecureStorage,
     onMealPlannerClick:()->Unit
-){
-    val pullToRefreshState = rememberPullToRefreshState()
+) {
 
     var userName by remember { mutableStateOf("") }
-    val menuState by menuFetchVM.uiState.collectAsStateWithLifecycle()
-    val isRefreshing = menuState is FetchMenuState.Loading
-    var clickedCardIndex by remember{ mutableIntStateOf(-1) }
+    var clickedCardIndex by remember { mutableIntStateOf(-1) }
     val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
     val dayWithDate = buildAnnotatedString {
         withStyle(
@@ -113,42 +109,31 @@ fun HomeScreen(
             append(getCurrentDate())
         }
     }
-    LaunchedEffect(Unit){
-        userName=authSecureStorage.getName()?:""
+    LaunchedEffect(Unit) {
+        userName = authSecureStorage.getName() ?: ""
     }
 
     LaunchedEffect(uiState) {
         if (uiState is CouponState.Error) {
-            clickedCardIndex=-1
+            clickedCardIndex = -1
             showToast((uiState as CouponState.Error).message)
             couponViewModel.clearError()
         }
     }
 
-
-
-//    LaunchedEffect(menuState) {
-//
-//        if (menuState is MessMenuState.Error) {
-//            showToast((menuState as MessMenuState.Error).message)
-//            messMenuViewModel.clearCurrentDayMenuError()
-//        }
-//    }
-
-
-
-    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        val screenHeight=maxHeight
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val screenHeight = maxHeight
         ConstraintLayout(
             modifier = modifier.fillMaxSize()
+                .background(CustomColors.OffWhite)
                 .blur(if (clickedCardIndex != -1) 2.5.dp else 0.dp)
 
-        ){
-            val (coloredBoxRef,whiteBoxRef,greetingsRef,bellIconRef,lazyColumnRef,todaysDateRef)=createRefs()
+        ) {
+            val (coloredBoxRef, whiteBoxRef, greetingsRef, bellIconRef, lazyColumnRef, todaysDateRef) = createRefs()
 
 
             Box(
-                modifier = Modifier.constrainAs(coloredBoxRef){
+                modifier = Modifier.constrainAs(coloredBoxRef) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -161,8 +146,8 @@ fun HomeScreen(
             )
 
             Box(
-                modifier = Modifier.constrainAs(bellIconRef){
-                    top.linkTo(parent.top, margin =60.dp)
+                modifier = Modifier.constrainAs(bellIconRef) {
+                    top.linkTo(parent.top, margin = 60.dp)
                     end.linkTo(parent.end, margin = 25.dp)
                 }
                     .size(30.dp)
@@ -177,11 +162,11 @@ fun HomeScreen(
                     )
                     .clip(CircleShape)
                     .clickable(
-                        enabled = clickedCardIndex==-1
-                    ){
+                        enabled = clickedCardIndex == -1
+                    ) {
                         onBellIconClick()
                     }
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Bell icon",
@@ -192,7 +177,7 @@ fun HomeScreen(
             Text(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                text ="Hey, $userName \uD83D\uDC4B Have a great meal!",
+                text = "Hey, $userName \uD83D\uDC4B Have a great meal!",
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.opensansregular)),
                 modifier = Modifier.constrainAs(greetingsRef) {
@@ -205,29 +190,29 @@ fun HomeScreen(
             )
 
             Box(
-                modifier = Modifier.constrainAs(whiteBoxRef){
+                modifier = Modifier.constrainAs(whiteBoxRef) {
                     top.linkTo(parent.top, margin = 110.dp)
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    height= Dimension.fillToConstraints
+                    height = Dimension.fillToConstraints
                 }
                     .fillMaxWidth()
                     .background(
                         color = Color.White,
                         shape = RoundedCornerShape(
-                            topEnd =30.dp,
+                            topEnd = 30.dp,
                             topStart = 30.dp
                         )
                     )
             )
 
             Text(
-                text =dayWithDate ,
+                text = dayWithDate,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                modifier = Modifier.constrainAs(todaysDateRef){
+                modifier = Modifier.constrainAs(todaysDateRef) {
                     start.linkTo(parent.start, margin = 20.dp)
                     top.linkTo(whiteBoxRef.top)
                 }
@@ -235,43 +220,22 @@ fun HomeScreen(
 
             )
             Spacer(modifier = Modifier.height(10.dp))
-
-            PullToRefreshBox(
-                state = pullToRefreshState,
-                indicator = {
-                    PullToRefreshDefaults.Indicator(
-                        containerColor = CustomColors.RichCerulean,
-                        color = Color.White,
-                        isRefreshing = isRefreshing,
-                        state = pullToRefreshState
-                    )
-                },
-                isRefreshing = isRefreshing,
-                onRefresh = {
-//                    messMenuViewModel.onMenuCardClick(
-//                        getCurrentDay().lowercase(), currentDay = true
-//                    )
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .constrainAs(lazyColumnRef){
-                        top.linkTo(todaysDateRef.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom)
-                        height= Dimension.fillToConstraints
-                    },
-                contentAlignment = Alignment.TopCenter
-            ){
                 LazyColumn(
                     userScrollEnabled = clickedCardIndex == -1,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
+                        .constrainAs(lazyColumnRef) {
+                            top.linkTo(todaysDateRef.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                            height = Dimension.fillToConstraints
+                        }
 
                 ) {
                     item {
 
                         Text(
-                            text ="Today’s Coupons",
+                            text = "Today’s Coupons",
                             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                             fontSize = 16.sp,
                             modifier = Modifier.padding(start = 20.dp)
@@ -294,39 +258,36 @@ fun HomeScreen(
                         ) {
                             item {
                                 CardHomeScreen(
-                                    fetchMenuState = menuState,
                                     modifier = Modifier.padding(start = 15.dp),
                                     borderColor = CustomColors.RichCerulean,
                                     containerColor = Color(0xFFF5F8FA),
                                     mealSlot = MealSlot.BREAKFAST,
                                     onCardClick = {
-                                        clickedCardIndex=0
+                                        clickedCardIndex = 0
                                         couponViewModel.onCouponClick(mealSlot = MealSlot.BREAKFAST.value)
                                     }
                                 )
                             }
                             item {
                                 CardHomeScreen(
-                                    fetchMenuState = menuState,
                                     modifier = Modifier,
                                     borderColor = CustomColors.HoneyBronze,
-                                    containerColor =Color(0xFFFFFBF4),
+                                    containerColor = Color(0xFFFFFBF4),
                                     mealSlot = MealSlot.LUNCH,
                                     onCardClick = {
-                                        clickedCardIndex=1
+                                        clickedCardIndex = 1
                                         couponViewModel.onCouponClick(mealSlot = MealSlot.LUNCH.value)
                                     }
                                 )
                             }
                             item {
                                 CardHomeScreen(
-                                    fetchMenuState = menuState,
                                     modifier = Modifier.padding(end = 15.dp),
                                     borderColor = CustomColors.BlackberryCream,
-                                    containerColor =Color(0xFFF6F5F7),
+                                    containerColor = Color(0xFFF6F5F7),
                                     mealSlot = MealSlot.DINNER,
                                     onCardClick = {
-                                        clickedCardIndex=2
+                                        clickedCardIndex = 2
                                         couponViewModel.onCouponClick(mealSlot = MealSlot.DINNER.value)
                                     }
                                 )
@@ -371,7 +332,7 @@ fun HomeScreen(
 
                     item {
                         AnalyticsTab(
-                            isClickable =clickedCardIndex==-1,
+                            isClickable = clickedCardIndex == -1,
                             modifier = Modifier
                                 .padding(horizontal = 15.dp)
                         )
@@ -381,7 +342,7 @@ fun HomeScreen(
                         QuickAccessBox(
                             icon = rememberVectorPainter(Icons.Outlined.Mood),
                             title = "Feedback",
-                            isClickable=clickedCardIndex == -1,
+                            isClickable = clickedCardIndex == -1,
                             modifier = Modifier
                                 .padding(vertical = 10.dp, horizontal = 15.dp),
                             onClick = onComplaintClick
@@ -392,14 +353,13 @@ fun HomeScreen(
                         QuickAccessBox(
                             icon = painterResource(Res.drawable.preference),
                             title = "Meal Planner",
-                            isClickable=clickedCardIndex == -1,
+                            isClickable = clickedCardIndex == -1,
                             modifier = Modifier
                                 .padding(vertical = 10.dp, horizontal = 15.dp),
                             onClick = onMealPlannerClick
                         )
                     }
                 }
-            }
 
         }
         when (uiState) {
@@ -412,7 +372,7 @@ fun HomeScreen(
 
             is CouponState.Success -> {
                 val data = (uiState as CouponState.Success).couponDetail
-                val dataAsJson=Json.encodeToString(data)
+                val dataAsJson = Json.encodeToString(data)
                 AnimatedVisibility(
                     visible = clickedCardIndex != -1,
                     enter = fadeIn() + scaleIn(),
@@ -421,7 +381,7 @@ fun HomeScreen(
                     CallCouponCard(
                         onCloseBtnClick = {
                             clickedCardIndex = -1
-                                          },
+                        },
                         data = dataAsJson,
                         modifier = Modifier.height(screenHeight * 0.45f),
                         clickedCardIndex = clickedCardIndex,
@@ -431,13 +391,12 @@ fun HomeScreen(
                 }
             }
 
-            is CouponState.Error-> Unit
+            is CouponState.Error -> Unit
         }
 
 
-
     }
-    }
+}
 
 
 @Composable

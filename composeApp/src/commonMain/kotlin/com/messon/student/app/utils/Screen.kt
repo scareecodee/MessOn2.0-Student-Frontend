@@ -11,5 +11,7 @@ sealed class Screen(val route: String) {
     object MealPreferenceScreen: Screen(route="meal_pref-screen")
 
     object CollegeListScreen: Screen(route="college_list_screen")
+    object RatingScreen: Screen(route="rating_screen")
+
 
 }

@@ -21,6 +21,7 @@ import com.messon.student.app.presentation.ui.screens.mainscreen.MainScreen
 import com.messon.student.app.presentation.ui.screens.mess.MealPreferenceScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.NotificationScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.RegisterComplaintScreen
+import com.messon.student.app.presentation.ui.screens.mess.RatingScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
@@ -173,6 +174,14 @@ fun AppNav(
             )
         }
 
-
+        composable(
+            route = Screen.RatingScreen.route,
+            enterTransition = enterLeft,
+            exitTransition = exitRight
+        ) {
+            RatingScreen(
+                onBackBtnClick = {navController.popBackStack()}
+            )
+        }
     }
 }

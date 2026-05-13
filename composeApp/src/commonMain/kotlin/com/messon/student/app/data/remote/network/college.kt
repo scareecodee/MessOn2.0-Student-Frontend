@@ -14,7 +14,7 @@ import io.ktor.client.request.get
 import com.messon.student.app.utils.Result
 
 
-private const val BASE_URL = "http://172.18.9.63:8000/"
+private const val BASE_URL = "https://messon2-0-backend.onrender.com/"
 
 class CollegeApi(
     private val httpClient: HttpClient

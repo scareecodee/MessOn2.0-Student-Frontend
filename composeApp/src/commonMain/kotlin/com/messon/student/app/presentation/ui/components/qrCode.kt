@@ -54,7 +54,6 @@ fun QrCode(
                 )
             }
         )
-        logo= QrKitLogo(myLogo)
     }
 
     Image(
