@@ -150,7 +150,7 @@ fun ContentScreen(
                 }
             },
             onComplaintClick ={
-                navController.navigate(Screen.RatingScreen.route){
+                navController.navigate(Screen.ViewComplaintsScreen.route){
                     launchSingleTop = true
                 }
             },

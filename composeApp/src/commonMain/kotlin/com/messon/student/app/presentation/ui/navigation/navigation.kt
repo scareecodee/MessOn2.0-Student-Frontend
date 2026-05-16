@@ -20,8 +20,9 @@ import com.messon.student.app.presentation.ui.screens.college.CollegeListScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.MainScreen
 import com.messon.student.app.presentation.ui.screens.mess.MealPreferenceScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.NotificationScreen
-import com.messon.student.app.presentation.ui.screens.mainscreen.RegisterComplaintScreen
 import com.messon.student.app.presentation.ui.screens.mess.RatingScreen
+import com.messon.student.app.presentation.ui.screens.mess.RegisterComplaintScreen
+import com.messon.student.app.presentation.ui.screens.mess.ViewComplaintsScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
@@ -118,22 +119,6 @@ fun AppNav(
         }
 
         composable(
-            route = Screen.RegisterComplainScreen.route,
-            enterTransition = enterLeft,
-            exitTransition = exitRight
-        ) {
-            RegisterComplaintScreen(
-                modifier = Modifier,
-                heading = "Mess Feedback",
-                subHeading = "Report an issue or suggest a change to today's menu.\n\n",
-                onSendClick = {},
-                onBackBtnClick ={
-                    navController.popBackStack()
-                },
-            )
-        }
-
-        composable(
             route = Screen.NotificationScreen.route,
             enterTransition = enterLeft,
             exitTransition = exitRight
@@ -181,6 +166,27 @@ fun AppNav(
         ) {
             RatingScreen(
                 onBackBtnClick = {navController.popBackStack()}
+            )
+        }
+
+        composable(
+            route = Screen.RegisterComplaintScreen.route,
+            enterTransition = enterLeft,
+            exitTransition = exitRight
+        ) {
+            RegisterComplaintScreen(
+                onBackClick = {navController.popBackStack()}
+            )
+        }
+
+        composable(
+            route = Screen.ViewComplaintsScreen.route,
+            enterTransition = enterLeft,
+            exitTransition = exitRight
+        ) {
+            ViewComplaintsScreen(
+                onRegisterCompClick = {navController.navigate(Screen.RegisterComplaintScreen.route)},
+                onBackClick = {navController.popBackStack()}
             )
         }
     }

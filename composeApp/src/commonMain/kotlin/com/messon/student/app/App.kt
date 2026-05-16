@@ -7,6 +7,7 @@ import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.ui.navigation.AppNav
 import com.messon.student.app.presentation.ui.screens.mess.RatingScreen
+import com.messon.student.app.presentation.ui.screens.mess.ViewComplaintsScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
@@ -34,5 +35,7 @@ fun App(
             menuFetchVM=menuFetchVM,
             mealPlannerViewModel = mealPlannerViewModel
         )
+
+
     }
 }
