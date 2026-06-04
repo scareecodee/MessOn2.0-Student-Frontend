@@ -18,10 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.theme.CustomColors.LightGrayBlue
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
@@ -46,7 +44,7 @@ fun InteractionButton(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = if (isSelected) Color.White else LightGrayBlue
+            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.outline
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
@@ -54,7 +52,7 @@ fun InteractionButton(
             style = MaterialTheme.typography.labelMedium.copy(
                 fontSize =14.sp,
                 fontFamily = FontFamily(Font(Res.font.opensansmedium)),
-                color = if (isSelected) Color.White else LightGrayBlue
+                color = if (isSelected) Color.White else MaterialTheme.colorScheme.outline
             )
         )
     }

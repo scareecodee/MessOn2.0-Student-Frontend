@@ -1,4 +1,5 @@
 package com.messon.student.app.presentation.ui.components
+
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -39,23 +40,22 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun MealTypeSelector(
-    selected:Int,
-    onSelect:(Int)->Unit
-){
+    selected: Int,
+    onSelect: (Int) -> Unit
+) {
     BoxWithConstraints(
         Modifier
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(32.dp))
-            .background(Color.LightGray.copy(.1f))
-            .border(1.dp, Color.White, RoundedCornerShape(32.dp))
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), RoundedCornerShape(32.dp))
             .padding(4.dp)
-    ){
-
+    ) {
         val tabWidth = maxWidth / 2
 
         val indicatorOffset by animateDpAsState(
-            targetValue = if(selected == 0) 0.dp else tabWidth,
+            targetValue = if (selected == 0) 0.dp else tabWidth,
             label = ""
         )
 
@@ -65,17 +65,16 @@ fun MealTypeSelector(
                 .width(tabWidth)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(28.dp))
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         )
 
-        Row(Modifier.fillMaxSize()){
-
+        Row(Modifier.fillMaxSize()) {
             MealTypeButton(
                 title = "Vegetarian",
                 icon = Icons.Default.Eco,
                 selected = selected == 0,
                 modifier = Modifier.weight(1f)
-            ){
+            ) {
                 onSelect(0)
             }
 
@@ -84,7 +83,7 @@ fun MealTypeSelector(
                 icon = Icons.Default.Whatshot,
                 selected = selected == 1,
                 modifier = Modifier.weight(1f)
-            ){
+            ) {
                 onSelect(1)
             }
         }
@@ -93,33 +92,30 @@ fun MealTypeSelector(
 
 @Composable
 fun MealTypeButton(
-    title:String,
+    title: String,
     icon: ImageVector,
-    selected:Boolean,
+    selected: Boolean,
     modifier: Modifier = Modifier,
-    onClick:()->Unit
-){
-
+    onClick: () -> Unit
+) {
     Box(
         modifier
             .fillMaxHeight()
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ){
+            ) {
                 onClick()
             },
         contentAlignment = Alignment.Center
-    ){
-
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
-        ){
-
+        ) {
             Icon(
                 icon,
                 null,
-                tint = if(selected) Color.Black else Color.Gray,
+                tint = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
 
@@ -127,9 +123,9 @@ fun MealTypeButton(
 
             Text(
                 title,
-                fontSize =12.sp,
+                fontSize = 12.sp,
                 fontFamily = FontFamily(Font(Res.font.opensansmedium)),
-                color = if(selected) Color.Black else Color.Gray
+                color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

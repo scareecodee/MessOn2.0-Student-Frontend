@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +29,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -68,7 +68,7 @@ fun ExpandedMenuCard(
                   Text(
                       text =day,
                       fontSize = 16.sp,
-                      color = CustomColors.RichCerulean,
+                      color = MaterialTheme.colorScheme.secondary,
                       fontFamily = FontFamily(
                           Font(Res.font.opensanssemiBold)
                       ),
@@ -94,21 +94,21 @@ fun ExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Breakfast",
               dishes = breakfastDishes?:"Unable to load",
-              color = CustomColors.RichCerulean
+              color = MaterialTheme.colorScheme.secondary
           )
 
           EachItemExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Lunch",
               dishes = lunchDishes?:"Unable to load",
-              color = CustomColors.HoneyBronze
+              color =MaterialTheme.colorScheme.secondary
           )
 
           EachItemExpandedMenuCard(
               modifier = Modifier.align(Alignment.Start),
               mealSlot = "Dinner",
               dishes = dinnerDishes?:"Unable to load",
-              color = CustomColors.BlackberryCream
+              color = MaterialTheme.colorScheme.onBackground
           )
       }
   }

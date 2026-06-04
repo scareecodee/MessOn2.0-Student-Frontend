@@ -1,4 +1,5 @@
 package com.messon.student.app.presentation.ui.screens.mainscreen
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -55,7 +57,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.messon.student.app.domain.auth.AuthSecureStorage
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -71,6 +72,7 @@ import com.messon.student.app.utils.MealSlot
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import com.messon.student.app.utils.getCurrentDate
 import com.messon.student.app.utils.getCurrentDay
+import com.messon.student.app.theme.MessonTheme
 import multiplatform.network.cmptoast.showToast
 import kotlinx.serialization.json.Json
 import messon.composeapp.generated.resources.preference
@@ -79,20 +81,20 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun HomeScreen(
     modifier: Modifier,
-    onBellIconClick:()-> Unit,
-    onComplaintClick:()->Unit,
+    onBellIconClick: () -> Unit,
+    onComplaintClick: () -> Unit,
     couponViewModel: CouponViewModel,
     authSecureStorage: AuthSecureStorage,
-    onMealPlannerClick:()->Unit
+    onMealPlannerClick: () -> Unit
 ) {
-
     var userName by remember { mutableStateOf("") }
     var clickedCardIndex by remember { mutableIntStateOf(-1) }
     val uiState by couponViewModel.uiState.collectAsStateWithLifecycle()
+
     val dayWithDate = buildAnnotatedString {
         withStyle(
             style = SpanStyle(
-                color = CustomColors.RichCerulean,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 23.5.sp
             )
         ) {
@@ -102,13 +104,14 @@ fun HomeScreen(
 
         withStyle(
             style = SpanStyle(
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground, // Replaced static Color.Black with theme onBackground
                 fontSize = 14.5.sp
             )
         ) {
             append(getCurrentDate())
         }
     }
+
     LaunchedEffect(Unit) {
         userName = authSecureStorage.getName() ?: ""
     }
@@ -125,12 +128,10 @@ fun HomeScreen(
         val screenHeight = maxHeight
         ConstraintLayout(
             modifier = modifier.fillMaxSize()
-                .background(CustomColors.OffWhite)
+                .background(MaterialTheme.colorScheme.background)
                 .blur(if (clickedCardIndex != -1) 2.5.dp else 0.dp)
-
         ) {
             val (coloredBoxRef, whiteBoxRef, greetingsRef, bellIconRef, lazyColumnRef, todaysDateRef) = createRefs()
-
 
             Box(
                 modifier = Modifier.constrainAs(coloredBoxRef) {
@@ -141,7 +142,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(140.dp)
                     .background(
-                        color = CustomColors.LightGrayBlue,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Adaptive banner color
                     )
             )
 
@@ -157,7 +158,7 @@ fun HomeScreen(
                     )
                     .border(
                         width = 1.dp,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), // Dynamic border outline
                         shape = CircleShape
                     )
                     .clip(CircleShape)
@@ -170,15 +171,18 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Bell icon",
+                    tint = MaterialTheme.colorScheme.onBackground, // Dynamic notification icon color
                     modifier = Modifier.padding(5.dp)
                         .size(22.dp)
                 )
             }
+
             Text(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 text = "Hey, $userName \uD83D\uDC4B Have a great meal!",
                 fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground, // Dynamic text color
                 fontFamily = FontFamily(Font(Res.font.opensansregular)),
                 modifier = Modifier.constrainAs(greetingsRef) {
                     start.linkTo(parent.start, margin = 30.dp)
@@ -199,7 +203,7 @@ fun HomeScreen(
                 }
                     .fillMaxWidth()
                     .background(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.background,
                         shape = RoundedCornerShape(
                             topEnd = 30.dp,
                             topStart = 30.dp
@@ -217,153 +221,148 @@ fun HomeScreen(
                     top.linkTo(whiteBoxRef.top)
                 }
                     .padding(top = 28.dp, bottom = 20.dp, end = 10.dp)
-
             )
+
             Spacer(modifier = Modifier.height(10.dp))
-                LazyColumn(
-                    userScrollEnabled = clickedCardIndex == -1,
-                    modifier = Modifier.fillMaxSize()
-                        .constrainAs(lazyColumnRef) {
-                            top.linkTo(todaysDateRef.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(parent.bottom)
-                            height = Dimension.fillToConstraints
-                        }
 
-                ) {
-                    item {
-
-                        Text(
-                            text = "Today’s Coupons",
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(start = 20.dp)
-                        )
-                        Text(
-                            text = "Click on the coupons to get QR",
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                            color = Color.LightGray,
-                            modifier = Modifier.padding(start = 20.dp)
-
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-
+            LazyColumn(
+                userScrollEnabled = clickedCardIndex == -1,
+                modifier = Modifier.fillMaxSize()
+                    .constrainAs(lazyColumnRef) {
+                        top.linkTo(todaysDateRef.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
                     }
-                    item {
-                        LazyRow(
-                            userScrollEnabled = clickedCardIndex == -1,
-                            horizontalArrangement = Arrangement.spacedBy(15.dp),
-                        ) {
-                            item {
-                                CardHomeScreen(
-                                    modifier = Modifier.padding(start = 15.dp),
-                                    borderColor = CustomColors.RichCerulean,
-                                    containerColor = Color(0xFFF5F8FA),
-                                    mealSlot = MealSlot.BREAKFAST,
-                                    onCardClick = {
-                                        clickedCardIndex = 0
-                                        couponViewModel.onCouponClick(mealSlot = MealSlot.BREAKFAST.value)
-                                    }
-                                )
-                            }
-                            item {
-                                CardHomeScreen(
-                                    modifier = Modifier,
-                                    borderColor = CustomColors.HoneyBronze,
-                                    containerColor = Color(0xFFFFFBF4),
-                                    mealSlot = MealSlot.LUNCH,
-                                    onCardClick = {
-                                        clickedCardIndex = 1
-                                        couponViewModel.onCouponClick(mealSlot = MealSlot.LUNCH.value)
-                                    }
-                                )
-                            }
-                            item {
-                                CardHomeScreen(
-                                    modifier = Modifier.padding(end = 15.dp),
-                                    borderColor = CustomColors.BlackberryCream,
-                                    containerColor = Color(0xFFF6F5F7),
-                                    mealSlot = MealSlot.DINNER,
-                                    onCardClick = {
-                                        clickedCardIndex = 2
-                                        couponViewModel.onCouponClick(mealSlot = MealSlot.DINNER.value)
-                                    }
-                                )
-                            }
-                        }
-                    }
+            ) {
+                item {
+                    Text(
+                        text = "Today’s Coupons",
+                        color = MaterialTheme.colorScheme.onBackground, // Adaptive header color
+                        fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                    Text(
+                        text = "Click on the coupons to get QR",
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Dynamic unselected text style
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
-                    item {
-                        Divider(
-                            thickness = 1.5.dp,
-                            color = CustomColors.OffWhite,
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(horizontal = 30.dp, vertical = 40.dp)
-                        )
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(horizontal = 18.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Analytics",
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
-
-                            )
-                            Text(
-                                text = "This Week",
-                                fontSize = 10.sp,
-                                color = CustomColors.RichCerulean,
-                                fontFamily = FontFamily(Font(Res.font.opensansregular))
+                item {
+                    LazyRow(
+                        userScrollEnabled = clickedCardIndex == -1,
+                        horizontalArrangement = Arrangement.spacedBy(15.dp),
+                    ) {
+                        item {
+                            CardHomeScreen(
+                                modifier = Modifier.padding(start = 15.dp),
+                                borderColor = MaterialTheme.colorScheme.primary,
+                                containerColor = MessonTheme.colors.infoContainer,
+                                mealSlot = MealSlot.BREAKFAST,
+                                onCardClick = {
+                                    clickedCardIndex = 0
+                                    couponViewModel.onCouponClick(mealSlot = MealSlot.BREAKFAST.value)
+                                }
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(15.dp))
-
-                    }
-
-                    item {
-                        AnalyticsTab(
-                            isClickable = clickedCardIndex == -1,
-                            modifier = Modifier
-                                .padding(horizontal = 15.dp)
-                        )
-                    }
-
-                    item {
-                        QuickAccessBox(
-                            icon = rememberVectorPainter(Icons.Outlined.Mood),
-                            title = "Feedback",
-                            isClickable = clickedCardIndex == -1,
-                            modifier = Modifier
-                                .padding(vertical = 10.dp, horizontal = 15.dp),
-                            onClick = onComplaintClick
-                        )
-                    }
-
-                    item {
-                        QuickAccessBox(
-                            icon = painterResource(Res.drawable.preference),
-                            title = "Meal Planner",
-                            isClickable = clickedCardIndex == -1,
-                            modifier = Modifier
-                                .padding(vertical = 10.dp, horizontal = 15.dp),
-                            onClick = onMealPlannerClick
-                        )
+                        item {
+                            CardHomeScreen(
+                                modifier = Modifier,
+                                borderColor = MaterialTheme.colorScheme.secondary,
+                                containerColor = MessonTheme.colors.warningContainer, // Adapting to Warning Container values
+                                mealSlot = MealSlot.LUNCH,
+                                onCardClick = {
+                                    clickedCardIndex = 1
+                                    couponViewModel.onCouponClick(mealSlot = MealSlot.LUNCH.value)
+                                }
+                            )
+                        }
+                        item {
+                            CardHomeScreen(
+                                modifier = Modifier.padding(end = 15.dp),
+                                borderColor = MaterialTheme.colorScheme.onBackground,
+                                containerColor = MessonTheme.colors.accentContainer, // Adapting to Accent Container values
+                                mealSlot = MealSlot.DINNER,
+                                onCardClick = {
+                                    clickedCardIndex = 2
+                                    couponViewModel.onCouponClick(mealSlot = MealSlot.DINNER.value)
+                                }
+                            )
+                        }
                     }
                 }
 
-        }
-        when (uiState) {
+                item {
+                    Divider(
+                        thickness = 0.35.dp,
+                        color = MessonTheme.colors.divider, // Use the custom adaptive theme divider color
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 30.dp, vertical = 40.dp)
+                    )
+                }
 
+//                item {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth()
+//                            .padding(horizontal = 18.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Text(
+//                            text = "Analytics",
+//                            fontSize = 16.sp,
+//                            color = MaterialTheme.colorScheme.onBackground, // Adaptive label color
+//                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
+//                        )
+//                        Text(
+//                            text = "This Week",
+//                            fontSize = 10.sp,
+//                            color = MaterialTheme.colorScheme.primary,
+//                            fontFamily = FontFamily(Font(Res.font.opensansregular))
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.height(15.dp))
+//                }
+
+//                item {
+//                    AnalyticsTab(
+//                        isClickable = clickedCardIndex == -1,
+//                        modifier = Modifier
+//                            .padding(horizontal = 15.dp)
+//                    )
+//                }
+
+                item {
+                    QuickAccessBox(
+                        icon = rememberVectorPainter(Icons.Outlined.Mood),
+                        title = "Feedback",
+                        isClickable = clickedCardIndex == -1,
+                        modifier = Modifier
+                            .padding(vertical = 10.dp, horizontal = 15.dp),
+                        onClick = onComplaintClick
+                    )
+                }
+
+                item {
+                    QuickAccessBox(
+                        icon = painterResource(Res.drawable.preference),
+                        title = "Meal Planner",
+                        isClickable = clickedCardIndex == -1,
+                        modifier = Modifier
+                            .padding(vertical = 10.dp, horizontal = 15.dp),
+                        onClick = onMealPlannerClick
+                    )
+                }
+            }
+        }
+
+        when (uiState) {
             CouponState.Idle -> Unit
 
             CouponState.Loading -> {
@@ -393,52 +392,48 @@ fun HomeScreen(
 
             is CouponState.Error -> Unit
         }
-
-
     }
 }
 
-
 @Composable
 fun CallCouponCard(
-    currentDate:String,
-    onCloseBtnClick:()-> Unit,
+    currentDate: String,
+    onCloseBtnClick: () -> Unit,
     data: String,
-    clickedCardIndex:Int=-1,
+    clickedCardIndex: Int = -1,
     modifier: Modifier,
     mealType: String
-){
-    when(clickedCardIndex){
-        0->CouponCard(
+) {
+    when (clickedCardIndex) {
+        0 -> CouponCard(
             modifier = modifier,
             mealSlot = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercaseChar() },
-            date=currentDate,
-            borderColor = CustomColors.RichCerulean,
-            containerColor = Color(0xFFF5F8FA),
-            data =data,
-            onCloseBtnClick = onCloseBtnClick,
-            mealType = mealType
-            )
-        1-> CouponCard(
-            modifier = modifier,
-            mealSlot = MealSlot.LUNCH.value.replaceFirstChar { it.uppercaseChar() },
-            date=currentDate,
-            borderColor = CustomColors.HoneyBronze,
-            containerColor = Color(0xFFFFFBF4),
-            data =data,
+            date = currentDate,
+            borderColor = MaterialTheme.colorScheme.primary,
+            containerColor = MessonTheme.colors.infoContainer, // Adaptive Breakfast color
+            data = data,
             onCloseBtnClick = onCloseBtnClick,
             mealType = mealType
         )
-        2->
-            CouponCard(
-                modifier = modifier,
-                mealSlot = MealSlot.DINNER.value.replaceFirstChar { it.uppercaseChar() },
-                date=currentDate,
-                borderColor = CustomColors.BlackberryCream,
-                containerColor =Color(0xFFF6F5F7),
-                data =data,
-                onCloseBtnClick = onCloseBtnClick,
-                mealType = mealType
-            )
+        1 -> CouponCard(
+            modifier = modifier,
+            mealSlot = MealSlot.LUNCH.value.replaceFirstChar { it.uppercaseChar() },
+            date = currentDate,
+            borderColor = MaterialTheme.colorScheme.secondary,
+            containerColor = MessonTheme.colors.warningContainer, // Adaptive Lunch color
+            data = data,
+            onCloseBtnClick = onCloseBtnClick,
+            mealType = mealType
+        )
+        2 -> CouponCard(
+            modifier = modifier,
+            mealSlot = MealSlot.DINNER.value.replaceFirstChar { it.uppercaseChar() },
+            date = currentDate,
+            borderColor = MaterialTheme.colorScheme.onBackground,
+            containerColor = MessonTheme.colors.accentContainer, // Adaptive Dinner color
+            data = data,
+            onCloseBtnClick = onCloseBtnClick,
+            mealType = mealType
+        )
     }
 }

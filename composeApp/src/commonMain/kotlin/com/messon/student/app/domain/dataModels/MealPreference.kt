@@ -33,3 +33,6 @@ data class DayModel(
     val label: String,
     val letter: String
 )
+
+
+data class MealMenu(val veg: String, val nonVeg: String)

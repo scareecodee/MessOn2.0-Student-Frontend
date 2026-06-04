@@ -22,6 +22,7 @@ import androidx.compose.material.icons.rounded.NightlightRound
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,8 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,13 +38,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.MealInfo
 import com.messon.student.app.presentation.ui.components.RatingCard
-import com.messon.student.app.theme.CustomColors
-import com.messon.student.app.theme.CustomColors.BlackberryCream
-import com.messon.student.app.theme.CustomColors.Cream
-import com.messon.student.app.theme.CustomColors.LightBlue
-import com.messon.student.app.theme.CustomColors.LightGrayBlue
-import com.messon.student.app.theme.CustomColors.LightLavender
-import com.messon.student.app.theme.CustomColors.OffWhite
+import com.messon.student.app.theme.MessonTheme
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansmedium
@@ -53,18 +46,9 @@ import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
 val meals = listOf(
-    MealInfo(
-        "B", "Breakfast", Icons.Rounded.FreeBreakfast, LightBlue,
-        iconColor = CustomColors.RichCerulean
-    ),
-    MealInfo(
-        "L", "Lunch", Icons.Rounded.WbSunny, Cream,
-        iconColor = CustomColors.HoneyBronze
-    ),
-    MealInfo(
-        "D", "Dinner", Icons.Rounded.NightlightRound, LightLavender,
-        iconColor = CustomColors.BlackberryCream
-    )
+    MealInfo("B", "Breakfast", Icons.Rounded.FreeBreakfast),
+    MealInfo("L", "Lunch", Icons.Rounded.WbSunny),
+    MealInfo("D", "Dinner", Icons.Rounded.NightlightRound)
 )
 
 @Composable
@@ -77,7 +61,7 @@ fun RatingScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(OffWhite)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         val (scrollContent, statusBarBox,backBtnRef,headingRef,heading) = createRefs()
         Box(
@@ -88,7 +72,7 @@ fun RatingScreen(
                         .asPaddingValues()
                         .calculateTopPadding() + 5.dp
                 )
-                .background(CustomColors.LightGrayBlue)
+                .background(MaterialTheme.colorScheme.outline)
                 .constrainAs(statusBarBox) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
@@ -143,9 +127,22 @@ fun RatingScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            items(meals) { meal ->
+            items(meals) { meal->
+                val accentColor = when(meal.id) {
+                    "B" -> MessonTheme.colors.infoContainer
+                    "L" -> MessonTheme.colors.warningContainer
+                    else -> MessonTheme.colors.accentContainer
+                }
+
+                val iconColor = when(meal.id) {
+                    "B" -> MaterialTheme.colorScheme.primary
+                    "L" -> MaterialTheme.colorScheme.secondary
+                    else -> MaterialTheme.colorScheme.onBackground
+                }
                 RatingCard(
                     meal = meal,
+                    accentColor = accentColor,
+                    iconColor = iconColor,
                     rating = ratings[meal.id] ?: 0,
                     feedbackText = feedback[meal.id] ?: "",
                     onRatingChange = { newRating ->
@@ -170,7 +167,7 @@ fun HeaderSec(
     ) {
         Text(
             text = "How was the food today?",
-            color = BlackberryCream,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 17.sp,
             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
         )
@@ -179,7 +176,7 @@ fun HeaderSec(
 
         Text(
             text = "Rate your meals to help us improve the menu.",
-            color = LightGrayBlue,
+            color =MaterialTheme.colorScheme.outline,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(Res.font.opensansmedium)),
             fontWeight = FontWeight.Medium

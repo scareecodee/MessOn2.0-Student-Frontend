@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -32,7 +32,8 @@ fun PrefMenuRow(type: String, text: String, color: Color) {
                 .padding(top = 2.dp)
                 .size(14.dp)
                 .border(1.5.dp, color, RoundedCornerShape(3.dp))
-                .background(Color.White, RoundedCornerShape(3.dp)),
+                // Adapts automatically (white in light mode, charcoal in dark mode)
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(3.dp)),
             contentAlignment = Alignment.Center
         ) {
             Box(modifier = Modifier.size(6.dp).background(color, CircleShape))
@@ -41,14 +42,14 @@ fun PrefMenuRow(type: String, text: String, color: Color) {
         Text(
             text = type,
             fontSize = 12.sp,
-            fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
-            color = CustomColors.BlackberryCream
+            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = "  :  $text",
             fontSize = 12.sp,
-            fontFamily = FontFamily(Font(Res.font.opensansregular) ),
-            color = CustomColors.BlackberryCream.copy(alpha = 0.7f),
+            fontFamily = FontFamily(Font(Res.font.opensansregular)),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

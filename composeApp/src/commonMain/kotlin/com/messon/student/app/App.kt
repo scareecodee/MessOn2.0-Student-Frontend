@@ -1,5 +1,6 @@
 package com.messon.student.app
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
@@ -12,6 +13,7 @@ import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import com.messon.student.app.theme.MessonTheme
 
 
 @Composable
@@ -23,19 +25,19 @@ fun App(
     menuFetchVM: MenuFetchVM,
     mealPlannerViewModel: MealPlannerViewModel
 ) {
-    MaterialTheme {
-        val navController=rememberNavController()
-
-        AppNav(
-            navController=navController,
-            authViewModel = authViewModel,
-            authSecureStorage=authSecureStorage,
-            couponViewModel = couponViewModel,
-            googleAuth = googleAuth,
-            menuFetchVM=menuFetchVM,
-            mealPlannerViewModel = mealPlannerViewModel
-        )
-
-
-    }
+    val navController=rememberNavController()
+    MessonTheme(
+        darkTheme = isSystemInDarkTheme(),
+        content = {
+            AppNav(
+                navController=navController,
+                authViewModel = authViewModel,
+                authSecureStorage=authSecureStorage,
+                couponViewModel = couponViewModel,
+                googleAuth = googleAuth,
+                menuFetchVM=menuFetchVM,
+                mealPlannerViewModel = mealPlannerViewModel
+            )
+        }
+    )
 }

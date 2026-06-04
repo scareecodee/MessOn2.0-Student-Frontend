@@ -1,26 +1,17 @@
 package com.messon.student.app.presentation.ui.screens.mainscreen
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,8 +22,8 @@ import com.messon.student.app.presentation.ui.screens.mess.ViewMessMenuScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
-import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.Screen
+import kotlinx.coroutines.launch
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.home
 import messon.composeapp.generated.resources.menu
@@ -48,50 +39,63 @@ fun MainScreen(
     couponViewModel: CouponViewModel,
     authViewModel: AuthViewModel,
     menuFetchVM: MenuFetchVM
-){
-    var selectedItemIndex by remember { mutableStateOf(0) }
-    val navItemList=listOf(
-        NavItem(icon = Res.drawable.home,"Home"),
-        NavItem(icon = Res.drawable.menu,"Menu"),
-        NavItem(icon = Res.drawable.person,"Profile")
+) {
+    // Standard pages mapping (0: Home, 1: Menu, 2: Profile)
+    val pageCount = 3
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
+    val coroutineScope = rememberCoroutineScope()
+
+    val navItemList = listOf(
+        NavItem(icon = Res.drawable.home, "Home"),
+        NavItem(icon = Res.drawable.menu, "Menu"),
+        NavItem(icon = Res.drawable.person, "Profile")
     )
+
     Scaffold(
-        modifier= Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             NavigationBar(
-                tonalElevation =20.dp,
-                modifier = Modifier.height(85.dp)
-                    .background(
-                        color = Color.White,
-                        shape = RoundedCornerShape(topStart =20.dp, topEnd = 20.dp)
-                    )
+                tonalElevation = 8.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end=24.dp,bottom = 16.dp) // Added floating offsets on all edges
+                    .height(70.dp) // Sleeker height footprint for a lightweight floating pill feel
                     .shadow(
-                        elevation =20.dp,
-                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(28.dp) // Fully rounded corner capsule shape
                     )
-                ,
-                containerColor = Color.White
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(28.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), // Adaptive glass boundary outline
+                        shape = RoundedCornerShape(28.dp)
+                    )
+                    .clip(RoundedCornerShape(28.dp)),
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 navItemList.forEachIndexed { index, item ->
                     NavigationBarItem(
-                        colors = NavigationBarItemColors(
-                            selectedIconColor = CustomColors.BlackberryCream,
-                            selectedTextColor = CustomColors.BlackberryCream,
-                            selectedIndicatorColor =Color(0xFFF7E6ED),
-                                    unselectedIconColor = Color.Black,
-                                    unselectedTextColor = Color.Black,
-                            disabledIconColor = Color.Black,
-                            disabledTextColor = Color.Black
-
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), // Safe dynamic pastel highlight capsule
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
-                        onClick= {
-                            selectedItemIndex=index
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         },
-                        selected = selectedItemIndex==index,
+                        selected = pagerState.currentPage == index,
                         icon = {
                             Icon(
                                 painter = painterResource(item.icon),
-                                contentDescription = "",
+                                contentDescription = item.label,
                                 modifier = Modifier.size(20.dp)
                             )
                         },
@@ -99,32 +103,33 @@ fun MainScreen(
                             Text(
                                 text = item.label,
                                 fontSize = 10.sp,
-                                fontFamily = FontFamily(Font(Res.font.opensansmedium) )
+                                fontFamily = FontFamily(Font(Res.font.opensansmedium))
                             )
                         }
                     )
                 }
             }
         }
-
-    ) {innerPadding->
+    ) { innerPadding ->
         ContentScreen(
-            modifier = Modifier.padding(top = 0.dp, bottom = innerPadding.calculateBottomPadding()),
-            selectedScreenIndex=selectedItemIndex,
-            navController=navController,
-            authSecureStorage =authSecureStorage,
+            modifier = Modifier.fillMaxSize(),
+            bottomPadding = innerPadding.calculateBottomPadding(),
+            pagerState = pagerState,
+            navController = navController,
+            authSecureStorage = authSecureStorage,
             couponViewModel = couponViewModel,
             authViewModel = authViewModel,
-            menuFetchVM=menuFetchVM
+            menuFetchVM = menuFetchVM
         )
     }
 }
 
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContentScreen(
     modifier: Modifier,
-    selectedScreenIndex: Int,
+    bottomPadding: Dp,
+    pagerState: androidx.compose.foundation.pager.PagerState,
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
@@ -141,45 +146,55 @@ fun ContentScreen(
         profileImg = authSecureStorage.getPicture()
     }
 
-    when(selectedScreenIndex){
-        0 -> HomeScreen(
-            modifier = modifier,
-            onBellIconClick = {
-                navController.navigate(Screen.NotificationScreen.route){
-                    launchSingleTop = true
-                }
-            },
-            onComplaintClick ={
-                navController.navigate(Screen.ViewComplaintsScreen.route){
-                    launchSingleTop = true
-                }
-            },
-            couponViewModel = couponViewModel,
-            authSecureStorage = authSecureStorage,
-           onMealPlannerClick = {
-               navController.navigate(Screen.MealPreferenceScreen.route){
-                   launchSingleTop = true
-               }
-           }
-        )
-        1 -> ViewMessMenuScreen(
-            onBackBtnClick = {navController.popBackStack()},
-            menuFetchVM =menuFetchVM
-        )
-        2 -> ProfileScreen(
-            modifier = modifier,
-            user = User(
-                name = name ?: "",
-                mailId = email ?: "",
-                profileImg = profileImg ?: "",
-                id = ""
-            ),
-            onLogoutClick = {
-                authViewModel.logout{
-                }
-
+    Box(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { pageIndex ->
+            when (pageIndex) {
+                0 -> HomeScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onBellIconClick = {
+                        navController.navigate(Screen.NotificationScreen.route) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onComplaintClick = {
+                        navController.navigate(Screen.ViewComplaintsScreen.route) {
+                            launchSingleTop = true
+                        }
+                    },
+                    couponViewModel = couponViewModel,
+                    authSecureStorage = authSecureStorage,
+                    onMealPlannerClick = {
+                        navController.navigate(Screen.MealPreferenceScreen.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
+                1 -> ViewMessMenuScreen(
+                    onBackBtnClick = {
+                        if (!navController.popBackStack()) {
+                            // Fallback pop
+                        }
+                    },
+                    menuFetchVM = menuFetchVM
+                )
+                2 -> ProfileScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = bottomPadding), // Non-scrollable Profile gets standard padding
+                    user = User(
+                        name = name ?: "",
+                        mailId = email ?: "",
+                        profileImg = profileImg ?: "",
+                        id = ""
+                    ),
+                    onLogoutClick = {
+                        authViewModel.logout {}
+                    }
+                )
             }
-
-        )
+        }
     }
 }

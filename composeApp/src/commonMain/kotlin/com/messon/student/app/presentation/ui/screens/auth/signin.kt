@@ -2,33 +2,20 @@ package com.messon.student.app.presentation.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +23,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
-import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.presentation.ui.state.AuthState
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.google
@@ -49,107 +35,177 @@ import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
-
-
 @Composable
 fun SignInScreen(
-    modifier: Modifier= Modifier,
-    onBtnClick:()->Unit,
+    modifier: Modifier = Modifier,
+    onBtnClick: () -> Unit,
     isCircularProgressVisible: Boolean
 ) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .background(CustomColors.OffWhite)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        val (statusBarBox, headingRef, googleBtn,textRef,circularProgress) = createRefs()
+        val (statusBarBox, illustrationRef, headingRef, subtitleRef, googleBtn, textRef, circularProgressOverlay) = createRefs()
 
-
+        // Adaptive top status bar spacer
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() + 5.dp)
-                .background(CustomColors.LightGrayBlue)
+                .background(MaterialTheme.colorScheme.background)
                 .constrainAs(statusBarBox) {
                     top.linkTo(parent.top)
-                    end.linkTo(parent.end)
+                    start.linkTo(parent.start)
                 }
         )
 
-
-        Text(
-            color = CustomColors.RichCerulean ,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            text ="Login to MessOn",
-            fontFamily = FontFamily(Font(Res.font.opensansbold)),
-            fontSize = 26.sp,
-            modifier = Modifier.padding(horizontal = 16.dp)
-                .constrainAs(headingRef){
-                    top.linkTo(parent.top, margin = 200.dp)
+        Box(
+            modifier = Modifier
+                .size(160.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                    shape = RoundedCornerShape(80.dp)
+                )
+                .constrainAs(illustrationRef) {
+                    top.linkTo(statusBarBox.bottom, margin = 40.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-        )
-
-        Button(
-            enabled = if(isCircularProgressVisible) false else true,
-            modifier = Modifier.constrainAs(googleBtn){
-                top.linkTo(headingRef.bottom, margin =35.dp)
-                end.linkTo(parent.end)
-                start.linkTo(parent.start)
-                width= Dimension.fillToConstraints
-            }.height(50.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .border(1.dp,Color.LightGray, shape =RoundedCornerShape(50.dp))
-            ,
-            onClick = onBtnClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-            )
         ) {
-            Icon(
-                painter = painterResource(Res.drawable.google),
-                contentDescription = "login",
-                tint=Color.Unspecified,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.size(10.dp))
             Text(
-                text="Continue With Google",
-                color = Color.Black,
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(Res.font.opensansmedium)),
+                text = "🍱",
+                fontSize = 56.sp,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
 
         Text(
-            text ="By continuing, you agree to our User Agreement and acknowledge that you understand the Privacy Policy",
-            fontFamily = FontFamily(Font(Res.font.opensansregular)),
-            fontSize = 12.sp,
-            color = Color.LightGray,
+            text = "Login to MessOn",
+            fontFamily = FontFamily(Font(Res.font.opensansbold)),
+            fontSize = 28.sp,
+            color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .constrainAs(textRef){
-                    bottom.linkTo(parent.bottom, margin = 100.dp)
+                .padding(horizontal = 24.dp)
+                .constrainAs(headingRef) {
+                    top.linkTo(illustrationRef.bottom, margin = 28.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(horizontal = 20.dp)
         )
 
-        if(isCircularProgressVisible){
-            CircularProgressIndicator(
-                strokeWidth = 4.dp,
-                strokeCap = StrokeCap.Round,
-                color = CustomColors.RichCerulean,
-                modifier = Modifier.size(50.dp)
-                    .constrainAs(circularProgress){
+        Text(
+            text = "Your daily campus mess companion",
+            fontFamily = FontFamily(Font(Res.font.opensansregular)),
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, // High legibility secondary color
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .constrainAs(subtitleRef) {
+                    top.linkTo(headingRef.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+        )
+
+        // Modernized elevated Google Button
+        Button(
+            onClick = { onBtnClick() },
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surface, // Clean white in Light Mode, Slate Charcoal in Dark Mode
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 4.dp
+            ),
+            modifier = Modifier
+                .constrainAs(googleBtn) {
+                    top.linkTo(subtitleRef.bottom, margin = 48.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
+                .height(56.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), // Perfect low-contrast outline matching system theme
+                    shape = RoundedCornerShape(28.dp)
+                )
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.google),
+                contentDescription = "Google Logo",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "Continue with Google",
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(Res.font.opensansmedium)),
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface // Responsive un-hardcoded text color
+            )
+        }
+
+        // Beautifully balanced disclaimer block
+        Text(
+            text = "By continuing, you agree to our User Agreement and acknowledge that you understand the Privacy Policy",
+            fontFamily = FontFamily(Font(Res.font.opensansregular)),
+            fontSize = 11.sp,
+            lineHeight = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), // High readability fallback
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .constrainAs(textRef) {
+                    bottom.linkTo(parent.bottom, margin = 48.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(horizontal = 40.dp)
+        )
+
+        if (isCircularProgressVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.35f)) // Dim screen overlay
+                    .clickable(enabled = false) {} // Absorb pointer clicks cleanly
+                    .constrainAs(circularProgressOverlay) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    modifier = Modifier.size(90.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            strokeWidth = 4.dp,
+                            strokeCap = StrokeCap.Round,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
-            )
+                }
+            }
         }
     }
 }
@@ -161,17 +217,15 @@ fun SignInRoute(
     onLoginSuccess: () -> Unit
 ) {
     var isVisible by remember { mutableStateOf(false) }
-    var showToast by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val state = viewModel.uiState.value
-
 
     isVisible = state is AuthState.Loading
 
     SignInScreen(
         onBtnClick = {
             viewModel.onGoogleClick(googleAuth = googleAuth)
-                     },
+        },
         isCircularProgressVisible = isVisible
     )
 
@@ -181,14 +235,13 @@ fun SignInRoute(
         }
         if (state is AuthState.Error) {
             showToast(
-                textSize = 20.sp,
+                textSize = 14.sp, // Modern balanced text size for toasts
                 message = state.message,
-                backgroundColor = Color.LightGray,
-                textColor = CustomColors.RichCerulean,
+                backgroundColor = Color.DarkGray, // Adaptive styling for errors
+                textColor = Color.White,
                 gravity = ToastGravity.Top,
                 padding = ToastPadding(12),
             )
         }
     }
 }
-

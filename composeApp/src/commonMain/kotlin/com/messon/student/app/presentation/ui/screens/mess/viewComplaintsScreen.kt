@@ -23,15 +23,10 @@ import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.Complaint
 import com.messon.student.app.presentation.ui.components.ComplaintCard
 import com.messon.student.app.presentation.ui.components.SearchBar
-import com.messon.student.app.theme.CustomColors
-import com.messon.student.app.theme.CustomColors.BlackberryCream
-import com.messon.student.app.theme.CustomColors.OffWhite
-import com.messon.student.app.theme.CustomColors.RichCerulean
 import com.messon.student.app.utils.ComplaintStatus
 import com.messon.student.app.utils.UserInteraction
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
@@ -71,14 +66,14 @@ fun ViewComplaintsScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(OffWhite)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         val (header, fab,list,statusBarBox,backBtnRef,headingRef,searchBarRef,filtersRef) = createRefs()
         Box(
             Modifier
                 .fillMaxWidth()
                 .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() + 5.dp)
-                .background(CustomColors.LightGrayBlue)
+                .background(MaterialTheme.colorScheme.outline)
                 .constrainAs(statusBarBox) {
                     top.linkTo(parent.top)
                 }
@@ -92,15 +87,20 @@ fun ViewComplaintsScreen(
             modifier = Modifier.constrainAs(backBtnRef) {
                 start.linkTo(parent.start, 15.dp)
                 top.linkTo(statusBarBox.bottom, 10.dp)
-            }
+            },
         ) {
-            Icon(Icons.Default.ChevronLeft, contentDescription = "back", modifier = Modifier.size(28.dp)
+            Icon(
+                Icons.Default.ChevronLeft,
+                contentDescription = "back",
+                modifier = Modifier.size(28.dp),
+                tint=MaterialTheme.colorScheme.onBackground
             )
         }
 
         Text(
             text = "Complaints",
             fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground,
             fontFamily = FontFamily(Font(Res.font.opensansbold)),
             modifier = Modifier.constrainAs(headingRef) {
                 start.linkTo(backBtnRef.end, 5.dp)
@@ -135,7 +135,7 @@ fun ViewComplaintsScreen(
             ) {
                 items(ComplaintStatus.entries) { status ->
                     FilterChip(
-                        selected = selectedFilter == status,
+                        selected =  selectedFilter == status,
                         onClick = { selectedFilter = status },
                         label = {
                             Text(
@@ -147,12 +147,26 @@ fun ViewComplaintsScreen(
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = BlackberryCream,
+                            // Selected: Prominent primary brand color with high-contrast text overlay
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
                             selectedLabelColor = Color.White,
-                            containerColor = Color.White,
-                            labelColor = BlackberryCream
+
+                            // Unselected: Soft surface color with muted secondary text
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor =  Color.White,
+
+                            // Handle disabled fallback states safely
+                            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                         ),
-                        border = null,
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected =   selectedFilter == status,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Dynamic outline ring
+                            selectedBorderColor = Color.Transparent, // No border needed when filled
+                            borderWidth = 1.dp,
+                            selectedBorderWidth = 0.dp
+                        ),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.height(36.dp)
                     )
@@ -202,7 +216,7 @@ fun ViewComplaintsScreen(
             onClick = {
                 onRegisterCompClick()
             },
-            containerColor = RichCerulean,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
             shape = CircleShape,
             modifier = Modifier

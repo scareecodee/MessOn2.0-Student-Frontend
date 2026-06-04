@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +35,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -52,7 +52,7 @@ isClickable: Boolean
         )
             .border(
                 width = 1.5.dp,
-                color =  CustomColors.OffWhite,
+                color =  MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(15.dp)
             )
     ){
@@ -62,19 +62,19 @@ isClickable: Boolean
         ) {
             EachAnalyticsItem(
                 title ="Breakfast",
-                color = CustomColors.RichCerulean,
+                color = MaterialTheme.colorScheme.secondary,
                 days = listOf(),
                 isClickable = isClickable
             )
             EachAnalyticsItem(
                 title = "Lunch",
-                color = CustomColors.HoneyBronze,
+                color = MaterialTheme.colorScheme.secondary,
                 days = listOf(),
                 isClickable = isClickable
             )
             EachAnalyticsItem(
                 title = "Dinner",
-                color = CustomColors.BlackberryCream,
+                color = MaterialTheme.colorScheme.onBackground,
                 days = listOf(),
                 isClickable = isClickable
             )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +22,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
@@ -45,7 +45,7 @@ fun EachItemProfileScreen(
             Icon(
                 imageVector =icon,
                 contentDescription ="icon",
-                tint = CustomColors.BlackberryCream,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(20.dp)
                     .constrainAs(iconRef){
                         start.linkTo(parent.start, margin =23.dp)
@@ -71,7 +71,7 @@ fun EachItemProfileScreen(
 
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
-                tint = CustomColors.RichCerulean ,
+                tint = MaterialTheme.colorScheme.primary ,
                 contentDescription = "trailing icon",
                 modifier = Modifier.constrainAs(trailingIconRef){
                     end.linkTo(parent.end, margin =8.dp)

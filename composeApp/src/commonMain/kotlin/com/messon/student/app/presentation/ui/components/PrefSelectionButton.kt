@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,7 +25,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import org.jetbrains.compose.resources.Font
@@ -40,10 +40,10 @@ fun PrefSelectionButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val borderColor by animateColorAsState(if (isSelected) activeColor else CustomColors.LightGrayBlue.copy(alpha = 0.2f), label = "border")
+    val borderColor by animateColorAsState(if (isSelected) activeColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), label = "border")
     val bgColor by animateColorAsState(if (isSelected) activeBgColor.copy(alpha = 0.5f) else Color.White, label = "bg")
-    val iconBgColor by animateColorAsState(if (isSelected) activeBgColor else CustomColors.OffWhite, label = "iconBg")
-    val contentColor by animateColorAsState(if (isSelected) activeColor else CustomColors.LightGrayBlue, label = "content")
+    val iconBgColor by animateColorAsState(if (isSelected) activeBgColor else MaterialTheme.colorScheme.background, label = "iconBg")
+    val contentColor by animateColorAsState(if (isSelected) activeColor else MaterialTheme.colorScheme.outline, label = "content")
 
     Column(
         modifier = modifier
@@ -71,7 +71,7 @@ fun PrefSelectionButton(
             text = title,
             fontSize = 12.sp,
             fontFamily = FontFamily(Font(Res.font.opensansbold) ),
-            color = if (isSelected) activeColor.copy(alpha = 0.8f) else CustomColors.BlackberryCream.copy(alpha = 0.5f)
+            color = if (isSelected) activeColor.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
         )
     }
 }

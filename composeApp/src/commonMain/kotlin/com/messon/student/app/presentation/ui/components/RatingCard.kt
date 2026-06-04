@@ -35,6 +35,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,10 +53,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.student.app.domain.dataModels.MealInfo
-import com.messon.student.app.theme.CustomColors.BlackberryCream
-import com.messon.student.app.theme.CustomColors.HoneyBronze
-import com.messon.student.app.theme.CustomColors.LightGrayBlue
-import com.messon.student.app.theme.CustomColors.RichCerulean
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansmedium
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -67,14 +64,17 @@ fun RatingCard(
     rating: Int,
     feedbackText: String,
     onRatingChange: (Int) -> Unit,
-    onFeedbackChange: (String) -> Unit
-) {
+    onFeedbackChange: (String) -> Unit,
+    accentColor: Color,
+    iconColor: Color,
+
+    ) {
     val isRated = rating > 0
     var isSubmitting by remember { mutableStateOf(false) }
     var showSuccess by remember { mutableStateOf(false) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = meal.accent),
+        colors = CardDefaults.cardColors(containerColor =accentColor),
         shape = RoundedCornerShape(40.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -103,7 +103,7 @@ fun RatingCard(
                         Icon(
                             imageVector = meal.icon,
                             contentDescription = meal.name,
-                            tint = if (isRated) meal.iconColor else LightGrayBlue,
+                            tint = if (isRated) iconColor else MaterialTheme.colorScheme.outline,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -114,13 +114,13 @@ fun RatingCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = meal.name,
-                        color = BlackberryCream,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                     )
                     Text(
                         text = if (showSuccess) "Feedback submitted" else if (isRated) "Rating recorded" else "Tap a star to rate",
-                        color = LightGrayBlue,
+                        color = MaterialTheme.colorScheme.outline,
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(Res.font.opensansmedium)),
                     )
@@ -132,7 +132,7 @@ fun RatingCard(
                     exit = scaleOut() + fadeOut()
                 ) {
                     val checkColor by animateColorAsState(
-                        targetValue = if (showSuccess) HoneyBronze else RichCerulean,
+                        targetValue = if (showSuccess) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                         label = "CheckmarkColor"
                     )
                     Surface(
@@ -161,7 +161,7 @@ fun RatingCard(
             ) {
                 for (i in 1..5) {
                     val starColor by animateColorAsState(
-                        targetValue = if (i <= rating) HoneyBronze else LightGrayBlue.copy(alpha = 0.4f),
+                        targetValue = if (i <= rating) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                         animationSpec = tween(300),
                         label = "StarColor"
                     )
@@ -195,10 +195,10 @@ fun RatingCard(
                         value = feedbackText,
                         onValueChange = onFeedbackChange,
                         textStyle = TextStyle(
-                            color = BlackberryCream,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 16.sp
                         ),
-                        cursorBrush = SolidColor(RichCerulean),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         decorationBox = { innerTextField ->
                             Box(
                                 modifier = Modifier
@@ -216,7 +216,7 @@ fun RatingCard(
                                 if (feedbackText.isEmpty()) {
                                     Text(
                                         text = "What did you like? What could improve? (Optional)",
-                                        color = LightGrayBlue.copy(alpha = 0.8f),
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f),
                                         fontSize = 12.sp,
                                         fontFamily = FontFamily(Font(Res.font.opensansmedium)),
                                     )
@@ -236,7 +236,7 @@ fun RatingCard(
                             .height(55.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = RichCerulean
+                            containerColor = MaterialTheme.colorScheme.primary
                         ),
                     ) {
                         Text(

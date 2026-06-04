@@ -1,7 +1,7 @@
 package com.messon.student.app.presentation.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,22 +18,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.Complaint
-import com.messon.student.app.theme.CustomColors
-import com.messon.student.app.theme.CustomColors.BlackberryCream
-import com.messon.student.app.theme.CustomColors.LightGrayBlue
-import com.messon.student.app.theme.CustomColors.OffWhite
-import com.messon.student.app.theme.CustomColors.RichCerulean
+import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.UserInteraction
+import com.messon.student.app.utils.backgroundColor
+import com.messon.student.app.utils.textColor
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
 import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
@@ -49,8 +45,10 @@ fun ComplaintCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        // Changed containerColor to adapt dynamically to light/dark surfaces
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         ConstraintLayout(
@@ -64,7 +62,7 @@ fun ComplaintCard(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(RichCerulean)
+                    .background(MaterialTheme.colorScheme.primary)
                     .constrainAs(avatar) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
@@ -74,7 +72,7 @@ fun ComplaintCard(
                 Text(
                     text = complaint.studentName.take(1),
                     color = Color.White,
-                    fontSize =14.sp,
+                    fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansbold)),
                 )
             }
@@ -84,9 +82,9 @@ fun ComplaintCard(
                 overflow = TextOverflow.Ellipsis,
                 text = complaint.studentName,
                 style = MaterialTheme.typography.titleSmall.copy(
-                    fontSize =14.sp,
+                    fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                    color = BlackberryCream
+                    color = MaterialTheme.colorScheme.onSurface // Responsive primary text
                 ),
                 modifier = Modifier.constrainAs(name) {
                     top.linkTo(avatar.top)
@@ -97,8 +95,8 @@ fun ComplaintCard(
             Text(
                 text = "ID: ${complaint.studentId}",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = LightGrayBlue,
-                    fontSize =10.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), // High contrast adaptive subtitle gray
+                    fontSize = 10.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                 ),
                 modifier = Modifier.constrainAs(studId) {
@@ -108,7 +106,7 @@ fun ComplaintCard(
             )
 
             Surface(
-                color = complaint.status.bgColor,
+                color = complaint.status.backgroundColor(),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.constrainAs(status) {
                     top.linkTo(parent.top)
@@ -119,8 +117,8 @@ fun ComplaintCard(
                     text = complaint.status.label.uppercase(),
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = complaint.status.textColor,
-                        fontSize =10.sp,
+                        color = complaint.status.textColor(),
+                        fontSize = 10.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                     )
                 )
@@ -131,8 +129,8 @@ fun ComplaintCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleLarge.copy(
-                    color = BlackberryCream,
-                    fontSize =14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansbold)),
                 ),
                 modifier = Modifier.constrainAs(title) {
@@ -146,8 +144,8 @@ fun ComplaintCard(
             Text(
                 text = complaint.description,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.Gray,
-                    fontSize =13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Optimized body text legibility
+                    fontSize = 13.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansregular)),
                 ),
                 maxLines = 3,
@@ -165,7 +163,7 @@ fun ComplaintCard(
                     top.linkTo(desc.bottom, margin = 20.dp)
                 },
                 thickness = 1.dp,
-                color = CustomColors.OffWhite
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) // Sleek divider border
             )
 
             Row(
@@ -179,22 +177,22 @@ fun ComplaintCard(
                 Icon(
                     imageVector = Icons.Default.DateRange,
                     contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = LightGrayBlue
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = complaint.date,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = LightGrayBlue,
-                        fontSize =12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        fontSize = 12.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                     )
                 )
             }
 
             Surface(
-                color = OffWhite,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), // Refined action card pocket
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.constrainAs(actions) {
                     top.linkTo(divider.bottom, margin = 12.dp)
@@ -204,23 +202,30 @@ fun ComplaintCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                 ) {
                     InteractionButton(
                         count = complaint.likes,
                         icon = if (complaint.userInteraction == UserInteraction.LIKE) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
                         isSelected = complaint.userInteraction == UserInteraction.LIKE,
-                        activeColor = RichCerulean,
+                        activeColor = MaterialTheme.colorScheme.primary,
                         onClick = onLikeClick
                     )
 
-                    Box(modifier = Modifier.width(1.dp).height(16.dp).background(LightGrayBlue.copy(alpha = 0.3f)))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(16.dp)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     InteractionButton(
                         count = complaint.dislikes,
                         icon = Icons.Outlined.ThumbDown,
                         isSelected = complaint.userInteraction == UserInteraction.DISLIKE,
-                        activeColor = CustomColors.HoneyBronze,
+                        activeColor = MaterialTheme.colorScheme.secondary,
                         onClick = onDislikeClick
                     )
                 }
@@ -228,3 +233,4 @@ fun ComplaintCard(
         }
     }
 }
+

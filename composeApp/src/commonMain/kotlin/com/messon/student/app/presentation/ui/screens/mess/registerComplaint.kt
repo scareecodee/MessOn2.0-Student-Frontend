@@ -1,4 +1,5 @@
 package com.messon.student.app.presentation.ui.screens.mess
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -25,7 +26,6 @@ import com.messon.student.app.domain.dataModels.ComplaintCategory
 import com.messon.student.app.domain.dataModels.ComplaintHistory
 import com.messon.student.app.presentation.ui.components.CategoryCard
 import com.messon.student.app.presentation.ui.components.HistoryItem
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansmedium
@@ -35,7 +35,7 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun RegisterComplaintScreen(
-    onBackClick:()-> Unit
+    onBackClick: () -> Unit
 ) {
     var description by remember { mutableStateOf("") }
     var selectedCategoryId by remember { mutableStateOf("food") }
@@ -55,30 +55,33 @@ fun RegisterComplaintScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(CustomColors.OffWhite)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        val (lazyColumnRef,statusBarBox,backBtnRef,headingRef) = createRefs()
+        val (lazyColumnRef, statusBarBox, backBtnRef, headingRef) = createRefs()
+
+        // Status bar area blends seamlessly with dynamic background colors
         Box(
             Modifier
                 .fillMaxWidth()
                 .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() + 5.dp)
-                .background(CustomColors.LightGrayBlue)
+                .background(MaterialTheme.colorScheme.background)
                 .constrainAs(statusBarBox) {
                     top.linkTo(parent.top)
                 }
         )
 
-
         IconButton(
-            onClick = {
-                onBackClick()
-            },
+            onClick = { onBackClick() },
             modifier = Modifier.constrainAs(backBtnRef) {
                 start.linkTo(parent.start, 15.dp)
                 top.linkTo(statusBarBox.bottom, 10.dp)
             }
         ) {
-            Icon(Icons.Default.ChevronLeft, contentDescription = "back", modifier = Modifier.size(28.dp)
+            Icon(
+                imageVector = Icons.Default.ChevronLeft,
+                contentDescription = "back",
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -86,11 +89,13 @@ fun RegisterComplaintScreen(
             text = "Register Complaint",
             fontSize = 18.sp,
             fontFamily = FontFamily(Font(Res.font.opensansbold)),
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.constrainAs(headingRef) {
                 start.linkTo(backBtnRef.end, 5.dp)
                 centerVerticallyTo(backBtnRef)
             }
         )
+
         LazyColumn(
             modifier = Modifier.constrainAs(lazyColumnRef) {
                 top.linkTo(headingRef.bottom, margin = 15.dp)
@@ -108,7 +113,8 @@ fun RegisterComplaintScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .clip(RoundedCornerShape(32.dp))
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface) // Adaptive card surfaces
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(32.dp))
                         .padding(24.dp)
                 ) {
                     val (catTitle, catGrid, descTitle, descBox, submitBtn) = createRefs()
@@ -118,13 +124,14 @@ fun RegisterComplaintScreen(
                         style = TextStyle(
                             fontSize = 12.sp,
                             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                            color = CustomColors.LightGrayBlue
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.constrainAs(catTitle) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                         }
                     )
+
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -133,9 +140,7 @@ fun RegisterComplaintScreen(
                             },
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-
                         items(categories.take(4)) { category ->
-
                             CategoryCard(
                                 category = category,
                                 isSelected = selectedCategoryId == category.id,
@@ -150,7 +155,7 @@ fun RegisterComplaintScreen(
                         style = TextStyle(
                             fontSize = 12.sp,
                             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                            color = CustomColors.LightGrayBlue
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.constrainAs(descTitle) {
                             top.linkTo(catGrid.bottom, margin = 32.dp)
@@ -166,23 +171,26 @@ fun RegisterComplaintScreen(
                                 top.linkTo(descTitle.bottom, margin = 16.dp)
                             }
                             .clip(RoundedCornerShape(20.dp))
-                            .background(CustomColors.LightBlue.copy(alpha = 0.3f))
-                            .border(1.dp, CustomColors.LightGrayBlue.copy(alpha = 0.2f), RoundedCornerShape(20.dp))
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f)) // Muted input backing
+                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                             .padding(16.dp)
                     ) {
                         BasicTextField(
                             value = description,
                             onValueChange = { if (it.length <= 500) description = it },
                             modifier = Modifier.fillMaxSize(),
-                            textStyle = TextStyle(color = CustomColors.BlackberryCream, fontSize = 16.sp,
+                            textStyle = TextStyle(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 15.sp,
                                 fontFamily = FontFamily(Font(Res.font.opensansregular)),
                             ),
                             decorationBox = { innerTextField ->
                                 if (description.isEmpty()) {
-                                    Text("Be specific about the issue...",
+                                    Text(
+                                        text = "Be specific about the issue...",
                                         fontSize = 12.sp,
                                         fontFamily = FontFamily(Font(Res.font.opensansmedium)),
-                                        color = Color.Gray
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                                 innerTextField()
@@ -199,13 +207,19 @@ fun RegisterComplaintScreen(
                                 top.linkTo(descBox.bottom, margin = 24.dp)
                                 bottom.linkTo(parent.bottom)
                             },
-                        colors = ButtonDefaults.buttonColors(containerColor = CustomColors.RichCerulean),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White
+                        ),
                         shape = RoundedCornerShape(30.dp)
                     ) {
-                        Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(imageVector = Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("File Complaint", fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),)
+                        Text(
+                            text = "File Complaint",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                        )
                     }
                 }
             }
@@ -216,14 +230,18 @@ fun RegisterComplaintScreen(
                     modifier = Modifier.padding(horizontal = 24.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.History, contentDescription = null, tint = CustomColors.LightGrayBlue)
+                    Icon(
+                        imageVector = Icons.Default.History,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Previous Complaints",
+                        text = "Previous Complaints",
                         style = TextStyle(
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                            color = CustomColors.LightGrayBlue,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     )
                 }

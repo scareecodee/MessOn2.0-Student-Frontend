@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.messon.student.app.theme.CustomColors
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensanssemiBold
@@ -69,7 +69,7 @@ fun SimpleCard(
                     height= Dimension.fillToConstraints
                 }
                     .background(
-                        color = CustomColors.RichCerulean,
+                        color = MaterialTheme.colorScheme.secondary,
                         shape = RoundedCornerShape(topStart =15.dp , bottomStart = 15.dp)
                     )
                     .width(65.dp)

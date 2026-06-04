@@ -1,4 +1,5 @@
 package com.messon.student.app.presentation.ui.screens.mess
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,6 @@ import com.messon.student.app.presentation.ui.components.PrefDaySelector
 import com.messon.student.app.presentation.ui.components.PrefMealCard
 import com.messon.student.app.presentation.ui.state.FetchMenuState
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
-import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.MealType
 import com.messon.student.app.utils.WeekDay
 import com.messon.student.app.utils.toDayMenuMap
@@ -39,14 +39,17 @@ import com.messon.student.app.domain.dataModels.DayModel
 import com.messon.student.app.presentation.ui.state.PrefSetupState
 import com.messon.student.app.presentation.ui.state.SavePrefState
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
+import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealSlot
 import multiplatform.network.cmptoast.showToast
+
+// Simple data model representing diet menus
+data class MealMenu(val veg: String, val nonVeg: String)
 
 @Composable
 fun MealPreferenceScreen(
     mealPlannerViewModel: MealPlannerViewModel
 ) {
-    
     var selectedDayId by remember { mutableStateOf("Mon") }
     val prefSetupState by mealPlannerViewModel.prefSetupState.collectAsState()
     val savePrefState by mealPlannerViewModel.savePrefState.collectAsState()
@@ -54,7 +57,6 @@ fun MealPreferenceScreen(
     LaunchedEffect(Unit){
         mealPlannerViewModel.fetchPrefSetupData()
     }
-
 
     LaunchedEffect(prefSetupState){
         if(prefSetupState is PrefSetupState.Error){
@@ -70,9 +72,7 @@ fun MealPreferenceScreen(
             }
             is SavePrefState.Success -> {
                 showToast("saved your meal pref.")
-
             }
-
             else -> {}
         }
         mealPlannerViewModel.clearSavePrefState()
@@ -95,177 +95,164 @@ fun MealPreferenceScreen(
     }
 
     val currentDayMenu = dayMenuMap[selectedDayId]
-
     val totalBookings = preferences.values.sumOf { it.selectionCount }
 
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        val (header, content, bottomBar) = createRefs()
 
+        HeaderSection(
+            modifier = Modifier.constrainAs(header) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
 
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(CustomColors.OffWhite)
-            ) {
-
-                val (header, content, bottomBar) = createRefs()
-
-                HeaderSection(
-                    modifier = Modifier.constrainAs(header) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
+        LazyColumn(
+            modifier = Modifier
+                .constrainAs(content) {
+                    top.linkTo(header.bottom)
+                    bottom.linkTo(bottomBar.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.fillToConstraints
+                }
+                .padding(bottom = 24.dp)
+        ) {
+            item {
+                PrefDaySelector(
+                    selectedDayId = selectedDayId,
+                    preferences = preferences,
+                    onDaySelected = { selectedDayId = it }
                 )
+            }
 
-                LazyColumn(
+            item {
+                Row(
                     modifier = Modifier
-                        .constrainAs(content) {
-                            top.linkTo(header.bottom)
-                            bottom.linkTo(bottomBar.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.fillToConstraints
-                        }
-                        .padding(bottom = 24.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
                 ) {
-
-                    item {
-                        PrefDaySelector(
-                            selectedDayId = selectedDayId,
-                            preferences = preferences,
-                            onDaySelected = { selectedDayId = it }
+                    Column {
+                        Text(
+                            text = "${WEEK_DATA.find { it.id == selectedDayId }?.label}".replaceFirstChar { it.uppercase() },
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
+                }
+            }
 
+            when(prefSetupState){
+                is PrefSetupState.Loading -> {
                     item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp, vertical = 20.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.Bottom
-                        ) {
-
-                            Column {
-                                Text(
-                                    text = "${WEEK_DATA.find { it.id == selectedDayId }?.label}".replaceFirstChar { it.uppercase() },
-                                    fontSize = 12.sp,
-                                    fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
-                                    color = CustomColors.BlackberryCream
-                                )
-                            }
+                        Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
                         }
-                    }
-
-
-                    when(prefSetupState){
-                        is PrefSetupState.Loading -> {
-                            item {
-                                CircularProgressIndicator()
-                            }
-                        }
-                        is PrefSetupState.Success->{
-                            item {
-
-                                val currentSelection = preferences[selectedDayId] ?: DaySelection()
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-
-                                    val breakfastData = currentDayMenu?.get(MealSlot.BREAKFAST)
-
-                                    PrefMealCard(
-                                        title = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercase() },
-                                        icon = Icons.Rounded.WbTwilight,
-                                        menu = MealMenu(
-                                            veg = breakfastData?.vegDish ?: "Not Available",
-                                            nonVeg = breakfastData?.nonVegDish ?: "Not Available"
-                                        ),
-                                        selectedType = currentSelection.breakfast,
-                                        onSelect = { type ->
-                                            mealPlannerViewModel.updateMeal(
-                                                dayId = selectedDayId,
-                                                mealSlot = MealSlot.BREAKFAST,
-                                                type = type,
-                                                isCompulsory = breakfastData?.isCompulsory == true
-                                            )
-                                        },
-                                        iconColor = CustomColors.RichCerulean,
-                                        isVegSelectable = breakfastData?.vegAvailability == true,
-                                        isNonVegSelectable = breakfastData?.nonVegAvailability == true
-                                    )
-
-                                    val lunchData = currentDayMenu?.get(MealSlot.LUNCH)
-
-                                    PrefMealCard(
-                                        title = MealSlot.LUNCH.value.replaceFirstChar { it.uppercase() },
-                                        icon = Icons.Default.WbSunny,
-                                        menu = MealMenu(
-                                            veg = lunchData?.vegDish ?: "Not Available",
-                                            nonVeg = lunchData?.nonVegDish ?: "Not Available"
-                                        ),
-                                        selectedType = currentSelection.lunch,
-                                        onSelect = { type ->
-                                            mealPlannerViewModel.updateMeal(
-                                                dayId = selectedDayId,
-                                                mealSlot = MealSlot.LUNCH,
-                                                type = type,
-                                                isCompulsory = lunchData?.isCompulsory == true
-                                            )
-                                        },
-                                        iconColor = CustomColors.RichCerulean,
-                                        isVegSelectable = lunchData?.vegAvailability == true,
-                                        isNonVegSelectable = lunchData?.nonVegAvailability == true
-                                    )
-
-                                    val dinnerData = currentDayMenu?.get(MealSlot.DINNER)
-
-                                    PrefMealCard(
-                                        title = MealSlot.DINNER.value.replaceFirstChar { it.uppercase() },
-                                        icon = Icons.Rounded.Nightlight,
-                                        menu = MealMenu(
-                                            veg = dinnerData?.vegDish ?: "Not Available",
-                                            nonVeg = dinnerData?.nonVegDish ?: "Not Available"
-                                        ),
-                                        selectedType = currentSelection.dinner,
-                                        onSelect = { type ->
-                                            mealPlannerViewModel.updateMeal(
-                                                dayId = selectedDayId,
-                                                mealSlot = MealSlot.DINNER,
-                                                type = type,
-                                                isCompulsory = dinnerData?.isCompulsory == true
-                                            )
-                                        },
-                                        iconColor = CustomColors.RichCerulean,
-                                        isVegSelectable = dinnerData?.vegAvailability == true,
-                                        isNonVegSelectable = dinnerData?.nonVegAvailability == true
-                                    )
-                                }
-                            }
-                        }
-
-                        else -> {}
                     }
                 }
+                is PrefSetupState.Success->{
+                    item {
+                        val currentSelection = preferences[selectedDayId] ?: DaySelection()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            val breakfastData = currentDayMenu?.get(MealSlot.BREAKFAST)
+                            PrefMealCard(
+                                title = MealSlot.BREAKFAST.value.replaceFirstChar { it.uppercase() },
+                                icon = Icons.Rounded.WbTwilight,
+                                menu = MealMenu(
+                                    veg = breakfastData?.vegDish ?: "Not Available",
+                                    nonVeg = breakfastData?.nonVegDish ?: "Not Available"
+                                ),
+                                selectedType = currentSelection.breakfast,
+                                onSelect = { type ->
+                                    mealPlannerViewModel.updateMeal(
+                                        dayId = selectedDayId,
+                                        mealSlot = MealSlot.BREAKFAST,
+                                        type = type,
+                                        isCompulsory = breakfastData?.isCompulsory == true
+                                    )
+                                },
+                                iconColor = MaterialTheme.colorScheme.primary,
+                                isVegSelectable = breakfastData?.vegAvailability == true,
+                                isNonVegSelectable = breakfastData?.nonVegAvailability == true
+                            )
 
-                BottomBarSection(
-                    isLoading=savePrefState is SavePrefState.Loading,
-                    totalBookings = totalBookings,
-                    modifier = Modifier.constrainAs(bottomBar) {
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                    onSaveBtnClick = {
-                        mealPlannerViewModel.saveMealPref()
+                            val lunchData = currentDayMenu?.get(MealSlot.LUNCH)
+                            PrefMealCard(
+                                title = MealSlot.LUNCH.value.replaceFirstChar { it.uppercase() },
+                                icon = Icons.Default.WbSunny,
+                                menu = MealMenu(
+                                    veg = lunchData?.vegDish ?: "Not Available",
+                                    nonVeg = lunchData?.nonVegDish ?: "Not Available"
+                                ),
+                                selectedType = currentSelection.lunch,
+                                onSelect = { type ->
+                                    mealPlannerViewModel.updateMeal(
+                                        dayId = selectedDayId,
+                                        mealSlot = MealSlot.LUNCH,
+                                        type = type,
+                                        isCompulsory = lunchData?.isCompulsory == true
+                                    )
+                                },
+                                iconColor = MaterialTheme.colorScheme.secondary,
+                                isVegSelectable = lunchData?.vegAvailability == true,
+                                isNonVegSelectable = lunchData?.nonVegAvailability == true
+                            )
+
+                            val dinnerData = currentDayMenu?.get(MealSlot.DINNER)
+                            PrefMealCard(
+                                title = MealSlot.DINNER.value.replaceFirstChar { it.uppercase() },
+                                icon = Icons.Rounded.Nightlight,
+                                menu = MealMenu(
+                                    veg = dinnerData?.vegDish ?: "Not Available",
+                                    nonVeg = dinnerData?.nonVegDish ?: "Not Available"
+                                ),
+                                selectedType = currentSelection.dinner,
+                                onSelect = { type ->
+                                    mealPlannerViewModel.updateMeal(
+                                        dayId = selectedDayId,
+                                        mealSlot = MealSlot.DINNER,
+                                        type = type,
+                                        isCompulsory = dinnerData?.isCompulsory == true
+                                    )
+                                },
+                                iconColor = MaterialTheme.colorScheme.tertiary,
+                                isVegSelectable = dinnerData?.vegAvailability == true,
+                                isNonVegSelectable = dinnerData?.nonVegAvailability == true
+                            )
+                        }
                     }
-                )
+                }
+                else -> {}
             }
         }
 
-
+        BottomBarSection(
+            isLoading = savePrefState is SavePrefState.Loading,
+            totalBookings = totalBookings,
+            modifier = Modifier.constrainAs(bottomBar) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            onSaveBtnClick = {
+                mealPlannerViewModel.saveMealPref()
+            }
+        )
+    }
+}
 
 @Composable
 fun HeaderSection(modifier: Modifier = Modifier) {
@@ -274,7 +261,7 @@ fun HeaderSection(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .shadow(4.dp, RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
             .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-            .background(CustomColors.RichCerulean)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(top = 48.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
     ) {
         Column {
@@ -289,8 +276,8 @@ fun HeaderSection(modifier: Modifier = Modifier) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                    .background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                    .border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -300,11 +287,11 @@ fun HeaderSection(modifier: Modifier = Modifier) {
                         Icon(
                             Icons.Rounded.LockClock,
                             contentDescription = null,
-                            tint = CustomColors.LightBlue,
+                            tint = MessonTheme.colors.infoContainer,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Closes in", fontSize = 12.sp, color = CustomColors.LightBlue)
+                        Text("Closes in", fontSize = 12.sp, color = MessonTheme.colors.infoContainer)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("14h 22m", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
@@ -315,13 +302,13 @@ fun HeaderSection(modifier: Modifier = Modifier) {
                 Column(horizontalAlignment = Alignment.End) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            Icons.Rounded.DateRange, // Calendar
+                            Icons.Rounded.DateRange,
                             contentDescription = null,
-                            tint = CustomColors.LightBlue,
+                            tint = MessonTheme.colors.infoContainer,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Week of", fontSize = 12.sp, color = CustomColors.LightBlue)
+                        Text("Week of", fontSize = 12.sp, color = MessonTheme.colors.infoContainer)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("16 Feb - 22 Feb", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
@@ -331,16 +318,15 @@ fun HeaderSection(modifier: Modifier = Modifier) {
     }
 }
 
-
 @Composable
 fun BottomBarSection(
     isLoading: Boolean,
     totalBookings: Int,
     modifier: Modifier = Modifier,
-    onSaveBtnClick:()-> Unit
+    onSaveBtnClick: () -> Unit
 ) {
     Surface(
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface, // Automatically swaps to charcoal in Dark Mode
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         shadowElevation = 16.dp,
         modifier = modifier.fillMaxWidth()
@@ -357,7 +343,7 @@ fun BottomBarSection(
                     text = "Meals Booked",
                     fontSize = 13.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansmedium) ),
-                    color = CustomColors.LightGrayBlue,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Dynamic unselected status text
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -365,19 +351,20 @@ fun BottomBarSection(
                         text = totalBookings.toString(),
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.opensansregular) ),
-                        color = CustomColors.BlackberryCream
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = " / 21",
                         fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontFamily = FontFamily(Font(Res.font.opensansregular) ),
                     )
                 }
             }
 
             Button(
-                onClick =onSaveBtnClick,
-                colors = ButtonDefaults.buttonColors(containerColor = CustomColors.RichCerulean),
+                onClick = onSaveBtnClick,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(16.dp),
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
@@ -385,23 +372,28 @@ fun BottomBarSection(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
+                    tint=Color.White
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Save Preference",
                     fontSize = 10.sp,
+                    color = Color.White,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 if(isLoading){
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp
+                    )
                 }
             }
         }
     }
 }
-
 
 val WEEK_DATA = listOf(
     DayModel("Mon", WeekDay.MONDAY.value, "M"),
@@ -412,5 +404,3 @@ val WEEK_DATA = listOf(
     DayModel("Sat", WeekDay.SATURDAY.value, "S"),
     DayModel("Sun", WeekDay.SUNDAY.value, "S")
 )
-
-data class MealMenu(val veg: String, val nonVeg: String)

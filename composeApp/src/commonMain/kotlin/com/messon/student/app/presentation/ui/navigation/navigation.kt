@@ -3,6 +3,7 @@ package com.messon.student.app.presentation.ui.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,16 +18,15 @@ import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.presentation.ui.screens.auth.SignInRoute
 import com.messon.student.app.presentation.ui.screens.college.CollegeListScreen
-import com.messon.student.app.presentation.ui.screens.mainscreen.MainScreen
 import com.messon.student.app.presentation.ui.screens.mess.MealPreferenceScreen
 import com.messon.student.app.presentation.ui.screens.mainscreen.NotificationScreen
+import com.messon.student.app.presentation.ui.screens.mainscreen.MainScreen
 import com.messon.student.app.presentation.ui.screens.mess.RatingScreen
 import com.messon.student.app.presentation.ui.screens.mess.RegisterComplaintScreen
 import com.messon.student.app.presentation.ui.screens.mess.ViewComplaintsScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
-import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.Screen
 import com.messon.student.app.theme.enterLeft
 import com.messon.student.app.theme.exitRight
@@ -76,7 +76,7 @@ fun AppNav(
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                color = CustomColors.RichCerulean,
+                color = MaterialTheme.colorScheme.secondary,
                 strokeCap = StrokeCap.Round,
             )
         }

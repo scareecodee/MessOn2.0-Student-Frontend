@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.messon.student.app.theme.CustomColors
 import com.messon.student.app.utils.MealType
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.Font
 @Composable
 fun AppHeader(timeLeft: String, weekRange: String) {
     Surface(
-        color = CustomColors.RichCerulean,
+        color = MaterialTheme.colorScheme.secondary,
         shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
         shadowElevation = 8.dp
     ) {
@@ -106,7 +106,7 @@ fun DayItem(day: String, isSelected: Boolean, hasSelection: Boolean, onClick: ()
             .background(if (isSelected) Color.White else Color.Transparent)
             .border(
                 width = if (isSelected) 2.dp else 1.dp,
-                color = if (isSelected) CustomColors.HoneyBronze else CustomColors.LightGrayBlue.copy(alpha = 0.4f),
+                color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable { onClick() },
@@ -115,12 +115,12 @@ fun DayItem(day: String, isSelected: Boolean, hasSelection: Boolean, onClick: ()
     ) {
         Text(day.take(3).uppercase(),
             fontSize = 10.sp, fontWeight = FontWeight.Bold,
-            color = CustomColors.BlackberryCream,
+            color = MaterialTheme.colorScheme.onBackground,
             fontFamily = FontFamily(Font(Res.font.opensansregular))
         )
         Text(day.take(1), fontSize = 12.sp,
             fontWeight = FontWeight.Black,
-            color = CustomColors.BlackberryCream,
+            color = MaterialTheme.colorScheme.onBackground,
             fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
 
         )
@@ -169,14 +169,14 @@ fun MealCard(title: String, currentSelection: MealType, onSelectionChange: (Meal
                 Icon(
                     Icons.Outlined.Notifications,
                     contentDescription = null,
-                    tint = CustomColors.HoneyBronze,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(title,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                    color = CustomColors.BlackberryCream)
+                    color = MaterialTheme.colorScheme.onBackground)
             }
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

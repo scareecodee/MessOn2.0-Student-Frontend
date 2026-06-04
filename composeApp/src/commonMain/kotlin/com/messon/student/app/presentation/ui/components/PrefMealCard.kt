@@ -3,31 +3,32 @@ package com.messon.student.app.presentation.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.presentation.ui.screens.mess.MealMenu
-import com.messon.student.app.theme.CustomColors
+import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealType
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
@@ -46,10 +47,14 @@ fun PrefMealCard(
     isVegSelectable: Boolean,
     isNonVegSelectable: Boolean
 ) {
+    // Beautiful dynamic green & red color palettes for light and dark environments
+    val vegAccent = Color(0xFF4CAF50)
+    val nonVegAccent = Color(0xFFEF5350)
+
     Surface(
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface, // Fits cleanly with dark themes
         shape = RoundedCornerShape(28.dp),
-        border = BorderStroke(1.dp, CustomColors.LightGrayBlue.copy(alpha = 0.2f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
         shadowElevation = 2.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -66,7 +71,7 @@ fun PrefMealCard(
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                     }
-                    .background(iconColor.copy(0.1f), RoundedCornerShape(12.dp))
+                    .background(iconColor.copy(0.12f), RoundedCornerShape(12.dp))
                     .padding(10.dp)
             ) {
                 Icon(
@@ -81,7 +86,7 @@ fun PrefMealCard(
                 text = title,
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.opensansbold) ),
-                color = CustomColors.BlackberryCream,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.constrainAs(titleText) {
                     top.linkTo(iconBox.top)
                     bottom.linkTo(iconBox.bottom)
@@ -91,7 +96,7 @@ fun PrefMealCard(
 
             if (selectedType != MealType.NONE) {
                 Surface(
-                    color = CustomColors.LightBlue,
+                    color = iconColor.copy(alpha = 0.15f),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.constrainAs(badge) {
                         top.linkTo(iconBox.top)
@@ -103,7 +108,7 @@ fun PrefMealCard(
                         text = "Selected",
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold) ),
-                        color = CustomColors.RichCerulean,
+                        color = iconColor,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                     )
                 }
@@ -117,26 +122,26 @@ fun PrefMealCard(
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
                     }
-                    .background(CustomColors.LightLavender, RoundedCornerShape(16.dp))
-                    .border(1.dp, CustomColors.LightGrayBlue.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f), RoundedCornerShape(16.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                     .padding(16.dp)
             ) {
                 Column {
                     PrefMenuRow(
                         type = "Veg",
                         text = menu.veg.ifBlank { "Not available" },
-                        color = CustomColors.Green500
+                        color = vegAccent
                     )
 
-                    Divider(
-                        color = CustomColors.LightGrayBlue.copy(alpha = 0.3f),
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                         modifier = Modifier.padding(top = 10.dp, bottom = 10.dp, start = 24.dp)
                     )
 
                     PrefMenuRow(
                         type = "Non-Veg",
                         text = menu.nonVeg.ifBlank { "Not available" },
-                        color = CustomColors.Red500
+                        color = nonVegAccent
                     )
                 }
             }
@@ -145,8 +150,7 @@ fun PrefMealCard(
                 title = "Veg",
                 icon = Icons.Default.CheckCircle,
                 isSelected = selectedType == MealType.VEG,
-                activeColor = CustomColors.Green500,
-                activeBgColor = CustomColors.Green50,
+                activeColor = vegAccent,
                 modifier = Modifier.constrainAs(vegBtn) {
                     top.linkTo(infoBox.bottom, margin = 16.dp)
                     start.linkTo(parent.start)
@@ -160,8 +164,7 @@ fun PrefMealCard(
                 title = "Non-Veg",
                 icon = Icons.Default.Favorite,
                 isSelected = selectedType == MealType.NON_VEG,
-                activeColor = CustomColors.Red500,
-                activeBgColor = CustomColors.Red50,
+                activeColor = nonVegAccent,
                 modifier = Modifier.constrainAs(nonVegBtn) {
                     top.linkTo(infoBox.bottom, margin = 16.dp)
                     start.linkTo(vegBtn.end, margin = 6.dp)
@@ -170,6 +173,47 @@ fun PrefMealCard(
                 },
                 isClickable = isNonVegSelectable
             ) { onSelect(MealType.NON_VEG) }
+        }
+    }
+}
+
+@Composable
+fun PrefSelectionButton(
+    title: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    activeColor: Color,
+    modifier: Modifier = Modifier,
+    isClickable: Boolean,
+    onClick: () -> Unit
+) {
+    val contentColor = if (isSelected) Color.White else if (isClickable) activeColor else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    val bgColor = if (isSelected) activeColor else Color.Transparent
+    val borderColor = if (isSelected) Color.Transparent else if (isClickable) activeColor.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(bgColor)
+            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .clickable(enabled = isClickable) { onClick() }
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = title,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                color = contentColor
+            )
         }
     }
 }

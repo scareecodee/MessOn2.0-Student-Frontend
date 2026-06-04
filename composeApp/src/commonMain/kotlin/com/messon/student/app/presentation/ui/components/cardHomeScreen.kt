@@ -11,6 +11,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,55 +34,60 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CardHomeScreen(
-    onCardClick:()->Unit,
-    modifier: Modifier ,
+    onCardClick: () -> Unit,
+    modifier: Modifier,
     borderColor: Color,
-    containerColor:Color,
+    containerColor: Color,
     mealSlot: MealSlot,
-){
-    val Log= Logger.withTag("CMP_LOG")
+) {
+    val Log = Logger.withTag("CMP_LOG")
     Card(
         onClick = onCardClick,
-        modifier = modifier.border(
-            1.dp,borderColor,RoundedCornerShape(18.dp)
-        )
+        modifier = modifier
+            .border(
+                1.dp,
+                borderColor.copy(alpha = 0.8f), // Dynamic borders with a premium subtle alpha opacity
+                RoundedCornerShape(18.dp)
+            )
             .width(150.dp)
-            .heightIn(min=175.dp, max=180.dp)
-        ,
+            .heightIn(min = 175.dp, max = 180.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White
+            // FIXED: Using the adaptive container color passed from HomeScreen instead of hardcoded Color.White
+            containerColor = containerColor
         )
     ) {
-        ConstraintLayout (
+        ConstraintLayout(
             modifier = Modifier.fillMaxSize()
-        ){
-            val (qrIconRef,mealSlotRef)=createRefs()
+        ) {
+            val (qrIconRef, mealSlotRef) = createRefs()
+
             Icon(
                 painter = painterResource(Res.drawable.qr),
-                contentDescription ="qr icon",
-                tint = Color.Unspecified,
-                modifier = Modifier.constrainAs(qrIconRef){
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(parent.top, margin = 18.dp)
-                }
+                contentDescription = "qr icon",
+                // FIXED: Tinted the QR silhouette icon to respect light/dark contrast automatically
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .constrainAs(qrIconRef) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top, margin = 18.dp)
+                    }
                     .size(80.dp)
             )
 
             Text(
-                text =mealSlot.value.replaceFirstChar { it.uppercaseChar() },
+                text = mealSlot.value.replaceFirstChar { it.uppercaseChar() },
                 fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                color =borderColor,
+                color = borderColor,
                 fontSize = 14.sp,
-                modifier = Modifier.constrainAs(mealSlotRef){
+                modifier = Modifier.constrainAs(mealSlotRef) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     top.linkTo(qrIconRef.bottom, margin = 5.dp)
                     bottom.linkTo(parent.bottom, margin = 5.dp)
                 }
             )
-
         }
     }
 }
