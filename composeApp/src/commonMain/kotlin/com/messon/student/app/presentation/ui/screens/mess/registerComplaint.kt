@@ -22,10 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.messon.student.app.domain.dataModels.ComplaintCategory
 import com.messon.student.app.domain.dataModels.ComplaintHistory
 import com.messon.student.app.presentation.ui.components.CategoryCard
 import com.messon.student.app.presentation.ui.components.HistoryItem
+import com.messon.student.app.presentation.ui.state.CreateComplaintState
+import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansmedium
@@ -35,18 +38,15 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun RegisterComplaintScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    complaintVM: ComplaintVM
 ) {
+
+    val saveState by complaintVM.uiState.collectAsStateWithLifecycle()
     var description by remember { mutableStateOf("") }
-    var selectedCategoryId by remember { mutableStateOf("food") }
-
-    val categories = listOf(
-        ComplaintCategory("food", "Food Quality", Icons.Default.Restaurant),
-        ComplaintCategory("hygiene", "Hygiene", Icons.Default.CleanHands),
-        ComplaintCategory("service", "Staff Behavior", Icons.Default.Person),
-        ComplaintCategory("infra", "Infrastructure", Icons.Default.Settings)
-    )
-
+    var selectedCategory by remember {
+        mutableStateOf(com.messon.student.app.utils.ComplaintCategory.FOOD)
+    }
     val history = listOf(
         ComplaintHistory(1, "Food Quality", "Today, 12:45 PM", "In Review", "The lentils were undercooked."),
         ComplaintHistory(2, "Hygiene", "Yesterday", "Closed", "Handwash dispenser is empty.")
@@ -59,7 +59,6 @@ fun RegisterComplaintScreen(
     ) {
         val (lazyColumnRef, statusBarBox, backBtnRef, headingRef) = createRefs()
 
-        // Status bar area blends seamlessly with dynamic background colors
         Box(
             Modifier
                 .fillMaxWidth()
@@ -140,11 +139,15 @@ fun RegisterComplaintScreen(
                             },
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(categories.take(4)) { category ->
+                        items(com.messon.student.app.utils.ComplaintCategory.entries) { category ->
                             CategoryCard(
-                                category = category,
-                                isSelected = selectedCategoryId == category.id,
-                                onClick = { selectedCategoryId = category.id },
+                                category = ComplaintCategory(
+                                    id = category.id,
+                                    label = category.label,
+                                    icon = category.icon
+                                ),
+                                isSelected = selectedCategory == category,
+                                onClick = { selectedCategory = category },
                                 modifier = Modifier
                             )
                         }
@@ -199,7 +202,12 @@ fun RegisterComplaintScreen(
                     }
 
                     Button(
-                        onClick = { /* Handle Submit */ },
+                        onClick = {
+                            complaintVM.createComplaint(
+                                subject =selectedCategory.label,
+                                description = description
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(55.dp)
@@ -213,13 +221,26 @@ fun RegisterComplaintScreen(
                         ),
                         shape = RoundedCornerShape(30.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "File Complaint",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                        )
+                        if (saveState is CreateComplaintState.Loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+
+                            Spacer(Modifier.width(8.dp))
+
+                            Text(
+                                text = "File Complaint",
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
+                            )
+                        }
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package com.messon.student.app.domain.dataModels
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.messon.student.app.utils.ComplaintStatus
 import com.messon.student.app.utils.UserInteraction
 
 data class ComplaintCategory(val id: String, val label: String, val icon: ImageVector)
@@ -18,4 +17,32 @@ data class Complaint(
     val likes: Int,
     val dislikes: Int,
     val userInteraction: UserInteraction? = null
+)
+
+data class CreateComplaintReq(
+    val description: String,
+    val title: String,
+)
+
+
+data class FetchComplaintsRes(
+    val complaints: List<Complaint>,
+    val nextCursor: String?
+)
+
+enum class ComplaintStatus {
+    PENDING,
+    IN_PROGRESS,
+    RESOLVED
+}
+
+
+data class ComplaintVoteReq(
+    val complaintId: String,
+    val voteType: String
+)
+
+data class ComplaintVoteRes(
+    val likeCount: String,
+    val dislikeCount: String
 )

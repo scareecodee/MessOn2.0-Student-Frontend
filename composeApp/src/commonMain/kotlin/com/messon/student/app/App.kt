@@ -10,6 +10,7 @@ import com.messon.student.app.presentation.ui.navigation.AppNav
 import com.messon.student.app.presentation.ui.screens.mess.RatingScreen
 import com.messon.student.app.presentation.ui.screens.mess.ViewComplaintsScreen
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
+import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
@@ -23,7 +24,8 @@ fun App(
     couponViewModel: CouponViewModel,
     googleAuth: GoogleAuth,
     menuFetchVM: MenuFetchVM,
-    mealPlannerViewModel: MealPlannerViewModel
+    mealPlannerViewModel: MealPlannerViewModel,
+    complaintVM: ComplaintVM
 ) {
     val navController=rememberNavController()
     MessonTheme(
@@ -36,7 +38,8 @@ fun App(
                 couponViewModel = couponViewModel,
                 googleAuth = googleAuth,
                 menuFetchVM=menuFetchVM,
-                mealPlannerViewModel = mealPlannerViewModel
+                mealPlannerViewModel = mealPlannerViewModel,
+                complaintVM=complaintVM
             )
         }
     )

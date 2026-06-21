@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbDown
 import androidx.compose.material.icons.outlined.ThumbUp
@@ -16,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,10 +24,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.Complaint
-import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.UserInteraction
 import com.messon.student.app.utils.backgroundColor
 import com.messon.student.app.utils.textColor
+import com.messon.student.app.utils.toFilter
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansregular
@@ -39,13 +39,13 @@ fun ComplaintCard(
     complaint: Complaint,
     modifier: Modifier = Modifier,
     onLikeClick: () -> Unit = {},
-    onDislikeClick: () -> Unit = {}
+    onDislikeClick: () -> Unit = {},
+    isVotingInProgress: Boolean = false
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
-        // Changed containerColor to adapt dynamically to light/dark surfaces
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
@@ -70,7 +70,7 @@ fun ComplaintCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = complaint.studentName.take(1),
+                    text = complaint.studentName.take(1).uppercase(),
                     color = Color.White,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansbold)),
@@ -84,18 +84,20 @@ fun ComplaintCard(
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                    color = MaterialTheme.colorScheme.onSurface // Responsive primary text
+                    color = MaterialTheme.colorScheme.onSurface
                 ),
                 modifier = Modifier.constrainAs(name) {
                     top.linkTo(avatar.top)
                     start.linkTo(avatar.end, margin = 12.dp)
+                    end.linkTo(status.start, margin = 8.dp)
+                    width = Dimension.fillToConstraints
                 }
             )
 
             Text(
                 text = "ID: ${complaint.studentId}",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), // High contrast adaptive subtitle gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     fontSize = 10.sp,
                     fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                 ),
@@ -106,7 +108,7 @@ fun ComplaintCard(
             )
 
             Surface(
-                color = complaint.status.backgroundColor(),
+                color = complaint.status.toFilter().backgroundColor(),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.constrainAs(status) {
                     top.linkTo(parent.top)
@@ -114,10 +116,10 @@ fun ComplaintCard(
                 }
             ) {
                 Text(
-                    text = complaint.status.label.uppercase(),
+                    text = complaint.status.name.uppercase(),
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = complaint.status.textColor(),
+                        color = complaint.status.toFilter().textColor(),
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                     )
@@ -144,7 +146,7 @@ fun ComplaintCard(
             Text(
                 text = complaint.description,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Optimized body text legibility
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansregular)),
                 ),
@@ -163,7 +165,7 @@ fun ComplaintCard(
                     top.linkTo(desc.bottom, margin = 20.dp)
                 },
                 thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) // Sleek divider border
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
             )
 
             Row(
@@ -185,14 +187,14 @@ fun ComplaintCard(
                     text = complaint.date,
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                        fontSize = 12.sp,
+                        fontSize = 9.sp,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                     )
                 )
             }
 
             Surface(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), // Refined action card pocket
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.constrainAs(actions) {
                     top.linkTo(divider.bottom, margin = 12.dp)
@@ -206,10 +208,14 @@ fun ComplaintCard(
                 ) {
                     InteractionButton(
                         count = complaint.likes,
-                        icon = if (complaint.userInteraction == UserInteraction.LIKE) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
+                        icon = if (complaint.userInteraction == UserInteraction.LIKE)
+                            Icons.Filled.ThumbUp
+                        else
+                            Icons.Outlined.ThumbUp,
                         isSelected = complaint.userInteraction == UserInteraction.LIKE,
                         activeColor = MaterialTheme.colorScheme.primary,
-                        onClick = onLikeClick
+                        onClick = onLikeClick,
+                        isLoading = isVotingInProgress
                     )
 
                     Spacer(modifier = Modifier.width(4.dp))
@@ -223,10 +229,14 @@ fun ComplaintCard(
 
                     InteractionButton(
                         count = complaint.dislikes,
-                        icon = Icons.Outlined.ThumbDown,
+                        icon = if (complaint.userInteraction == UserInteraction.DISLIKE)
+                            Icons.Filled.ThumbDown
+                        else
+                            Icons.Outlined.ThumbDown,
                         isSelected = complaint.userInteraction == UserInteraction.DISLIKE,
                         activeColor = MaterialTheme.colorScheme.secondary,
-                        onClick = onDislikeClick
+                        onClick = onDislikeClick,
+                        isLoading = isVotingInProgress
                     )
                 }
             }

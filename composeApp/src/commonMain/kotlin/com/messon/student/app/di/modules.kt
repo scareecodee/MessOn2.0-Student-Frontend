@@ -6,6 +6,7 @@ import com.messon.student.app.data.local.dao.CouponDao
 import com.messon.student.app.data.local.dao.MessMenuDao
 import com.messon.student.app.data.remote.network.Auth
 import com.messon.student.app.data.remote.network.CollegeApi
+import com.messon.student.app.data.remote.network.ComplaintApi
 import com.messon.student.app.data.remote.network.Coupon
 import com.messon.student.app.data.remote.network.MessApi
 import com.messon.student.app.domain.repository.AuthRepository
@@ -14,7 +15,9 @@ import com.messon.student.app.domain.repository.CouponRepository
 import com.messon.student.app.domain.repository.MessRepository
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
+import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
+import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import org.koin.core.module.Module
@@ -33,7 +36,12 @@ val sharedModule = module {
 
     single { AuthRepository(get()) }
 
-    single{ MessRepository(get()) }
+    single { ComplaintApi(get()) }
+
+    single{ MessRepository(
+        get(),
+        complaintApi = get()
+    ) }
 
     single { CouponRepository(get(),get()) }
     single { CollegeRepository(get()) }
@@ -83,6 +91,17 @@ val sharedModule = module {
         CollegeScreenVM(
             collegeRepository = get()
         )
+    }
+
+    viewModel {
+        ComplaintVM(
+            get(),
+            get()
+        )
+    }
+
+    viewModel {
+        FetchComplaintsVM(get(),get())
     }
 }
 

@@ -36,7 +36,7 @@ import qrgenerator.qrkitpainter.rememberQrKitPainter
 fun QrCode(
     modifier: Modifier,
     data: String,
-    myLogo: Painter
+    logoColor: Color
 ){
     val painter = rememberQrKitPainter(data) {
         shapes = QrKitShapes(
@@ -48,8 +48,8 @@ fun QrCode(
         colors = QrKitColors(
             darkBrush = QrKitBrush.customBrush {
                 Brush.linearGradient(
-                    0f to Color.Black,
-                    1f to Color.Black,
+                    0f to logoColor,
+                    1f to logoColor,
                     end = Offset(it, it)
                 )
             }

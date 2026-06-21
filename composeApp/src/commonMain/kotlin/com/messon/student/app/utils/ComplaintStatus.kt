@@ -3,10 +3,14 @@ package com.messon.student.app.utils
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.messon.student.app.domain.dataModels.ComplaintStatus
 import com.messon.student.app.theme.MessonTheme
 
 
-enum class ComplaintStatus(
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+enum class ComplaintFilter(
     val label: String
 ) {
     ALL("All"),
@@ -14,41 +18,48 @@ enum class ComplaintStatus(
     IN_PROGRESS("In Progress"),
     RESOLVED("Resolved")
 }
-enum class UserInteraction {
-    LIKE,
-    DISLIKE
-}
 
 @Composable
-fun ComplaintStatus.backgroundColor(): Color {
+fun ComplaintFilter.backgroundColor(): Color {
     return when (this) {
-        ComplaintStatus.ALL ->
+        ComplaintFilter.ALL ->
             MaterialTheme.colorScheme.surface
 
-        ComplaintStatus.PENDING ->
+        ComplaintFilter.PENDING ->
             MessonTheme.colors.warningContainer
 
-        ComplaintStatus.IN_PROGRESS ->
+        ComplaintFilter.IN_PROGRESS ->
             MessonTheme.colors.infoContainer
 
-        ComplaintStatus.RESOLVED ->
+        ComplaintFilter.RESOLVED ->
             MessonTheme.colors.accentContainer
     }
 }
 
 @Composable
-fun ComplaintStatus.textColor(): Color {
+fun ComplaintFilter.textColor(): Color {
     return when (this) {
-        ComplaintStatus.ALL ->
+        ComplaintFilter.ALL ->
             MaterialTheme.colorScheme.onSurface
 
-        ComplaintStatus.PENDING ->
+        ComplaintFilter.PENDING ->
             MaterialTheme.colorScheme.secondary
 
-        ComplaintStatus.IN_PROGRESS ->
+        ComplaintFilter.IN_PROGRESS ->
             MaterialTheme.colorScheme.primary
 
-        ComplaintStatus.RESOLVED ->
+        ComplaintFilter.RESOLVED ->
             MaterialTheme.colorScheme.onBackground
     }
 }
+
+
+fun ComplaintStatus.toFilter(): ComplaintFilter {
+    return when (this) {
+        ComplaintStatus.PENDING -> ComplaintFilter.PENDING
+        ComplaintStatus.IN_PROGRESS -> ComplaintFilter.IN_PROGRESS
+        ComplaintStatus.RESOLVED -> ComplaintFilter.RESOLVED
+    }
+}
+
+

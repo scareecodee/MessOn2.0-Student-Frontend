@@ -5,62 +5,88 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.messon.student.app.domain.dataModels.Complaint
 import com.messon.student.app.presentation.ui.components.ComplaintCard
 import com.messon.student.app.presentation.ui.components.SearchBar
-import com.messon.student.app.utils.ComplaintStatus
-import com.messon.student.app.utils.UserInteraction
+import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
+import com.messon.student.app.utils.ComplaintFilter
+import com.messon.student.app.utils.toFilter
+import kotlinx.coroutines.flow.distinctUntilChanged
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
+import messon.composeapp.generated.resources.opensansregular
 import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
-
-val INITIAL_COMPLAINTS = listOf(
-    Complaint(
-        "1",
-        "Arjun Sharma",
-        "STU-2023-042",
-        "Broken WiFi in Block B",
-        "The WiFi connection in the south wing of Block B library has been unstable for the last 3 days.",
-        ComplaintStatus.IN_PROGRESS,
-        "Oct 24, 2023",
-        42,
-        2
-    ),
-    Complaint("2", "Priya V.", "STU-2023-118", "Canteen Food Quality", "The lunch served today was undercooked. This is the second time this week.", ComplaintStatus.PENDING, "Oct 25, 2023", 128, 5),
-    Complaint("3", "Rohan Das", "STU-2023-089", "New Sports Equipment", "Most of the basketballs in the gym are worn out. Requesting management for new gear.", ComplaintStatus.RESOLVED, "Oct 20, 2023", 85, 12),
-    Complaint("4", "Sneha Kapur", "STU-2023-201", "Washroom Hygiene", "The washrooms on the 3rd floor of the Science Block need immediate cleaning.", ComplaintStatus.PENDING, "Oct 25, 2023", 56, 1)
-)
-
 @Composable
 fun ViewComplaintsScreen(
-    onRegisterCompClick:()-> Unit,
-    onBackClick:()-> Unit
+    onRegisterCompClick: () -> Unit,
+    onBackClick: () -> Unit,
+    fetchComplaintsVM: FetchComplaintsVM
 ) {
-    var complaints by remember { mutableStateOf(INITIAL_COMPLAINTS) }
     var searchQuery by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf(ComplaintStatus.ALL) }
+    var selectedFilter by remember {
+        mutableStateOf(ComplaintFilter.ALL)
+    }
 
-    val filteredComplaints = complaints.filter {
-        (it.title.contains(searchQuery, ignoreCase = true) ||
-                it.description.contains(searchQuery, ignoreCase = true)) &&
-                (selectedFilter == ComplaintStatus.ALL || it.status == selectedFilter)
+    val fetchComplaintState by fetchComplaintsVM.state.collectAsState()
+    val isRefreshing: Boolean = fetchComplaintState.isRefreshing
+
+    val filteredComplaints = remember(fetchComplaintState.complaints, searchQuery, selectedFilter) {
+        fetchComplaintState.complaints.filter { complaint ->
+            val matchesSearch = searchQuery.isEmpty() ||
+                    complaint.title.contains(searchQuery, true) ||
+                    complaint.description.contains(searchQuery, true)
+
+            val matchesStatus = selectedFilter == ComplaintFilter.ALL ||
+                    complaint.status.toFilter() == selectedFilter
+
+            matchesSearch && matchesStatus
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        fetchComplaintsVM.loadFirstPage()
+    }
+
+    LaunchedEffect(searchQuery) {
+        fetchComplaintsVM.setSearch(searchQuery)
+    }
+
+    val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(lazyListState, fetchComplaintState) {
+        snapshotFlow { lazyListState.layoutInfo }
+            .distinctUntilChanged()
+            .collect { layoutInfo ->
+                val totalItems = layoutInfo.totalItemsCount
+                val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+
+                if (lastVisibleIndex >= totalItems - 3 &&
+                    totalItems > 0 &&
+                    !fetchComplaintState.isLoadingMore &&
+                    !fetchComplaintState.endReached &&
+                    fetchComplaintState.error == null
+                ) {
+                    fetchComplaintsVM.loadNextItems()
+                }
+            }
     }
 
     ConstraintLayout(
@@ -68,7 +94,8 @@ fun ViewComplaintsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        val (header, fab,list,statusBarBox,backBtnRef,headingRef,searchBarRef,filtersRef) = createRefs()
+        val (fab, list, statusBarBox, backBtnRef, headingRef, searchBarRef, filtersRef) = createRefs()
+
         Box(
             Modifier
                 .fillMaxWidth()
@@ -79,11 +106,8 @@ fun ViewComplaintsScreen(
                 }
         )
 
-
         IconButton(
-            onClick = {
-                onBackClick()
-            },
+            onClick = onBackClick,
             modifier = Modifier.constrainAs(backBtnRef) {
                 start.linkTo(parent.start, 15.dp)
                 top.linkTo(statusBarBox.bottom, 10.dp)
@@ -91,9 +115,9 @@ fun ViewComplaintsScreen(
         ) {
             Icon(
                 Icons.Default.ChevronLeft,
-                contentDescription = "back",
+                contentDescription = "Back",
                 modifier = Modifier.size(28.dp),
-                tint=MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -108,73 +132,61 @@ fun ViewComplaintsScreen(
             }
         )
 
-            SearchBar(
-                placeholderText = "Search complaint",
-                query = searchQuery,
-                onQueryChange = {
-                    searchQuery = it
-                }
-                ,
-                modifier = Modifier.constrainAs(searchBarRef) {
-                    top.linkTo(backBtnRef.bottom, 10.dp)
-                    start.linkTo(parent.start, 5.dp)
-                    end.linkTo(parent.end, 5.dp)
-                    width = Dimension.fillToConstraints
-                }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyRow(
-                modifier = Modifier
-                    .constrainAs(filtersRef){
-                        top.linkTo(searchBarRef.bottom, margin = 12.dp)
-                        centerHorizontallyTo(searchBarRef)
-                    },
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(ComplaintStatus.entries) { status ->
-                    FilterChip(
-                        selected =  selectedFilter == status,
-                        onClick = { selectedFilter = status },
-                        label = {
-                            Text(
-                                text = status.label,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily(
-                                    Font(Res.font.opensanssemiBold)
-                                )
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            // Selected: Prominent primary brand color with high-contrast text overlay
-                            selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = Color.White,
-
-                            // Unselected: Soft surface color with muted secondary text
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor =  Color.White,
-
-                            // Handle disabled fallback states safely
-                            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected =   selectedFilter == status,
-                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Dynamic outline ring
-                            selectedBorderColor = Color.Transparent, // No border needed when filled
-                            borderWidth = 1.dp,
-                            selectedBorderWidth = 0.dp
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.height(36.dp)
-                    )
-                }
+        SearchBar(
+            placeholderText = "Search complaint",
+            query = searchQuery,
+            onQueryChange = { searchQuery = it },
+            modifier = Modifier.constrainAs(searchBarRef) {
+                top.linkTo(backBtnRef.bottom, 10.dp)
+                start.linkTo(parent.start, 5.dp)
+                end.linkTo(parent.end, 5.dp)
+                width = Dimension.fillToConstraints
             }
+        )
 
+        LazyRow(
+            modifier = Modifier
+                .constrainAs(filtersRef) {
+                    top.linkTo(searchBarRef.bottom, margin = 12.dp)
+                    centerHorizontallyTo(searchBarRef)
+                },
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(ComplaintFilter.entries) { status ->
+                FilterChip(
+                    selected = selectedFilter == status,
+                    onClick = { selectedFilter = status },
+                    label = {
+                        Text(
+                            text = status.label,
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedFilter == status,
+                        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        selectedBorderColor = Color.Transparent,
+                        borderWidth = 1.dp,
+                        selectedBorderWidth = 0.dp
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.height(36.dp)
+                )
+            }
+        }
 
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .constrainAs(list) {
                     top.linkTo(filtersRef.bottom, margin = 14.dp)
@@ -183,39 +195,111 @@ fun ViewComplaintsScreen(
                     end.linkTo(parent.end)
                     height = Dimension.fillToConstraints
                 },
-            contentPadding = PaddingValues(bottom = 100.dp)
+            contentPadding = PaddingValues(bottom = 40.dp)
         ) {
-            items(filteredComplaints) { complaint ->
+            items(
+                items = filteredComplaints,
+                key = { it.id }
+            ) { complaint ->
                 ComplaintCard(
                     complaint = complaint,
                     onLikeClick = {
-                        complaints = complaints.map {
-                            if (it.id == complaint.id) {
-                                val newInteraction = if (it.userInteraction == UserInteraction.LIKE) null else UserInteraction.LIKE
-                                val likeDiff = if (it.userInteraction == UserInteraction.DISLIKE) -1 else if (it.userInteraction == UserInteraction.DISLIKE) 1 else 1
-                                val dislikeDiff = if (it.userInteraction == UserInteraction.DISLIKE) -1 else 0
-                                it.copy(likes = it.likes + likeDiff, dislikes = it.dislikes + dislikeDiff, userInteraction = newInteraction)
-                            } else it
-                        }
+                        fetchComplaintsVM.voteComplaint(
+                            complaintId = complaint.id,
+                            voteType = "like"
+                        )
                     },
                     onDislikeClick = {
-                        complaints = complaints.map {
-                            if (it.id == complaint.id) {
-                                val newInteraction = if (it.userInteraction == UserInteraction.DISLIKE) null else UserInteraction.DISLIKE
-                                val dislikeDiff = if (it.userInteraction == UserInteraction.DISLIKE) -1 else if (it.userInteraction == UserInteraction.LIKE) 1 else 1
-                                val likeDiff = if (it.userInteraction == UserInteraction.LIKE) -1 else 0
-                                it.copy(dislikes = it.dislikes + dislikeDiff, likes = it.likes + likeDiff, userInteraction = newInteraction)
-                            } else it
+                        fetchComplaintsVM.voteComplaint(
+                            complaintId = complaint.id,
+                            voteType = "dislike"
+                        )
+                    },
+                    isVotingInProgress = complaint.id in fetchComplaintState.votingInProgress
+                )
+            }
+
+            if (fetchComplaintState.isLoadingMore || fetchComplaintState.error != null) {
+                item {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        when {
+                            fetchComplaintState.isLoadingMore -> {
+                                CircularProgressIndicator(
+                                    strokeCap = StrokeCap.Round,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            fetchComplaintState.error != null -> {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = fetchComplaintState.error ?: "Unable to load more",
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(Res.font.opensansregular)),
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                    TextButton(
+                                        onClick = {
+                                            fetchComplaintsVM.clearError()
+                                            fetchComplaintsVM.loadNextItems()
+                                        }
+                                    ) {
+                                        Text("Retry")
+                                    }
+                                }
+                            }
                         }
                     }
-                )
+                }
+            }
+
+            if (filteredComplaints.isEmpty() && !fetchComplaintState.isLoadingMore && !fetchComplaintState.isRefreshing) {
+                item {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .padding(32.dp)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Announcement,
+                                contentDescription = "No complaints",
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                            Text(
+                                text = if (searchQuery.isEmpty()) "No complaints yet" else "No matching complaints",
+                                fontSize = 18.sp,
+                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (searchQuery.isNotEmpty()) {
+                                Text(
+                                    text = "Try adjusting your search",
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(Res.font.opensansregular)),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
         FloatingActionButton(
-            onClick = {
-                onRegisterCompClick()
-            },
+            onClick = onRegisterCompClick,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
             shape = CircleShape,

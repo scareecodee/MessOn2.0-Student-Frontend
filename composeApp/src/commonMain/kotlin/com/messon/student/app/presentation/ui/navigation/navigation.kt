@@ -32,6 +32,8 @@ import com.messon.student.app.theme.enterLeft
 import com.messon.student.app.theme.exitRight
 import com.messon.student.app.presentation.ui.state.AuthState
 import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
+import com.messon.student.app.presentation.viewmodel.ComplaintVM
+import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -43,7 +45,8 @@ fun AppNav(
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
     menuFetchVM: MenuFetchVM,
-    mealPlannerViewModel: MealPlannerViewModel
+    mealPlannerViewModel: MealPlannerViewModel,
+    complaintVM: ComplaintVM
 ) {
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -175,7 +178,8 @@ fun AppNav(
             exitTransition = exitRight
         ) {
             RegisterComplaintScreen(
-                onBackClick = {navController.popBackStack()}
+                onBackClick = { navController.popBackStack() },
+                complaintVM = complaintVM
             )
         }
 
@@ -184,9 +188,11 @@ fun AppNav(
             enterTransition = enterLeft,
             exitTransition = exitRight
         ) {
+            val fetchComplaintVM: FetchComplaintsVM=koinViewModel()
             ViewComplaintsScreen(
-                onRegisterCompClick = {navController.navigate(Screen.RegisterComplaintScreen.route)},
-                onBackClick = {navController.popBackStack()}
+                onRegisterCompClick = { navController.navigate(Screen.RegisterComplaintScreen.route) },
+                onBackClick = { navController.popBackStack() },
+                fetchComplaintsVM = fetchComplaintVM
             )
         }
     }
