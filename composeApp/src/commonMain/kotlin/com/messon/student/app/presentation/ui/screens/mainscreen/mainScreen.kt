@@ -3,6 +3,7 @@ package com.messon.student.app.presentation.ui.screens.mainscreen
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -129,7 +130,7 @@ fun MainScreen(
 fun ContentScreen(
     modifier: Modifier,
     bottomPadding: Dp,
-    pagerState: androidx.compose.foundation.pager.PagerState,
+    pagerState: PagerState,
     navController: NavController,
     authSecureStorage: AuthSecureStorage,
     couponViewModel: CouponViewModel,
@@ -170,7 +171,8 @@ fun ContentScreen(
                         navController.navigate(Screen.MealPreferenceScreen.route) {
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    onRateMealClick = {navController.navigate(Screen.RatingScreen.route)}
                 )
                 1 -> ViewMessMenuScreen(
                     onBackBtnClick = {

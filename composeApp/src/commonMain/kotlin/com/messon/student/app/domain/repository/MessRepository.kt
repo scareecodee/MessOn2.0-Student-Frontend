@@ -12,6 +12,7 @@ import com.messon.student.app.domain.dataModels.FetchComplaintsRes
 import com.messon.student.app.domain.dataModels.MealPref
 import com.messon.student.app.domain.dataModels.Menu
 import com.messon.student.app.domain.dataModels.PrefSetupData
+import com.messon.student.app.domain.dataModels.SubmitRatingReq
 import com.messon.student.app.presentation.mapper.toDto
 
 
@@ -172,6 +173,30 @@ class MessRepository(
 
                 Result.Success(
                     data = dto.toDomain()
+                )
+            }
+            is Result.Error -> Result.Error(result.error)
+        }
+    }
+
+    suspend fun submitRating(
+        token: String,
+        submitRatingReq: SubmitRatingReq
+    ): Result<String, NetworkError> {
+
+        return when (
+            val result =messApi.submitRating(
+                token = token,
+                submitRatingReqDto = submitRatingReq.toDto(),
+            )
+        ) {
+            is Result.Success -> {
+
+                val dto = result.data
+
+
+                Result.Success(
+                    data = dto
                 )
             }
             is Result.Error -> Result.Error(result.error)

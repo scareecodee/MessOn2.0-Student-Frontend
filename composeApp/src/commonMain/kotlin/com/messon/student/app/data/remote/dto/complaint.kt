@@ -84,8 +84,11 @@ data class ComplaintVoteReqDto(
 @Serializable
 data class ComplaintVoteResDto(
     @SerialName("likes_count")
-    val likeCount: String,
+    val likeCount: Int,
 
     @SerialName("dislikes_count")
-    val dislikeCount: String
+    val dislikeCount: Int,
+
+    @SerialName("user_vote")
+    val userVote: String? = null
 )

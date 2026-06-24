@@ -43,6 +43,7 @@ data class ComplaintVoteReq(
 )
 
 data class ComplaintVoteRes(
-    val likeCount: String,
-    val dislikeCount: String
+    val likeCount: Int,
+    val dislikeCount:Int,
+    val userVote: String? = null
 )

@@ -35,6 +35,7 @@ import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
 import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import com.messon.student.app.presentation.viewmodel.SubmitRatingVM
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -167,8 +168,10 @@ fun AppNav(
             enterTransition = enterLeft,
             exitTransition = exitRight
         ) {
+            val submitRatingVM: SubmitRatingVM=koinViewModel()
             RatingScreen(
-                onBackBtnClick = {navController.popBackStack()}
+                onBackBtnClick = { navController.popBackStack() },
+                submitRatingVM = submitRatingVM
             )
         }
 

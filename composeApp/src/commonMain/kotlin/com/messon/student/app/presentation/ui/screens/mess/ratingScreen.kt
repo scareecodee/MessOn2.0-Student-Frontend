@@ -1,4 +1,5 @@
 package com.messon.student.app.presentation.ui.screens.mess
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,34 +37,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.messon.student.app.domain.dataModels.MealInfo
 import com.messon.student.app.presentation.ui.components.RatingCard
+import com.messon.student.app.presentation.ui.state.SubmitRatingState
+import com.messon.student.app.presentation.viewmodel.SubmitRatingVM
 import com.messon.student.app.theme.MessonTheme
+import com.messon.student.app.utils.MealSlot
 import messon.composeapp.generated.resources.Res
 import messon.composeapp.generated.resources.opensansbold
 import messon.composeapp.generated.resources.opensansmedium
 import messon.composeapp.generated.resources.opensanssemiBold
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.Font
-
-val meals = listOf(
-    MealInfo("B", "Breakfast", Icons.Rounded.FreeBreakfast),
-    MealInfo("L", "Lunch", Icons.Rounded.WbSunny),
-    MealInfo("D", "Dinner", Icons.Rounded.NightlightRound)
-)
 
 @Composable
 fun RatingScreen(
-    onBackBtnClick:()-> Unit
+    onBackBtnClick: () -> Unit,
+    submitRatingVM: SubmitRatingVM
 ) {
-    var ratings by remember { mutableStateOf(mapOf("B" to 0, "L" to 0, "D" to 0)) }
-    var feedback by remember { mutableStateOf(mapOf("B" to "", "L" to "", "D" to "")) }
+    var breakfastRating by remember { mutableStateOf(0) }
+    var lunchRating by remember { mutableStateOf(0) }
+    var dinnerRating by remember { mutableStateOf(0) }
+
+    val submitState by submitRatingVM.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(submitState) {
+        when (submitState) {
+            is SubmitRatingState.Success -> {
+                showToast(message = "submitted rating")
+                breakfastRating = 0
+                lunchRating = 0
+                dinnerRating = 0
+                submitRatingVM.resetRatings()
+            }
+            is SubmitRatingState.Error -> {
+                showToast("unable to submit rating")
+            }
+            else -> {}
+        }
+    }
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        val (scrollContent, statusBarBox,backBtnRef,headingRef,heading) = createRefs()
+        val (scrollContent, statusBarBox, backBtnRef, headingRef, heading) = createRefs()
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,29 +100,30 @@ fun RatingScreen(
                 }
         )
 
-
         IconButton(
             shape = CircleShape,
             onClick = onBackBtnClick,
-            modifier = Modifier.constrainAs(backBtnRef){
+            modifier = Modifier.constrainAs(backBtnRef) {
                 start.linkTo(parent.start, margin = 15.dp)
                 top.linkTo(statusBarBox.bottom, margin = 10.dp)
             }
-        ){
+        ) {
             Icon(
                 imageVector = Icons.Default.ChevronLeft,
                 contentDescription = "back btn",
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
         Text(
             maxLines = 1,
-            text ="Rate Meal",
+            text = "Rate Meal",
             fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onBackground,
             fontFamily = FontFamily(Font(Res.font.opensansbold)),
             modifier = Modifier
-                .constrainAs(headingRef){
+                .constrainAs(headingRef) {
                     start.linkTo(backBtnRef.end, margin = 5.dp)
                     top.linkTo(backBtnRef.top)
                     bottom.linkTo(backBtnRef.bottom)
@@ -118,7 +140,7 @@ fun RatingScreen(
                     height = Dimension.fillToConstraints
                 }
                 .padding(horizontal = 20.dp),
-            contentPadding = PaddingValues(top =5.dp, bottom = 80.dp)
+            contentPadding = PaddingValues(top = 5.dp, bottom = 80.dp)
         ) {
             item {
                 HeaderSec(
@@ -127,30 +149,89 @@ fun RatingScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            items(meals) { meal->
-                val accentColor = when(meal.id) {
-                    "B" -> MessonTheme.colors.infoContainer
-                    "L" -> MessonTheme.colors.warningContainer
-                    else -> MessonTheme.colors.accentContainer
-                }
+            item {
+                val meal = MealInfo(
+                    id = MealSlot.BREAKFAST.value,
+                    name = "Breakfast",
+                    icon = Icons.Rounded.FreeBreakfast
+                )
 
-                val iconColor = when(meal.id) {
-                    "B" -> MaterialTheme.colorScheme.primary
-                    "L" -> MaterialTheme.colorScheme.secondary
-                    else -> MaterialTheme.colorScheme.onBackground
-                }
                 RatingCard(
                     meal = meal,
-                    accentColor = accentColor,
-                    iconColor = iconColor,
-                    rating = ratings[meal.id] ?: 0,
-                    feedbackText = feedback[meal.id] ?: "",
+                    accentColor = MessonTheme.colors.infoContainer,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    rating = breakfastRating,
                     onRatingChange = { newRating ->
-                        ratings = ratings.toMutableMap().apply { put(meal.id, newRating) }
+                        breakfastRating = newRating
+                        submitRatingVM.setBreakfastRating(newRating)
                     },
-                    onFeedbackChange = { newFeedback ->
-                        feedback = feedback.toMutableMap().apply { put(meal.id, newFeedback) }
-                    }
+                    onSubmitClick = {
+                        if (breakfastRating > 0) {
+                            submitRatingVM.submitRating(mealSlot = MealSlot.BREAKFAST.value)
+                        } else {
+                            showToast("Please select a rating first")
+                        }
+                    },
+                    isSubmitting = submitState is SubmitRatingState.Loading,
+                    isSubmitEnabled = breakfastRating > 0
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            item {
+                val meal = MealInfo(
+                    id = MealSlot.LUNCH.value,
+                    name = "Lunch",
+                    icon = Icons.Rounded.WbSunny
+                )
+
+                RatingCard(
+                    meal = meal,
+                    accentColor = MessonTheme.colors.warningContainer,
+                    iconColor = MaterialTheme.colorScheme.secondary,
+                    rating = lunchRating,
+                    onRatingChange = { newRating ->
+                        lunchRating = newRating
+                        submitRatingVM.setLunchRating(newRating)
+                    },
+                    onSubmitClick = {
+                        if (lunchRating > 0) {
+                            submitRatingVM.submitRating(mealSlot = MealSlot.LUNCH.value)
+                        } else {
+                            showToast("Please select a rating first")
+                        }
+                    },
+                    isSubmitting = submitState is SubmitRatingState.Loading,
+                    isSubmitEnabled = lunchRating > 0
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            item {
+                val meal = MealInfo(
+                    id = MealSlot.DINNER.value,
+                    name = "Dinner",
+                    icon = Icons.Rounded.NightlightRound
+                )
+
+                RatingCard(
+                    meal = meal,
+                    accentColor = MessonTheme.colors.accentContainer,
+                    iconColor = MaterialTheme.colorScheme.onBackground,
+                    rating = dinnerRating,
+                    onRatingChange = { newRating ->
+                        dinnerRating = newRating
+                        submitRatingVM.setDinnerRating(newRating)
+                    },
+                    onSubmitClick = {
+                        if (dinnerRating > 0) {
+                            submitRatingVM.submitRating(mealSlot = MealSlot.DINNER.value)
+                        } else {
+                            showToast("Please select a rating first")
+                        }
+                    },
+                    isSubmitting = submitState is SubmitRatingState.Loading,
+                    isSubmitEnabled = dinnerRating > 0
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -176,7 +257,7 @@ fun HeaderSec(
 
         Text(
             text = "Rate your meals to help us improve the menu.",
-            color =MaterialTheme.colorScheme.outline,
+            color = MaterialTheme.colorScheme.outline,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(Res.font.opensansmedium)),
             fontWeight = FontWeight.Medium

@@ -20,6 +20,7 @@ import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import com.messon.student.app.presentation.viewmodel.SubmitRatingVM
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import kotlinx.coroutines.Dispatchers
@@ -102,6 +103,10 @@ val sharedModule = module {
 
     viewModel {
         FetchComplaintsVM(get(),get())
+    }
+
+    viewModel {
+        SubmitRatingVM(get(),get())
     }
 }
 

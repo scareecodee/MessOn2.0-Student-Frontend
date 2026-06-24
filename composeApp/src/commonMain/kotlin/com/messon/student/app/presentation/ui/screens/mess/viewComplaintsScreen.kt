@@ -48,6 +48,18 @@ fun ViewComplaintsScreen(
     val fetchComplaintState by fetchComplaintsVM.state.collectAsState()
     val isRefreshing: Boolean = fetchComplaintState.isRefreshing
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(fetchComplaintState.error) {
+        fetchComplaintState.error?.let { errorMessage ->
+            snackbarHostState.showSnackbar(
+                message = errorMessage,
+                duration = SnackbarDuration.Short
+            )
+            fetchComplaintsVM.clearError()
+        }
+    }
+
     val filteredComplaints = remember(fetchComplaintState.complaints, searchQuery, selectedFilter) {
         fetchComplaintState.complaints.filter { complaint ->
             val matchesSearch = searchQuery.isEmpty() ||
@@ -89,170 +101,189 @@ fun ViewComplaintsScreen(
             }
     }
 
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        val (fab, list, statusBarBox, backBtnRef, headingRef, searchBarRef, filtersRef) = createRefs()
-
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() + 5.dp)
-                .background(MaterialTheme.colorScheme.outline)
-                .constrainAs(statusBarBox) {
-                    top.linkTo(parent.top)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        actionColor = MaterialTheme.colorScheme.primary
+                    )
                 }
-        )
-
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.constrainAs(backBtnRef) {
-                start.linkTo(parent.start, 15.dp)
-                top.linkTo(statusBarBox.bottom, 10.dp)
-            },
-        ) {
-            Icon(
-                Icons.Default.ChevronLeft,
-                contentDescription = "Back",
-                modifier = Modifier.size(28.dp),
-                tint = MaterialTheme.colorScheme.onBackground
             )
         }
-
-        Text(
-            text = "Complaints",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontFamily = FontFamily(Font(Res.font.opensansbold)),
-            modifier = Modifier.constrainAs(headingRef) {
-                start.linkTo(backBtnRef.end, 5.dp)
-                centerVerticallyTo(backBtnRef)
-            }
-        )
-
-        SearchBar(
-            placeholderText = "Search complaint",
-            query = searchQuery,
-            onQueryChange = { searchQuery = it },
-            modifier = Modifier.constrainAs(searchBarRef) {
-                top.linkTo(backBtnRef.bottom, 10.dp)
-                start.linkTo(parent.start, 5.dp)
-                end.linkTo(parent.end, 5.dp)
-                width = Dimension.fillToConstraints
-            }
-        )
-
-        LazyRow(
+    ) { paddingValues ->
+        ConstraintLayout(
             modifier = Modifier
-                .constrainAs(filtersRef) {
-                    top.linkTo(searchBarRef.bottom, margin = 12.dp)
-                    centerHorizontallyTo(searchBarRef)
-                },
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues)
         ) {
-            items(ComplaintFilter.entries) { status ->
-                FilterChip(
-                    selected = selectedFilter == status,
-                    onClick = { selectedFilter = status },
-                    label = {
-                        Text(
-                            text = status.label,
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
-                        )
+            val (fab, list, backBtnRef, headingRef, searchBarRef, filtersRef) = createRefs()
+
+
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.constrainAs(backBtnRef) {
+                    start.linkTo(parent.start, 15.dp)
+                    top.linkTo(parent.top, 10.dp)
+                },
+            ) {
+                Icon(
+                    Icons.Default.ChevronLeft,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(28.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Text(
+                text = "Complaints",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontFamily = FontFamily(Font(Res.font.opensansbold)),
+                modifier = Modifier.constrainAs(headingRef) {
+                    start.linkTo(backBtnRef.end, 5.dp)
+                    centerVerticallyTo(backBtnRef)
+                }
+            )
+
+            SearchBar(
+                placeholderText = "Search complaint",
+                query = searchQuery,
+                onQueryChange = { searchQuery = it },
+                modifier = Modifier.constrainAs(searchBarRef) {
+                    top.linkTo(backBtnRef.bottom, 10.dp)
+                    start.linkTo(parent.start, 5.dp)
+                    end.linkTo(parent.end, 5.dp)
+                    width = Dimension.fillToConstraints
+                }
+            )
+
+            LazyRow(
+                modifier = Modifier
+                    .constrainAs(filtersRef) {
+                        top.linkTo(searchBarRef.bottom, margin = 12.dp)
+                        centerHorizontallyTo(searchBarRef)
                     },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = Color.White,
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                    ),
-                    border = FilterChipDefaults.filterChipBorder(
-                        enabled = true,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(ComplaintFilter.entries) { status ->
+                    FilterChip(
                         selected = selectedFilter == status,
-                        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        selectedBorderColor = Color.Transparent,
-                        borderWidth = 1.dp,
-                        selectedBorderWidth = 0.dp
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.height(36.dp)
-                )
-            }
-        }
-
-        LazyColumn(
-            state = lazyListState,
-            modifier = Modifier
-                .constrainAs(list) {
-                    top.linkTo(filtersRef.bottom, margin = 14.dp)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    height = Dimension.fillToConstraints
-                },
-            contentPadding = PaddingValues(bottom = 40.dp)
-        ) {
-            items(
-                items = filteredComplaints,
-                key = { it.id }
-            ) { complaint ->
-                ComplaintCard(
-                    complaint = complaint,
-                    onLikeClick = {
-                        fetchComplaintsVM.voteComplaint(
-                            complaintId = complaint.id,
-                            voteType = "like"
-                        )
-                    },
-                    onDislikeClick = {
-                        fetchComplaintsVM.voteComplaint(
-                            complaintId = complaint.id,
-                            voteType = "dislike"
-                        )
-                    },
-                    isVotingInProgress = complaint.id in fetchComplaintState.votingInProgress
-                )
+                        onClick = { selectedFilter = status },
+                        label = {
+                            Text(
+                                text = status.label,
+                                fontSize = 12.sp,
+                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold))
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = Color.White,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = selectedFilter == status,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            selectedBorderColor = Color.Transparent,
+                            borderWidth = 1.dp,
+                            selectedBorderWidth = 0.dp
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.height(36.dp)
+                    )
+                }
             }
 
-            if (fetchComplaintState.isLoadingMore || fetchComplaintState.error != null) {
-                item {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        when {
-                            fetchComplaintState.isLoadingMore -> {
-                                CircularProgressIndicator(
-                                    strokeCap = StrokeCap.Round,
-                                    color = MaterialTheme.colorScheme.primary
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .constrainAs(list) {
+                        top.linkTo(filtersRef.bottom, margin = 14.dp)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                    },
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                items(
+                    items = filteredComplaints,
+                    key = { it.id }
+                ) { complaint ->
+                    ComplaintCard(
+                        complaint = complaint,
+                        onLikeClick = {
+                            fetchComplaintsVM.voteComplaint(
+                                complaintId = complaint.id,
+                                voteType = "like"
+                            )
+                        },
+                        onDislikeClick = {
+                            fetchComplaintsVM.voteComplaint(
+                                complaintId = complaint.id,
+                                voteType = "dislike"
+                            )
+                        }
+                    )
+                }
+
+                if (fetchComplaintState.isLoadingMore) {
+                    item {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                strokeCap = StrokeCap.Round,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                if (filteredComplaints.isEmpty() && !fetchComplaintState.isLoadingMore && !fetchComplaintState.isRefreshing) {
+                    item {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillParentMaxSize()
+                                .padding(32.dp)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Announcement,
+                                    contentDescription = "No complaints",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                 )
-                            }
-                            fetchComplaintState.error != null -> {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
+                                Text(
+                                    text = if (searchQuery.isEmpty()) "No complaints yet" else "No matching complaints",
+                                    fontSize = 18.sp,
+                                    fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (searchQuery.isNotEmpty()) {
                                     Text(
-                                        text = fetchComplaintState.error ?: "Unable to load more",
+                                        text = "Try adjusting your search",
                                         fontSize = 14.sp,
                                         fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                                        color = MaterialTheme.colorScheme.error,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                     )
-                                    TextButton(
-                                        onClick = {
-                                            fetchComplaintsVM.clearError()
-                                            fetchComplaintsVM.loadNextItems()
-                                        }
-                                    ) {
-                                        Text("Retry")
-                                    }
                                 }
                             }
                         }
@@ -260,58 +291,21 @@ fun ViewComplaintsScreen(
                 }
             }
 
-            if (filteredComplaints.isEmpty() && !fetchComplaintState.isLoadingMore && !fetchComplaintState.isRefreshing) {
-                item {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillParentMaxSize()
-                            .padding(32.dp)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Announcement,
-                                contentDescription = "No complaints",
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                text = if (searchQuery.isEmpty()) "No complaints yet" else "No matching complaints",
-                                fontSize = 18.sp,
-                                fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            if (searchQuery.isNotEmpty()) {
-                                Text(
-                                    text = "Try adjusting your search",
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                )
-                            }
-                        }
+            FloatingActionButton(
+                onClick = onRegisterCompClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .size(58.dp)
+                    .constrainAs(fab) {
+                        bottom.linkTo(parent.bottom, margin = 24.dp)
+                        end.linkTo(parent.end, margin = 24.dp)
                     }
-                }
+                    .shadow(12.dp, CircleShape)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Complaint", modifier = Modifier.size(32.dp))
             }
-        }
-
-        FloatingActionButton(
-            onClick = onRegisterCompClick,
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = Color.White,
-            shape = CircleShape,
-            modifier = Modifier
-                .size(58.dp)
-                .constrainAs(fab) {
-                    bottom.linkTo(parent.bottom, margin = 24.dp)
-                    end.linkTo(parent.end, margin = 24.dp)
-                }
-                .shadow(12.dp, CircleShape)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Complaint", modifier = Modifier.size(32.dp))
         }
     }
 }

@@ -7,3 +7,8 @@ data class MealInfo(
     val name: String,
     val icon: ImageVector
 )
+
+data class SubmitRatingReq(
+    val mealSlot: String,
+    val rating: Int
+)

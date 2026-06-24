@@ -17,8 +17,7 @@ data class FetchComplaintState(
     val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
     val error: String? = null,
-    val endReached: Boolean = false,
-    val votingInProgress: Set<String> = emptySet() // Track which complaints are being voted on
+    val endReached: Boolean = false
 )
 
 sealed class VoteComplaintState{

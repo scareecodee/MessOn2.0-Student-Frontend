@@ -65,7 +65,8 @@ fun ComplaintVoteReq.toDto(): ComplaintVoteReqDto {
 fun ComplaintVoteResDto.toDomain(): ComplaintVoteRes {
     return ComplaintVoteRes(
         likeCount = likeCount,
-        dislikeCount = dislikeCount
+        dislikeCount = dislikeCount,
+        userVote=userVote
     )
 }
 
@@ -113,35 +114,5 @@ fun String.formatDate(): String {
         } catch (e2: Exception) {
             this // Return original if all parsing fails
         }
-    }
-}
-
-// Simple date formatter without time
-fun String.formatDateSimple(): String {
-    return try {
-        val instant = Instant.parse(this)
-        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-
-        val day = dateTime.dayOfMonth.toString().padStart(2, '0')
-        val month = when (dateTime.monthNumber) {
-            1 -> "Jan"
-            2 -> "Feb"
-            3 -> "Mar"
-            4 -> "Apr"
-            5 -> "May"
-            6 -> "Jun"
-            7 -> "Jul"
-            8 -> "Aug"
-            9 -> "Sep"
-            10 -> "Oct"
-            11 -> "Nov"
-            12 -> "Dec"
-            else -> "Unknown"
-        }
-        val year = dateTime.year
-
-        "$day $month $year"
-    } catch (e: Exception) {
-        this
     }
 }

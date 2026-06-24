@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,19 +63,24 @@ import org.jetbrains.compose.resources.Font
 fun RatingCard(
     meal: MealInfo,
     rating: Int,
-    feedbackText: String,
     onRatingChange: (Int) -> Unit,
-    onFeedbackChange: (String) -> Unit,
     accentColor: Color,
     iconColor: Color,
-
-    ) {
+    onSubmitClick: () -> Unit,
+    isSubmitting: Boolean,
+    isSubmitEnabled: Boolean
+) {
     val isRated = rating > 0
-    var isSubmitting by remember { mutableStateOf(false) }
     var showSuccess by remember { mutableStateOf(false) }
 
+    LaunchedEffect(rating) {
+        if (rating == 0) {
+            showSuccess = false
+        }
+    }
+
     Card(
-        colors = CardDefaults.cardColors(containerColor =accentColor),
+        colors = CardDefaults.cardColors(containerColor = accentColor),
         shape = RoundedCornerShape(40.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -178,6 +184,7 @@ fun RatingCard(
                                 enabled = !showSuccess && !isSubmitting
                             ) {
                                 onRatingChange(i)
+                                showSuccess = false
                             }
                     )
                 }
@@ -188,65 +195,30 @@ fun RatingCard(
                 enter = slideInVertically() + fadeIn(),
                 exit = slideOutVertically() + fadeOut()
             ) {
-                Column {
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    BasicTextField(
-                        value = feedbackText,
-                        onValueChange = onFeedbackChange,
-                        textStyle = TextStyle(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 16.sp
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(100.dp)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(Color.White.copy(alpha = 0.6f))
-                                    .border(
-                                        width = 2.dp,
-                                        color = Color.White.copy(alpha = 0.8f),
-                                        shape = RoundedCornerShape(24.dp)
-                                    )
-                                    .padding(16.dp)
-                            ) {
-                                if (feedbackText.isEmpty()) {
-                                    Text(
-                                        text = "What did you like? What could improve? (Optional)",
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f),
-                                        fontSize = 12.sp,
-                                        fontFamily = FontFamily(Font(Res.font.opensansmedium)),
-                                    )
-                                }
-                                innerTextField()
-                            }
+                Button(
+                    onClick = {
+                        onSubmitClick()
+                        if (isSubmitEnabled && !isSubmitting) {
+                            // loading indicator add kr dena baad me
                         }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(55.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    ),
+                    enabled = isSubmitEnabled && !isSubmitting && !showSuccess
+                ) {
+                    Text(
+                        text = if (isSubmitting) "Submitting..." else "Submit Response",
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+                        maxLines = 1,
+                        color = Color.White
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(55.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                    ) {
-                        Text(
-                            text ="Submit Response",
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-                            maxLines = 1,
-                            color = Color.White
-                        )
-                    }
                 }
             }
         }

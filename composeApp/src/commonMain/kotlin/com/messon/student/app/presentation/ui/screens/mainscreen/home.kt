@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Mood
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
@@ -85,7 +87,8 @@ fun HomeScreen(
     onComplaintClick: () -> Unit,
     couponViewModel: CouponViewModel,
     authSecureStorage: AuthSecureStorage,
-    onMealPlannerClick: () -> Unit
+    onMealPlannerClick: () -> Unit,
+    onRateMealClick:()-> Unit
 ) {
     var userName by remember { mutableStateOf("") }
     var clickedCardIndex by remember { mutableIntStateOf(-1) }
@@ -104,7 +107,7 @@ fun HomeScreen(
 
         withStyle(
             style = SpanStyle(
-                color = MaterialTheme.colorScheme.onBackground, // Replaced static Color.Black with theme onBackground
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 14.5.sp
             )
         ) {
@@ -142,7 +145,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(140.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Adaptive banner color
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
             )
 
@@ -158,7 +161,7 @@ fun HomeScreen(
                     )
                     .border(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), // Dynamic border outline
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                         shape = CircleShape
                     )
                     .clip(CircleShape)
@@ -171,7 +174,7 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Bell icon",
-                    tint = MaterialTheme.colorScheme.onBackground, // Dynamic notification icon color
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(5.dp)
                         .size(22.dp)
                 )
@@ -182,7 +185,7 @@ fun HomeScreen(
                 overflow = TextOverflow.Ellipsis,
                 text = "Hey, $userName \uD83D\uDC4B Have a great meal!",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground, // Dynamic text color
+                color = MaterialTheme.colorScheme.onBackground,
                 fontFamily = FontFamily(Font(Res.font.opensansregular)),
                 modifier = Modifier.constrainAs(greetingsRef) {
                     start.linkTo(parent.start, margin = 30.dp)
@@ -227,19 +230,20 @@ fun HomeScreen(
 
             LazyColumn(
                 userScrollEnabled = clickedCardIndex == -1,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
                     .constrainAs(lazyColumnRef) {
                         top.linkTo(todaysDateRef.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
                         height = Dimension.fillToConstraints
-                    }
+                    },
+                contentPadding = PaddingValues(bottom = 100.dp)
             ) {
                 item {
                     Text(
                         text = "Today’s Coupons",
-                        color = MaterialTheme.colorScheme.onBackground, // Adaptive header color
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
                         fontSize = 16.sp,
                         modifier = Modifier.padding(start = 20.dp)
@@ -248,7 +252,7 @@ fun HomeScreen(
                         text = "Click on the coupons to get QR",
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(Res.font.opensansregular)),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Dynamic unselected text style
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 20.dp)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
@@ -275,7 +279,7 @@ fun HomeScreen(
                             CardHomeScreen(
                                 modifier = Modifier,
                                 borderColor = MaterialTheme.colorScheme.secondary,
-                                containerColor = MessonTheme.colors.warningContainer, // Adapting to Warning Container values
+                                containerColor = MessonTheme.colors.warningContainer,
                                 mealSlot = MealSlot.LUNCH,
                                 onCardClick = {
                                     clickedCardIndex = 1
@@ -287,7 +291,7 @@ fun HomeScreen(
                             CardHomeScreen(
                                 modifier = Modifier.padding(end = 15.dp),
                                 borderColor = MaterialTheme.colorScheme.onBackground,
-                                containerColor = MessonTheme.colors.accentContainer, // Adapting to Accent Container values
+                                containerColor = MessonTheme.colors.accentContainer,
                                 mealSlot = MealSlot.DINNER,
                                 onCardClick = {
                                     clickedCardIndex = 2
@@ -301,7 +305,7 @@ fun HomeScreen(
                 item {
                     Divider(
                         thickness = 0.35.dp,
-                        color = MessonTheme.colors.divider, // Use the custom adaptive theme divider color
+                        color = MessonTheme.colors.divider,
                         modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 30.dp, vertical = 40.dp)
                     )
@@ -357,6 +361,17 @@ fun HomeScreen(
                         modifier = Modifier
                             .padding(vertical = 10.dp, horizontal = 15.dp),
                         onClick = onMealPlannerClick
+                    )
+                }
+
+                item {
+                    QuickAccessBox(
+                        icon =rememberVectorPainter(Icons.Default.Star) ,
+                        title = "Rate Meal",
+                        isClickable = clickedCardIndex == -1,
+                        modifier = Modifier
+                            .padding(vertical = 10.dp, horizontal = 15.dp),
+                        onClick = onRateMealClick
                     )
                 }
             }
@@ -420,7 +435,7 @@ fun CallCouponCard(
             mealSlot = MealSlot.LUNCH.value.replaceFirstChar { it.uppercaseChar() },
             date = currentDate,
             borderColor = MaterialTheme.colorScheme.secondary,
-            containerColor = MessonTheme.colors.warningContainer, // Adaptive Lunch color
+            containerColor = MessonTheme.colors.warningContainer,
             data = data,
             onCloseBtnClick = onCloseBtnClick,
             mealType = mealType
@@ -430,7 +445,7 @@ fun CallCouponCard(
             mealSlot = MealSlot.DINNER.value.replaceFirstChar { it.uppercaseChar() },
             date = currentDate,
             borderColor = MaterialTheme.colorScheme.onBackground,
-            containerColor = MessonTheme.colors.accentContainer, // Adaptive Dinner color
+            containerColor = MessonTheme.colors.accentContainer,
             data = data,
             onCloseBtnClick = onCloseBtnClick,
             mealType = mealType

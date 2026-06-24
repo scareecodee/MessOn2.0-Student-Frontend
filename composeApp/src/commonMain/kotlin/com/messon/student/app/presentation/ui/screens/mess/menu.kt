@@ -97,7 +97,7 @@ fun ViewMessMenuScreen(
                 Icons.Rounded.ChevronLeft,
                 contentDescription = "back",
                 modifier = Modifier.size(28.dp),
-                tint = MaterialTheme.colorScheme.onBackground // Dynamic icon tint
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 

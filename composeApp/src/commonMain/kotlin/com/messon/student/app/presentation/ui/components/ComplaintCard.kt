@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.Complaint
+import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.UserInteraction
 import com.messon.student.app.utils.backgroundColor
 import com.messon.student.app.utils.textColor
@@ -39,8 +41,7 @@ fun ComplaintCard(
     complaint: Complaint,
     modifier: Modifier = Modifier,
     onLikeClick: () -> Unit = {},
-    onDislikeClick: () -> Unit = {},
-    isVotingInProgress: Boolean = false
+    onDislikeClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -214,8 +215,7 @@ fun ComplaintCard(
                             Icons.Outlined.ThumbUp,
                         isSelected = complaint.userInteraction == UserInteraction.LIKE,
                         activeColor = MaterialTheme.colorScheme.primary,
-                        onClick = onLikeClick,
-                        isLoading = isVotingInProgress
+                        onClick = onLikeClick
                     )
 
                     Spacer(modifier = Modifier.width(4.dp))
@@ -235,8 +235,7 @@ fun ComplaintCard(
                             Icons.Outlined.ThumbDown,
                         isSelected = complaint.userInteraction == UserInteraction.DISLIKE,
                         activeColor = MaterialTheme.colorScheme.secondary,
-                        onClick = onDislikeClick,
-                        isLoading = isVotingInProgress
+                        onClick = onDislikeClick
                     )
                 }
             }
@@ -244,3 +243,47 @@ fun ComplaintCard(
     }
 }
 
+@Composable
+private fun InteractionButton(
+    count: Int,
+    icon: ImageVector,
+    isSelected: Boolean,
+    activeColor: Color,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.height(32.dp),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) {
+                activeColor.copy(alpha = 0.15f)
+            } else {
+                Color.Transparent
+            },
+            contentColor = if (isSelected) {
+                activeColor
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            }
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp
+        ),
+        contentPadding = PaddingValues(horizontal = 8.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = if (isSelected) "Selected" else "Not selected",
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = count.toString(),
+            fontSize = 12.sp,
+            fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
+            color = if (isSelected) activeColor else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        )
+    }
+}

@@ -58,7 +58,6 @@ class FetchComplaintsVM(
     private val _state = MutableStateFlow(FetchComplaintState())
     val state = _state.asStateFlow()
 
-    // FetchComplaintsVM.kt - Update onSuccess
     private val paginator = Paginator<String?, FetchComplaintsRes, NetworkError>(
         initialKey = null,
 
@@ -97,24 +96,27 @@ class FetchComplaintsVM(
         },
 
         onSuccess = { response, _ ->
-            println("✅ Success: ${response.complaints.size} complaints loaded")
-            // IMPORTANT: Append new complaints to existing ones
             _state.update { currentState ->
                 val existingComplaints = currentState.complaints
                 val newComplaints = response.complaints
 
-                // Remove duplicates based on ID
-                val existingIds = existingComplaints.map { it.id }.toSet()
-                val uniqueNewComplaints = newComplaints.filter { it.id !in existingIds }
-
-                println("📊 Existing: ${existingComplaints.size}, New: ${newComplaints.size}, Unique: ${uniqueNewComplaints.size}")
-
-                currentState.copy(
-                    complaints = existingComplaints + uniqueNewComplaints,
-                    error = null,
-                    endReached = response.nextCursor == null,
-                    isRefreshing = false
-                )
+                if (existingComplaints.isEmpty()) {
+                    currentState.copy(
+                        complaints = newComplaints,
+                        error = null,
+                        endReached = response.nextCursor == null,
+                        isRefreshing = false
+                    )
+                } else {
+                    val existingIds = existingComplaints.map { it.id }.toSet()
+                    val uniqueNewComplaints = newComplaints.filter { it.id !in existingIds }
+                    currentState.copy(
+                        complaints = existingComplaints + uniqueNewComplaints,
+                        error = null,
+                        endReached = response.nextCursor == null,
+                        isRefreshing = false
+                    )
+                }
             }
         },
 
@@ -128,7 +130,7 @@ class FetchComplaintsVM(
             it.copy(
                 error = null,
                 endReached = false,
-                votingInProgress = emptySet()
+                complaints = emptyList()
             )
         }
 
@@ -141,7 +143,6 @@ class FetchComplaintsVM(
 
     fun loadNextItems() {
         if (state.value.endReached) return
-
         viewModelScope.launch {
             paginator.loadNextItems()
         }
@@ -149,16 +150,14 @@ class FetchComplaintsVM(
 
     fun manualRefresh() {
         paginator.reset()
-
         _state.update {
             it.copy(
                 error = null,
                 endReached = false,
                 isRefreshing = true,
-                votingInProgress = emptySet()
+                complaints = emptyList()
             )
         }
-
         viewModelScope.launch {
             paginator.loadNextItems()
         }
@@ -166,20 +165,19 @@ class FetchComplaintsVM(
 
     fun refreshSilently() {
         paginator.reset()
-
         _state.update {
             it.copy(
                 error = null,
                 endReached = false,
                 isRefreshing = false,
-                votingInProgress = emptySet()
+                complaints = emptyList()
             )
         }
-
         viewModelScope.launch {
             paginator.loadNextItems()
         }
     }
+
 
     fun voteComplaint(complaintId: String, voteType: String) {
         viewModelScope.launch {
@@ -199,10 +197,6 @@ class FetchComplaintsVM(
                 return@launch
             }
 
-            _state.update {
-                it.copy(votingInProgress = it.votingInProgress + complaintId)
-            }
-
             val (newInteraction, likeDelta, dislikeDelta) = calculateVoteUpdate(
                 currentUserInteraction = currentComplaint.userInteraction,
                 voteType = voteType
@@ -217,12 +211,13 @@ class FetchComplaintsVM(
                     voteType = voteType
                 )
             ).onSuccess { response ->
+                // Update with server response
                 _state.update { currentState ->
                     val updatedComplaints = currentState.complaints.map { complaint ->
                         if (complaint.id == complaintId) {
                             complaint.copy(
-                                likes = response.likeCount.toIntOrNull() ?: complaint.likes,
-                                dislikes = response.dislikeCount.toIntOrNull() ?: complaint.dislikes,
+                                likes = response.likeCount,
+                                dislikes = response.dislikeCount,
                                 userInteraction = newInteraction
                             )
                         } else {
@@ -231,8 +226,7 @@ class FetchComplaintsVM(
                     }
                     currentState.copy(
                         complaints = updatedComplaints,
-                        error = null,
-                        votingInProgress = currentState.votingInProgress - complaintId
+                        error = null
                     )
                 }
             }.onError { error ->
@@ -246,8 +240,11 @@ class FetchComplaintsVM(
                     }
                     currentState.copy(
                         complaints = revertedComplaints,
-                        error = "Failed to vote: ${error.toString()}",
-                        votingInProgress = currentState.votingInProgress - complaintId
+                        error = when (voteType) {
+                            "like" -> "Failed to like the complaint"
+                            "dislike" -> "Failed to dislike the complaint"
+                            else -> "Failed to vote"
+                        }
                     )
                 }
             }
@@ -264,16 +261,22 @@ class FetchComplaintsVM(
         return when {
             (isLike && currentInteraction == UserInteraction.LIKE) ->
                 Triple(null, -1, 0)
+
             (!isLike && currentInteraction == UserInteraction.DISLIKE) ->
                 Triple(null, 0, -1)
+
             (isLike && currentInteraction == UserInteraction.DISLIKE) ->
                 Triple(UserInteraction.LIKE, 1, -1)
+
             (!isLike && currentInteraction == UserInteraction.LIKE) ->
                 Triple(UserInteraction.DISLIKE, -1, 1)
+
             (isLike && currentInteraction == null) ->
                 Triple(UserInteraction.LIKE, 1, 0)
+
             (!isLike && currentInteraction == null) ->
                 Triple(UserInteraction.DISLIKE, 0, 1)
+
             else -> Triple(null, 0, 0)
         }
     }

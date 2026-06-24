@@ -45,18 +45,18 @@ fun QuickAccessBox(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp) // Sleek height footprint
+            .height(64.dp)
             .shadow(
                 elevation = 2.dp,
                 shape = RoundedCornerShape(16.dp)
             )
             .background(
-                color = MaterialTheme.colorScheme.surface, // Matches surface palette
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(16.dp)
             )
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), // Soft glass outline
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
                 shape = RoundedCornerShape(16.dp)
             )
             .clip(RoundedCornerShape(16.dp))
@@ -66,12 +66,11 @@ fun QuickAccessBox(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Beautifully tinted round container for the leading icon
         Box(
             modifier = Modifier
                 .size(36.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), // Subtle brand color tint
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
                     shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -79,7 +78,7 @@ fun QuickAccessBox(
             Icon(
                 painter = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary, // Brand-accented leading icon
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -89,17 +88,17 @@ fun QuickAccessBox(
         Text(
             text = title,
             fontFamily = FontFamily(Font(Res.font.opensanssemiBold)),
-            color = MaterialTheme.colorScheme.onSurface, // High legibility title color
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 14.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f) // Automatically fills horizontal space
+            modifier = Modifier.weight(1f)
         )
 
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = "Navigate to feature",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), // Soft secondary grey arrow
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             modifier = Modifier.size(18.dp)
         )
     }

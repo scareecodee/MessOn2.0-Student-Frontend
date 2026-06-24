@@ -4,6 +4,7 @@ import com.messon.student.app.data.remote.dto.MealPrefSaveReq
 import com.messon.student.app.data.remote.dto.MenuResDto
 import com.messon.student.app.data.remote.dto.MessRuleDto
 import com.messon.student.app.data.remote.dto.PrefSetupDto
+import com.messon.student.app.data.remote.dto.SubmitRatingReqDto
 import com.messon.student.app.utils.NetworkError
 import com.messon.student.app.utils.Result
 import io.ktor.client.HttpClient
@@ -175,6 +176,58 @@ class MessApi(
                 header("Authorization", "Bearer $token")
                 setBody(
                     mealPref
+                )
+            }
+        } catch (e: UnresolvedAddressException){
+            return  Result.Error(NetworkError.NO_INTERNET)
+        }
+        catch (e: SerializationException){
+            return  Result.Error(NetworkError.SERIALIZATION)
+        }
+        catch (e: Exception){
+            Log.d(tag = "Ktor", message = {e.message.toString()})
+
+            return  Result.Error(NetworkError.UNKNOWN)
+        }
+        Log.d(tag = "Ktor", message = {response.toString()})
+        println("STATUS CODE = ${response.status}")
+
+        return when(response.status.value){
+            in 200..299->{
+                val mess=response.body<String>()
+                Log.d(tag = "Ktor", message = {mess})
+
+                Result.Success(mess)
+            }
+            401->Result.Error(NetworkError.UNAUTHORIZED)
+            403->Result.Error(NetworkError.FORBIDDEN)
+            409 -> Result.Error(NetworkError.CONFLICT)
+            408 ->  Result.Error(NetworkError.REQUEST_TIMEOUT)
+            413 ->  Result.Error(NetworkError.PAYLOAD_TOO_LARGE)
+            in 500..599->  Result.Error(NetworkError.SERVER_ERROR)
+            else ->  Result.Error(NetworkError.UNKNOWN)
+        }
+    }
+
+
+    suspend fun submitRating(
+        token:String,
+        submitRatingReqDto: SubmitRatingReqDto
+    ): Result<String, NetworkError>
+    {
+
+        Log.d(
+            tag = "rating ktor",
+            message = {submitRatingReqDto.toString()}
+        )
+        val response=try {
+            httpClient.post(
+                urlString = "${BASE_URL}rate-meal"
+            ) {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer $token")
+                setBody(
+                    submitRatingReqDto
                 )
             }
         } catch (e: UnresolvedAddressException){
