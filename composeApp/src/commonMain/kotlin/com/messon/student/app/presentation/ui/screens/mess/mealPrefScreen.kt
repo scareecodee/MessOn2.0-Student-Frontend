@@ -43,7 +43,6 @@ import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealSlot
 import multiplatform.network.cmptoast.showToast
 
-// Simple data model representing diet menus
 data class MealMenu(val veg: String, val nonVeg: String)
 
 @Composable
@@ -326,7 +325,7 @@ fun BottomBarSection(
     onSaveBtnClick: () -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface, // Automatically swaps to charcoal in Dark Mode
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         shadowElevation = 16.dp,
         modifier = modifier.fillMaxWidth()
@@ -343,7 +342,7 @@ fun BottomBarSection(
                     text = "Meals Booked",
                     fontSize = 13.sp,
                     fontFamily = FontFamily(Font(Res.font.opensansmedium) ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Dynamic unselected status text
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Row(verticalAlignment = Alignment.Bottom) {

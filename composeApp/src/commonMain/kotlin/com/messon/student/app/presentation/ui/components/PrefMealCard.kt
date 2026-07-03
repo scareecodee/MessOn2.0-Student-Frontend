@@ -47,12 +47,11 @@ fun PrefMealCard(
     isVegSelectable: Boolean,
     isNonVegSelectable: Boolean
 ) {
-    // Beautiful dynamic green & red color palettes for light and dark environments
     val vegAccent = Color(0xFF4CAF50)
     val nonVegAccent = Color(0xFFEF5350)
 
     Surface(
-        color = MaterialTheme.colorScheme.surface, // Fits cleanly with dark themes
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
         shadowElevation = 2.dp,

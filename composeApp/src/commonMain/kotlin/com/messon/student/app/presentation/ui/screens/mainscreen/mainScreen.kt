@@ -41,7 +41,6 @@ fun MainScreen(
     authViewModel: AuthViewModel,
     menuFetchVM: MenuFetchVM
 ) {
-    // Standard pages mapping (0: Home, 1: Menu, 2: Profile)
     val pageCount = 3
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
     val coroutineScope = rememberCoroutineScope()
