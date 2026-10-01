@@ -11,6 +11,7 @@ import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import com.messon.student.app.services.NotificationChannelManager
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        NotificationChannelManager.createChannels(this)
 
 
         setContent {

@@ -12,6 +12,7 @@ plugins {
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    id("com.google.gms.google-services")
 }
 
 
@@ -64,6 +65,7 @@ kotlin {
             implementation(libs.play.services.auth)
 
             implementation("androidx.security:security-crypto:1.1.0-alpha06")
+            implementation(libs.firebase.messaging)
 
 
 

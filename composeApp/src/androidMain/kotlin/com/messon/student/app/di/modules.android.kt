@@ -3,6 +3,9 @@ package com.messon.student.app.di
 import android.app.Activity
 import android.content.Context
 import com.messon.student.app.core.AppDispatchers
+import com.messon.student.app.core.EncryptedTokenStorage
+import com.messon.student.app.core.PushNotificationManager
+import com.messon.student.app.core.PushTokenProvider
 import com.messon.student.app.data.local.DataBase
 import com.messon.student.app.data.local.getDatabase
 import com.messon.student.app.data.remote.network.createHttpClient
@@ -21,6 +24,10 @@ actual val platformModule = module {
     single { AppDispatchers() }
 
     single { createHttpClient(OkHttp.create()) }
+
+    single { EncryptedTokenStorage(androidContext()) }
+    single { PushNotificationManager() }
+    single { PushTokenProvider() }
 
     factory<GoogleAuth> { (activity: Activity) ->
         GoogleAuthAndroid(

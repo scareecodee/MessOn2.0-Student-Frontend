@@ -30,7 +30,7 @@ coil = "3.3.0"
 room = "2.8.4"
 ksp = "2.3.5"
 sqlite = "2.6.2"
-
+firebaseMessaging = "25.0.1"
 
 
 
@@ -76,7 +76,7 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-runtime-android = { module = "androidx.room:room-runtime-android", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
 
