@@ -44,12 +44,12 @@ import com.messon.student.app.presentation.ui.state.SubmitRatingState
 import com.messon.student.app.presentation.viewmodel.SubmitRatingVM
 import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealSlot
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensanssemiBold
-import multiplatform.network.cmptoast.showToast
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
+import multiplatform.network.cmptoast.showToast
 
 @Composable
 fun RatingScreen(

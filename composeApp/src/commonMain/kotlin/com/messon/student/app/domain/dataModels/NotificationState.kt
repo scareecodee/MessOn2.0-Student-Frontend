@@ -9,5 +9,6 @@ sealed interface NotificationState {
     data class Registered(val token: String) : NotificationState
     data object Unregistering : NotificationState
     data object Unregistered : NotificationState
+    data object PermissionDenied : NotificationState
     data class Error(val error: AppError) : NotificationState
 }

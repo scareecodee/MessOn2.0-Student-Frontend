@@ -31,10 +31,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.presentation.ui.components.EachNotificationItem
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
+
+
 
 @Composable
 fun NotificationScreen(

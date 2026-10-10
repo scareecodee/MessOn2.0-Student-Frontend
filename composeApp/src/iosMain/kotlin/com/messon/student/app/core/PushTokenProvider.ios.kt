@@ -1,13 +1,17 @@
 package com.messon.student.app.core
 
+
 import kotlinx.coroutines.flow.Flow
 
-actual class PushTokenProvider {
-    actual suspend fun getToken(): String? {
-        return IosPushBridge.currentToken
+class IosPushTokenProvider(
+    private val pushNotificationManager: PushNotificationManager
+) : PushTokenProvider {
+
+    override suspend fun getToken(): String? {
+        return pushNotificationManager.awaitToken()
     }
 
-    actual fun observeTokenChanges(): Flow<String> {
-        return IosPushBridge.tokenRefreshFlow
+    override fun observeTokenChanges(): Flow<String> {
+        return pushNotificationManager.observeTokenRefresh()
     }
 }

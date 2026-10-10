@@ -10,5 +10,7 @@ expect class PushNotificationManager() {
     fun observeNotifications(): Flow<NotificationPayload>
     fun observeTokenRefresh(): Flow<String>
     suspend fun requestPermission(): PermissionStatus
-    fun getCurrentToken(): String?
+    suspend fun getCurrentToken(): String?
+    suspend fun awaitToken(timeoutMs: Long = 10_000): String?
+
 }

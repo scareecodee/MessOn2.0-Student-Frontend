@@ -1,9 +1,11 @@
 package com.messon.student.app.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.messon.student.app.core.AppError
 import com.messon.student.app.core.PushNotificationManager
 import com.messon.student.app.domain.dataModels.DeviceInfo
 import com.messon.student.app.domain.dataModels.NotificationState
+import com.messon.student.app.domain.dataModels.PermissionStatus
 import com.messon.student.app.domain.repository.DeviceRepository
 import com.messon.student.app.domain.usecase.RegisterDeviceUseCase
 import com.messon.student.app.domain.usecase.UnregisterDeviceUseCase
@@ -92,17 +94,32 @@ class NotificationViewModel(
         _uiState.update { it.copy(unreadCount = 0) }
     }
 
+
     private fun registerDevice(deviceInfo: DeviceInfo) {
         _uiState.update { it.copy(notificationState = NotificationState.Registering) }
         viewModelScope.launch(Dispatchers.Main) {
+            val permission = pushNotificationManager.requestPermission()
+            _uiState.update { it.copy(permissionStatus = permission) }
+
+            if (permission != PermissionStatus.GRANTED) {
+                _uiState.update { it.copy(notificationState = NotificationState.PermissionDenied) }
+                return@launch
+            }
+
+            pushNotificationManager.registerForPushNotifications()
+
             registerDeviceUseCase(deviceInfo)
                 .onSuccess { response ->
-                    _uiState.update { it.copy(notificationState = NotificationState.Registered(response.token)) }
-                    pushNotificationManager.registerForPushNotifications()
+                    _uiState.update {
+                        it.copy(notificationState = NotificationState.Registered(response.token))
+                    }
                 }
                 .onFailure { error ->
-                    _uiState.update { it.copy(notificationState = NotificationState.Error(error)) }
+                    _uiState.update {
+                        it.copy(notificationState = NotificationState.Error(error))
+                    }
                 }
         }
     }
+
 }

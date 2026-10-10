@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
 
 @Composable

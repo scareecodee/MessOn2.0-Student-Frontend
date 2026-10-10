@@ -12,12 +12,15 @@ import com.messon.student.app.data.remote.network.createHttpClient
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.auth.GoogleAuth
 import com.messon.student.app.domain.auth.GoogleAuthAndroid
+import com.messon.student.app.domain.provider.AndroidDeviceInfoProvider
+import com.messon.student.app.domain.provider.DeviceInfoProvider
 import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 actual val platformModule = module {
 
+    single<DeviceInfoProvider> { AndroidDeviceInfoProvider(androidContext()) }
 
     single<DataBase> { getDatabase(androidContext()) }
 
@@ -27,7 +30,6 @@ actual val platformModule = module {
 
     single { EncryptedTokenStorage(androidContext()) }
     single { PushNotificationManager() }
-    single { PushTokenProvider() }
 
     factory<GoogleAuth> { (activity: Activity) ->
         GoogleAuthAndroid(

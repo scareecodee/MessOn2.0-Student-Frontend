@@ -14,8 +14,7 @@ class RegisterDeviceUseCase(
 ) {
     suspend operator fun invoke(deviceInfo: DeviceInfo): AppResult<DeviceRegistrationResponse> {
         val token = tokenProvider.getToken()
-        return if (token != null) {
-            deviceRepository.registerDevice(token, deviceInfo)
-        } else {
-            Result.Error(AppError.Unknown("Failed to obtain push token"))    }
-}}
+            ?: return Result.Error(AppError.Unknown("Failed to obtain push token"))
+        return deviceRepository.registerDevice(token, deviceInfo)
+    }
+}

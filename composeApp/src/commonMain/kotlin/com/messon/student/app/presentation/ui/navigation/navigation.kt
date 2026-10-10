@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.messon.student.app.domain.auth.AuthSecureStorage
 import com.messon.student.app.domain.auth.GoogleAuth
+import com.messon.student.app.domain.provider.DeviceInfoProvider
 import com.messon.student.app.presentation.ui.screens.auth.SignInRoute
 import com.messon.student.app.presentation.ui.screens.college.CollegeListScreen
 import com.messon.student.app.presentation.ui.screens.mess.MealPreferenceScreen
@@ -35,42 +36,32 @@ import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
 import com.messon.student.app.presentation.viewmodel.ComplaintVM
 import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
+import com.messon.student.app.presentation.viewmodel.NotificationViewModel
 import com.messon.student.app.presentation.viewmodel.SubmitRatingVM
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppNav(
     navController: NavHostController,
-    authViewModel: AuthViewModel,
     googleAuth: GoogleAuth,
-    authSecureStorage: AuthSecureStorage,
-    couponViewModel: CouponViewModel,
-    menuFetchVM: MenuFetchVM,
-    mealPlannerViewModel: MealPlannerViewModel,
-    complaintVM: ComplaintVM
 ) {
+    val collegeScreenVM: CollegeScreenVM= koinViewModel()
+    val authSecureStorage: AuthSecureStorage = koinInject()
+    val authViewModel: AuthViewModel = koinViewModel<AuthViewModel>()
+    val couponViewModel: CouponViewModel =koinViewModel<CouponViewModel>()
+    val menuFetchVM=koinViewModel<MenuFetchVM>()
+    val notificationViewModel: NotificationViewModel=koinViewModel<NotificationViewModel>()
+    val mealPlannerViewModel: MealPlannerViewModel=koinViewModel<MealPlannerViewModel>()
+    val deviceInfoProvider: DeviceInfoProvider=koinInject()
+    val complaintVM: ComplaintVM=koinViewModel<ComplaintVM>()
+
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
 
-    val collegeScreenVM: CollegeScreenVM= koinViewModel()
-
-    LaunchedEffect(authState) {
-        when (authState) {
-            is AuthState.Success -> {
-                navController.navigate(Screen.MainScreen.route) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
-            }
-
-            AuthState.Unauthenticated -> {
-                navController.navigate(Screen.CollegeListScreen.route) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
-            }
-
-            else -> Unit
-        }
+    val startDestination = when (authState) {
+        is AuthState.Success -> Screen.MainScreen.route
+        AuthState.Unauthenticated -> Screen.CollegeListScreen.route
+        else -> Screen.CollegeListScreen.route
     }
 
 
@@ -89,7 +80,7 @@ fun AppNav(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.CollegeListScreen.route
+        startDestination = startDestination
     ) {
 
         composable(
@@ -100,11 +91,13 @@ fun AppNav(
             SignInRoute(
                 viewModel = authViewModel,
                 onLoginSuccess = {
-                    navController.navigate(Screen.MainScreen.route){
-                        launchSingleTop=true
+                    navController.navigate(Screen.MainScreen.route) {
+                        launchSingleTop = true
                     }
                 },
-                googleAuth = googleAuth
+                googleAuth = googleAuth,
+                notificationViewModel = notificationViewModel,
+                deviceInfoProvider = deviceInfoProvider
             )
         }
 

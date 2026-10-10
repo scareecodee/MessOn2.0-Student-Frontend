@@ -24,8 +24,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.student.app.domain.dataModels.ComplaintCategory
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansmedium
 import org.jetbrains.compose.resources.Font
 
 @Composable

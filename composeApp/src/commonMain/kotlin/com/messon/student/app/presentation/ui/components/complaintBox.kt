@@ -26,13 +26,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import com.messon.student.app.utils.MealSlot
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensanssemiBold
-import messon.composeapp.generated.resources.qr
+import com.messon.student.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
+
 
 @Composable
 fun QuickAccessBox(

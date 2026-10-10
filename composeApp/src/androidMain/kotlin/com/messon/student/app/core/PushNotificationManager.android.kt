@@ -1,4 +1,5 @@
 package com.messon.student.app.core
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 actual class PushNotificationManager actual constructor() {
 
@@ -27,6 +30,7 @@ actual class PushNotificationManager actual constructor() {
 
     actual fun registerForPushNotifications() {
         NotificationChannelManager.createChannels(context)
+        CoroutineScope(Dispatchers.IO).launch { awaitToken() }
     }
 
     actual fun unregisterFromPushNotifications() {
@@ -55,5 +59,19 @@ actual class PushNotificationManager actual constructor() {
         return PermissionStatus.GRANTED
     }
 
-    actual fun getCurrentToken(): String? = tokenStorage.getToken()
+    actual suspend fun getCurrentToken(): String? = tokenStorage.getToken()
+
+    actual suspend fun awaitToken(timeoutMs: Long): String? {
+        tokenStorage.getToken()?.let { return it }
+
+        return withTimeoutOrNull(timeoutMs.milliseconds) {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                tokenStorage.saveToken(token)
+                token
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
 }

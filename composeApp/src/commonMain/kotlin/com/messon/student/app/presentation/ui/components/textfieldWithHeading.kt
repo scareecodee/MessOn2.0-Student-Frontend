@@ -19,11 +19,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensansregular
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 
 @Composable
 fun TextFieldItem(

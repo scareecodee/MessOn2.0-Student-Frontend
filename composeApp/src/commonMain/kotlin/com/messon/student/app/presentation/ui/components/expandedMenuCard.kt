@@ -29,9 +29,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
 

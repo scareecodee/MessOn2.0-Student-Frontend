@@ -23,11 +23,10 @@ import com.messon.student.app.presentation.ui.components.CollegeCard
 import com.messon.student.app.presentation.ui.components.SearchBar
 import com.messon.student.app.presentation.ui.state.FetchCollegesState
 import com.messon.student.app.presentation.viewmodel.CollegeScreenVM
-import com.messon.student.app.theme.MessonTheme
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import multiplatform.network.cmptoast.showToast
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansbold
 import org.jetbrains.compose.resources.Font
+import multiplatform.network.cmptoast.showToast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

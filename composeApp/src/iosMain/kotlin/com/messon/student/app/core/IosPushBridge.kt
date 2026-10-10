@@ -7,7 +7,17 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.UIKit.UIApplication
+import platform.UIKit.registerForRemoteNotifications
+import platform.UIKit.unregisterForRemoteNotifications
+import platform.UserNotifications.UNAuthorizationOptionAlert
+import platform.UserNotifications.UNAuthorizationOptionBadge
+import platform.UserNotifications.UNAuthorizationOptionSound
+import platform.UserNotifications.UNUserNotificationCenter
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 import kotlin.coroutines.resume
+import swiftPMImport.com.messon.student.ComposeApp.FIRMessaging
 
 object IosPushBridge {
     private val _notificationsFlow = MutableSharedFlow<NotificationPayload>(
@@ -71,18 +81,37 @@ object IosPushBridge {
         _deepLinkFlow.tryEmit(deepLink)
     }
 
+    private var registerCallback: (() -> Unit)? = null
+
+
     fun registerForRemoteNotifications() {
-        // Actual registration happens in Swift AppDelegate
+        val center = UNUserNotificationCenter.currentNotificationCenter()
+        center.requestAuthorizationWithOptions(
+            UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
+        ) { granted, _ ->
+            if (granted) {
+                dispatch_async(dispatch_get_main_queue()) {
+                    UIApplication.sharedApplication.registerForRemoteNotifications()
+                }
+            }
+        }
+    }
+    fun setRegisterCallback(callback: () -> Unit) {
+        registerCallback = callback
     }
 
     fun unregister() {
+        FirebaseMessaging.messaging().deleteTokenWithCompletion { _ -> }
+        UIApplication.sharedApplication.unregisterForRemoteNotifications()
         currentToken = null
-        // Actual Firebase token deletion happens in Swift
     }
 
-    suspend fun requestPermission(): PermissionStatus = suspendCancellableCoroutine { continuation ->
-        requestPermissionWithCallback { status ->
-            continuation.resume(status)
+    suspend fun requestPermission(): PermissionStatus = suspendCancellableCoroutine { cont ->
+        val center = UNUserNotificationCenter.currentNotificationCenter()
+        center.requestAuthorizationWithOptions(
+            UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
+        ) { granted, _ ->
+            cont.resume(if (granted) PermissionStatus.GRANTED else PermissionStatus.DENIED)
         }
     }
 

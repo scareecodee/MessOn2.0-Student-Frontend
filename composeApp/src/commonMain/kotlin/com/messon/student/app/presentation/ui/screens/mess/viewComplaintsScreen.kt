@@ -27,12 +27,12 @@ import com.messon.student.app.presentation.ui.components.SearchBar
 import com.messon.student.app.presentation.viewmodel.FetchComplaintsVM
 import com.messon.student.app.utils.ComplaintFilter
 import com.messon.student.app.utils.toFilter
+import com.messon.student.composeapp.generated.resources.Res
 import kotlinx.coroutines.flow.distinctUntilChanged
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 
 @Composable
 fun ViewComplaintsScreen(

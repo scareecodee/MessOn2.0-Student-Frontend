@@ -29,12 +29,12 @@ import com.messon.student.app.presentation.ui.components.CategoryCard
 import com.messon.student.app.presentation.ui.components.HistoryItem
 import com.messon.student.app.presentation.ui.state.CreateComplaintState
 import com.messon.student.app.presentation.viewmodel.ComplaintVM
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 
 @Composable
 fun RegisterComplaintScreen(

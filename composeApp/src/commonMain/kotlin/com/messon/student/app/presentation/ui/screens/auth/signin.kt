@@ -22,17 +22,20 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.auth.GoogleAuth
+import com.messon.student.app.domain.dataModels.NotificationState
+import com.messon.student.app.domain.provider.DeviceInfoProvider
 import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.ui.state.AuthState
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.google
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensansregular
+import com.messon.student.app.presentation.viewmodel.NotificationViewModel
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.google
+import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensansregular
 import multiplatform.network.cmptoast.ToastGravity
 import multiplatform.network.cmptoast.ToastPadding
 import multiplatform.network.cmptoast.showToast
-import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -48,7 +51,6 @@ fun SignInScreen(
     ) {
         val (statusBarBox, illustrationRef, headingRef, subtitleRef, googleBtn, textRef, circularProgressOverlay) = createRefs()
 
-        // Adaptive top status bar spacer
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,7 +103,7 @@ fun SignInScreen(
             text = "Your daily campus mess companion",
             fontFamily = FontFamily(Font(Res.font.opensansregular)),
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant, // High legibility secondary color
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(horizontal = 24.dp)
@@ -112,12 +114,11 @@ fun SignInScreen(
                 }
         )
 
-        // Modernized elevated Google Button
         Button(
             onClick = { onBtnClick() },
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surface, // Clean white in Light Mode, Slate Charcoal in Dark Mode
+                containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface
             ),
             elevation = ButtonDefaults.buttonElevation(
@@ -136,7 +137,7 @@ fun SignInScreen(
                 .padding(horizontal = 32.dp)
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), // Perfect low-contrast outline matching system theme
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(28.dp)
                 )
         ) {
@@ -152,11 +153,10 @@ fun SignInScreen(
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.opensansmedium)),
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface // Responsive un-hardcoded text color
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
-        // Beautifully balanced disclaimer block
         Text(
             text = "By continuing, you agree to our User Agreement and acknowledge that you understand the Privacy Policy",
             fontFamily = FontFamily(Font(Res.font.opensansregular)),
@@ -178,8 +178,8 @@ fun SignInScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.35f)) // Dim screen overlay
-                    .clickable(enabled = false) {} // Absorb pointer clicks cleanly
+                    .background(Color.Black.copy(alpha = 0.35f))
+                    .clickable(enabled = false) {}
                     .constrainAs(circularProgressOverlay) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
@@ -214,13 +214,14 @@ fun SignInScreen(
 fun SignInRoute(
     googleAuth: GoogleAuth,
     viewModel: AuthViewModel,
+    notificationViewModel: NotificationViewModel,
+    deviceInfoProvider: DeviceInfoProvider,
     onLoginSuccess: () -> Unit
 ) {
-    var isVisible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val state = viewModel.uiState.value
-
-    isVisible = state is AuthState.Loading
+    val state by viewModel.uiState.collectAsState()
+    val notificationState by notificationViewModel.uiState.collectAsState()
+    val isVisible = state is AuthState.Loading
 
     SignInScreen(
         onBtnClick = {
@@ -231,17 +232,34 @@ fun SignInRoute(
 
     LaunchedEffect(state) {
         if (state is AuthState.Success) {
-            onLoginSuccess()
+            val user = (state as AuthState.Success).user
+            val deviceInfo = deviceInfoProvider.getDeviceInfo()
+            notificationViewModel.onLogin(deviceInfo)
         }
         if (state is AuthState.Error) {
             showToast(
-                textSize = 14.sp, // Modern balanced text size for toasts
-                message = state.message,
-                backgroundColor = Color.DarkGray, // Adaptive styling for errors
+                textSize = 14.sp,
+                message = (state as AuthState.Error).message,
+                backgroundColor = Color.DarkGray,
                 textColor = Color.White,
                 gravity = ToastGravity.Top,
                 padding = ToastPadding(12),
             )
+        }
+    }
+
+    LaunchedEffect(notificationState.notificationState) {
+        when (val ns = notificationState.notificationState) {
+            is NotificationState.Registered -> {
+                onLoginSuccess()
+            }
+            is NotificationState.PermissionDenied -> {
+                onLoginSuccess()
+            }
+            is NotificationState.Error -> {
+                onLoginSuccess()
+            }
+            else -> Unit
         }
     }
 }

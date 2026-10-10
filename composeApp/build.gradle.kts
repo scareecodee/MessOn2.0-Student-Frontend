@@ -1,13 +1,12 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
+group = "com.messon.student"
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.application")
     id("org.jetbrains.compose")
 
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.native.cocoapods")
     id("org.jetbrains.kotlin.plugin.compose")
 
     alias(libs.plugins.ksp)
@@ -22,7 +21,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -33,20 +32,17 @@ kotlin {
         }
     }
 
-    cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
-        ios.deploymentTarget = "16.0"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "shared"
-            isStatic = true
-        }
-        pod("GoogleSignIn")
+    swiftPMDependencies {
+        swiftPackage(
+            url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+            version = from("12.5.0"),
+            products = listOf(
+                product("FirebaseMessaging"),
+                product("FirebaseCore")
+            )
+        )
     }
 
-    
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -66,7 +62,6 @@ kotlin {
 
             implementation("androidx.security:security-crypto:1.1.0-alpha06")
             implementation(libs.firebase.messaging)
-
 
 
         }
@@ -127,7 +122,6 @@ kotlin {
             implementation(libs.ktor.client.darwin)
 
 
-
         }
     }
 }
@@ -164,7 +158,7 @@ dependencies {
 }
 
 
-room{
+room {
     schemaDirectory("$projectDir/schemas")
 }
 

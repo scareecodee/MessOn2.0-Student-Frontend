@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.student.app.domain.dataModels.ComplaintHistory
 import com.messon.student.app.theme.MessonTheme
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
 @Composable

@@ -59,9 +59,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.messon.student.app.domain.auth.AuthSecureStorage
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 import com.messon.student.app.presentation.ui.components.AnalyticsTab
 import com.messon.student.app.presentation.ui.components.CardHomeScreen
@@ -75,9 +75,11 @@ import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import com.messon.student.app.utils.getCurrentDate
 import com.messon.student.app.utils.getCurrentDay
 import com.messon.student.app.theme.MessonTheme
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.preference
 import multiplatform.network.cmptoast.showToast
 import kotlinx.serialization.json.Json
-import messon.composeapp.generated.resources.preference
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

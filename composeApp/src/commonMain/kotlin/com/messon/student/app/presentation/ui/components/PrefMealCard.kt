@@ -30,10 +30,9 @@ import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.presentation.ui.screens.mess.MealMenu
 import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealType
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansbold
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
 
 @Composable

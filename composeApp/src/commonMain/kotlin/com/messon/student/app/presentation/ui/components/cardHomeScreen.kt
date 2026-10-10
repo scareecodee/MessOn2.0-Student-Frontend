@@ -25,10 +25,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import co.touchlab.kermit.Logger
 import com.messon.student.app.presentation.ui.state.FetchMenuState
 import com.messon.student.app.utils.MealSlot
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
-import messon.composeapp.generated.resources.qr
+import com.messon.student.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansbold
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.qr
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 

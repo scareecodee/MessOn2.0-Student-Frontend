@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -24,12 +25,12 @@ import com.messon.student.app.presentation.viewmodel.AuthViewModel
 import com.messon.student.app.presentation.viewmodel.CouponViewModel
 import com.messon.student.app.presentation.viewmodel.MenuFetchVM
 import com.messon.student.app.utils.Screen
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.home
+import com.messon.student.composeapp.generated.resources.menu
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.person
 import kotlinx.coroutines.launch
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.home
-import messon.composeapp.generated.resources.menu
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.person
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 
@@ -48,7 +49,8 @@ fun MainScreen(
     val navItemList = listOf(
         NavItem(icon = Res.drawable.home, "Home"),
         NavItem(icon = Res.drawable.menu, "Menu"),
-        NavItem(icon = Res.drawable.person, "Profile")
+        NavItem(icon = Res.drawable.
+        person, "Profile")
     )
 
     Scaffold(
@@ -176,7 +178,7 @@ fun ContentScreen(
                 1 -> ViewMessMenuScreen(
                     onBackBtnClick = {
                         if (!navController.popBackStack()) {
-                            // Fallback pop
+
                         }
                     },
                     menuFetchVM = menuFetchVM
@@ -184,7 +186,7 @@ fun ContentScreen(
                 2 -> ProfileScreen(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(bottom = bottomPadding), // Non-scrollable Profile gets standard padding
+                        .padding(bottom = bottomPadding),
                     user = User(
                         name = name ?: "",
                         mailId = email ?: "",

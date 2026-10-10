@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.messon.student.app.domain.dataModels.DaySelection
 import com.messon.student.app.presentation.ui.screens.mess.WEEK_DATA
-import com.messon.student.app.theme.MessonTheme
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensanssemiBold
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
+
 
 @Composable
 fun PrefDaySelector(

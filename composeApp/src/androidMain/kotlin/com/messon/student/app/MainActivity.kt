@@ -28,20 +28,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val activity = LocalActivity.current as Activity
             val googleAuth: GoogleAuth = koinInject { parametersOf(activity) }
-            val authSecureStorage: AuthSecureStorage = koinInject()
-            val authViewModel: AuthViewModel = koinViewModel<AuthViewModel>()
-            val couponViewModel: CouponViewModel =koinViewModel<CouponViewModel>()
-            val menuFetchVM=koinViewModel<MenuFetchVM>()
-            val mealPlannerViewModel: MealPlannerViewModel=koinViewModel<MealPlannerViewModel>()
-            val complaintVM: ComplaintVM=koinViewModel<ComplaintVM>()
             App(
-                authViewModel = authViewModel,
-                authSecureStorage =authSecureStorage,
-                couponViewModel = couponViewModel ,
                 googleAuth = googleAuth,
-                menuFetchVM = menuFetchVM,
-                mealPlannerViewModel = mealPlannerViewModel,
-                complaintVM=complaintVM
             )
         }
     }

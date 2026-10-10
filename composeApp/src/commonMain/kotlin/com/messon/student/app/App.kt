@@ -19,27 +19,15 @@ import com.messon.student.app.theme.MessonTheme
 
 @Composable
 fun App(
-    authSecureStorage: AuthSecureStorage,
-    authViewModel: AuthViewModel,
-    couponViewModel: CouponViewModel,
     googleAuth: GoogleAuth,
-    menuFetchVM: MenuFetchVM,
-    mealPlannerViewModel: MealPlannerViewModel,
-    complaintVM: ComplaintVM
 ) {
     val navController=rememberNavController()
     MessonTheme(
         darkTheme = isSystemInDarkTheme(),
         content = {
             AppNav(
-                navController=navController,
-                authViewModel = authViewModel,
-                authSecureStorage=authSecureStorage,
-                couponViewModel = couponViewModel,
+                navController = navController,
                 googleAuth = googleAuth,
-                menuFetchVM=menuFetchVM,
-                mealPlannerViewModel = mealPlannerViewModel,
-                complaintVM=complaintVM
             )
         }
     )

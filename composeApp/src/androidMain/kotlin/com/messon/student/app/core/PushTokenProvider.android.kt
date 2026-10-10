@@ -1,21 +1,21 @@
 package com.messon.student.app.core
 
-import android.content.Context
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.tasks.await
 
 
-actual class PushTokenProvider actual constructor() {
-    actual suspend fun getToken(): String? {
+class AndroidPushTokenProvider(
+    private val pushNotificationManager: PushNotificationManager
+) : PushTokenProvider {
+
+    override suspend fun getToken(): String? {
         return try {
-            FirebaseMessaging.getInstance().token.await()
+            pushNotificationManager.awaitToken()
         } catch (e: Exception) {
             null
         }
     }
 
-    actual fun observeTokenChanges(): Flow<String> {
-        return PushNotificationManager.tokenRefreshFlow
+    override fun observeTokenChanges(): Flow<String> {
+        return pushNotificationManager.observeTokenRefresh()
     }
 }

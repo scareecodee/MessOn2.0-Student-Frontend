@@ -29,11 +29,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil3.compose.AsyncImage
 import com.messon.student.app.domain.dataModels.User
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.intersemibold
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensansregular
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.intersemibold
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensansregular
 
 @Composable
 fun ProfileScreen(

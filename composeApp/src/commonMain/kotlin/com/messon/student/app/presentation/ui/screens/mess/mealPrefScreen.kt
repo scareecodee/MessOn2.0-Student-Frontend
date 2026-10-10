@@ -25,22 +25,19 @@ import androidx.constraintlayout.compose.Dimension
 import com.messon.student.app.domain.dataModels.DaySelection
 import com.messon.student.app.presentation.ui.components.PrefDaySelector
 import com.messon.student.app.presentation.ui.components.PrefMealCard
-import com.messon.student.app.presentation.ui.state.FetchMenuState
-import com.messon.student.app.presentation.viewmodel.MenuFetchVM
-import com.messon.student.app.utils.MealType
 import com.messon.student.app.utils.WeekDay
 import com.messon.student.app.utils.toDayMenuMap
-import messon.composeapp.generated.resources.Res
-import messon.composeapp.generated.resources.opensansmedium
-import messon.composeapp.generated.resources.opensansregular
-import messon.composeapp.generated.resources.opensanssemiBold
 import org.jetbrains.compose.resources.Font
+import com.messon.student.composeapp.generated.resources.opensanssemiBold
 import com.messon.student.app.domain.dataModels.DayModel
 import com.messon.student.app.presentation.ui.state.PrefSetupState
 import com.messon.student.app.presentation.ui.state.SavePrefState
 import com.messon.student.app.presentation.viewmodel.MealPlannerViewModel
 import com.messon.student.app.theme.MessonTheme
 import com.messon.student.app.utils.MealSlot
+import com.messon.student.composeapp.generated.resources.Res
+import com.messon.student.composeapp.generated.resources.opensansmedium
+import com.messon.student.composeapp.generated.resources.opensansregular
 import multiplatform.network.cmptoast.showToast
 
 data class MealMenu(val veg: String, val nonVeg: String)
