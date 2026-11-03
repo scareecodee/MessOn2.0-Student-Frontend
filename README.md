@@ -133,7 +133,15 @@ Key capabilities:
 
 File handling is implemented using FileKit.
 
-### 7. Push Notifications
+### 7. Meal Ratings & Feedback
+
+student can rate for individual meals.
+
+Understand student satisfaction with different meals.
+
+Use ratings to identify areas for improvement.
+
+### 8. Push Notifications
 
 Keeps students informed about important mess-related announcements through Firebase Cloud Messaging (FCM).
 
@@ -151,7 +159,7 @@ Key capabilities:
 - Synchronize device registration with the backend.
 - Support notification delivery through Firebase.
 
-### 8. Cross-Platform Development
+### 9. Cross-Platform Development
 
 Built using Compose Multiplatform, allowing shared Kotlin application logic and UI development across supported platforms.
 
