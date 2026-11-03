@@ -607,7 +607,7 @@ MessOn Student is one of three interconnected applications.
 |---|---|
 | **MessOn Student** | Student-facing application for meal coupons, preferences, menus, complaints, billing, and notifications. |
 | **MessOn Faculty** | Faculty administration for student management, mess managers, billing, holidays, complaints, and notifications. |
-| **MessOn Mess** | Mess-side application for operational activities, including meal coupon scanning and validation. |
+| **MessOn Admin** | Mess-side application for operational activities, including meal coupon scanning and validation. |
 | **MessOn Backend** | Centralized API, database, and notification infrastructure. |
 
 All applications communicate through a centralized backend to provide a unified digital mess management experience.
